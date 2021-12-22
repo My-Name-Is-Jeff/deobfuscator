@@ -27,6 +27,7 @@ import com.javadeobfuscator.deobfuscator.rules.normalizer.RuleSourceFileAttribut
 import com.javadeobfuscator.deobfuscator.rules.skidsuite2.RuleFakeException;
 import com.javadeobfuscator.deobfuscator.rules.smoke.RuleNumberObfuscation;
 import com.javadeobfuscator.deobfuscator.rules.special.RuleBisguardClassEncryption;
+import com.javadeobfuscator.deobfuscator.rules.special.RuleStringFlowObfuscator;
 import com.javadeobfuscator.deobfuscator.rules.special.RuleSuperblaubeereObfuscation;
 import com.javadeobfuscator.deobfuscator.rules.stringer.RuleHideAccess;
 import com.javadeobfuscator.deobfuscator.rules.stringer.RuleInvokedynamic1;
@@ -89,6 +90,9 @@ public class Rules {
 
             // Special
             new RuleBisguardClassEncryption(),
-            new RuleSuperblaubeereObfuscation()
+            new RuleSuperblaubeereObfuscation(),
+
+            // Custom
+            new RuleStringFlowObfuscator()
     );
 }
