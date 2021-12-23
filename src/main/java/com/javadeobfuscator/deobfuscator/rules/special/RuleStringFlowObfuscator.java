@@ -37,6 +37,15 @@ public class RuleStringFlowObfuscator implements Rule {
 							}
 						}
 					}
+					if (TransformerHelper.isInvokeStatic(insn, "java/util/Base64", "getDecoder", "()Ljava/util/Base64$Decoder;")) {
+						AbstractInsnNode next = Utils.getNext(insn);
+						if (TransformerHelper.isConstantString(next) && next.getNext() != null) {
+							next = Utils.getNext(next);
+							if (TransformerHelper.isInvokeVirtual(next, "java/util/Base64$Decoder", "decode", "(Ljava/lang/String;)[B")) {
+								return "Skids love to use Base64 in their programs";
+							}
+						}
+					}
 				}
 			}
 		}

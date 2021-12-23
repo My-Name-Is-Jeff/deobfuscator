@@ -14,11 +14,9 @@ import com.javadeobfuscator.deobfuscator.transformers.Transformer;
 import com.javadeobfuscator.deobfuscator.utils.TransformerHelper;
 import com.javadeobfuscator.deobfuscator.utils.Utils;
 import org.objectweb.asm.Type;
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.LdcInsnNode;
-import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.*;
 
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -82,6 +80,7 @@ public class StringFlowObfTransformer extends Transformer<StringFlowObfTransform
 
         System.out.println("[Special] [StringFlowObfTransformer] Starting");
         AtomicInteger stringReplacements = new AtomicInteger();
+        AtomicInteger base64 = new AtomicInteger();
 
         Set<String> erroredClasses = new HashSet<>();
         //Fold numbers
@@ -94,6 +93,25 @@ public class StringFlowObfTransformer extends Transformer<StringFlowObfTransform
                     boolean modified;
                     do {
                         modified = false;
+                        Base64.Decoder b64 = Base64.getDecoder();
+                        for (AbstractInsnNode insn : method.instructions.toArray()) {
+                            if (TransformerHelper.isInvokeStatic(insn, "java/util/Base64", "getDecoder", "()Ljava/util/Base64$Decoder;")) {
+                                AbstractInsnNode next = Utils.getNext(insn);
+                                if (TransformerHelper.isConstantString(next) && next.getNext() != null) {
+                                    String base64String = TransformerHelper.getConstantString(next);
+                                    next = Utils.getNext(next);
+                                    if (TransformerHelper.isInvokeVirtual(next, "java/util/Base64$Decoder", "decode", "(Ljava/lang/String;)[B")) {
+                                        method.instructions.remove(Utils.getNext(insn, 2));
+                                        method.instructions.remove(Utils.getNext(insn));
+                                        method.instructions.insertBefore(insn, new LdcInsnNode(new String(b64.decode(base64String))));
+                                        method.instructions.insert(insn, new MethodInsnNode(INVOKEVIRTUAL, "java/lang/String", "getBytes", "()[B", false));
+                                        method.instructions.remove(insn);
+                                        base64.incrementAndGet();
+                                        modified = true;
+                                    }
+                                }
+                            }
+                        }
                         for (AbstractInsnNode insn : method.instructions.toArray()) {
                             if (TransformerHelper.isConstantString(insn) && insn.getNext() != null) {
                                 AbstractInsnNode next = Utils.getNext(insn);
@@ -128,6 +146,7 @@ public class StringFlowObfTransformer extends Transformer<StringFlowObfTransform
             }
         }
         System.out.println("[Special] [StringFlowObfTransformer] Undid " + stringReplacements + " string replace instructions");
+        System.out.println("[Special] [StringFlowObfTransformer] Undid " + base64 + " base64 instructions");
         if (!erroredClasses.isEmpty()) {
             System.out.println("[Special] [StringFlowObfTransformer] Errors occurred during decryption of " + erroredClasses.size() + " classes:");
             for (String erroredClass : erroredClasses) {
