@@ -36,6 +36,9 @@ public class RuleStringFlowObfuscator implements Rule {
 								}
 							}
 						}
+						if (TransformerHelper.isInvokeVirtual(next, "org/apache/commons/codec/binary/Base32", "decode", "(Ljava/lang/String;)[B")) {
+							return "Some skids use base32 in their programs";
+						}
 					}
 					if (TransformerHelper.isInvokeStatic(insn, "java/util/Base64", "getDecoder", "()Ljava/util/Base64$Decoder;")) {
 						AbstractInsnNode next = Utils.getNext(insn);

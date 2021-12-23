@@ -1,5 +1,6 @@
 package com.javadeobfuscator.deobfuscator.transformers.special;
 
+import com.google.common.io.BaseEncoding;
 import com.javadeobfuscator.deobfuscator.config.TransformerConfig;
 import com.javadeobfuscator.deobfuscator.executor.Context;
 import com.javadeobfuscator.deobfuscator.executor.defined.JVMMethodProvider;
@@ -81,6 +82,7 @@ public class StringFlowObfTransformer extends Transformer<StringFlowObfTransform
         System.out.println("[Special] [StringFlowObfTransformer] Starting");
         AtomicInteger stringReplacements = new AtomicInteger();
         AtomicInteger base64 = new AtomicInteger();
+        AtomicInteger base32 = new AtomicInteger();
 
         Set<String> erroredClasses = new HashSet<>();
         //Fold numbers
@@ -94,6 +96,7 @@ public class StringFlowObfTransformer extends Transformer<StringFlowObfTransform
                     do {
                         modified = false;
                         Base64.Decoder b64 = Base64.getDecoder();
+                        BaseEncoding b32 = BaseEncoding.base32();
                         for (AbstractInsnNode insn : method.instructions.toArray()) {
                             if (TransformerHelper.isInvokeStatic(insn, "java/util/Base64", "getDecoder", "()Ljava/util/Base64$Decoder;")) {
                                 AbstractInsnNode next = Utils.getNext(insn);
@@ -111,10 +114,29 @@ public class StringFlowObfTransformer extends Transformer<StringFlowObfTransform
                                     }
                                 }
                             }
-                        }
-                        for (AbstractInsnNode insn : method.instructions.toArray()) {
                             if (TransformerHelper.isConstantString(insn) && insn.getNext() != null) {
                                 AbstractInsnNode next = Utils.getNext(insn);
+                                AbstractInsnNode prev = Utils.getPrevious(insn);
+                                if (TransformerHelper.isInvokeVirtual(next, "org/apache/commons/codec/binary/Base32", "decode", "(Ljava/lang/String;)[B")) {
+                                    method.instructions.remove(next);
+                                    if (prev.getOpcode() == ALOAD || prev.getOpcode() == GETFIELD) method.instructions.remove(prev);
+                                    else method.instructions.insertBefore(insn, new InsnNode(POP));
+                                    method.instructions.insertBefore(insn, new LdcInsnNode(new String(b32.decode(TransformerHelper.getConstantString(insn)))));
+                                    method.instructions.insert(insn, new MethodInsnNode(INVOKEVIRTUAL, "java/lang/String", "getBytes", "()[B", false));
+                                    method.instructions.remove(insn);
+                                    base32.incrementAndGet();
+                                    modified = true;
+                                }
+                                if (TransformerHelper.isInvokeVirtual(next, "java/lang/String", "getBytes", null) && TransformerHelper.isInvokeVirtual(Utils.getNext(next), "org/apache/commons/codec/binary/Base32", "decode", "([B)[B")) {
+                                    method.instructions.remove(Utils.getNext(next));
+                                    method.instructions.remove(next);
+                                    if (prev.getOpcode() == ALOAD || prev.getOpcode() == GETFIELD) method.instructions.remove(prev);
+                                    method.instructions.insertBefore(insn, new LdcInsnNode(new String(b32.decode(TransformerHelper.getConstantString(insn)))));
+                                    method.instructions.insert(insn, new MethodInsnNode(INVOKEVIRTUAL, "java/lang/String", "getBytes", "()[B", false));
+                                    method.instructions.remove(insn);
+                                    base32.incrementAndGet();
+                                    modified = true;
+                                }
                                 if (TransformerHelper.isConstantString(next) && next.getNext() != null) {
                                     LdcInsnNode replacing = (LdcInsnNode) next;
                                     next = Utils.getNext(next);
@@ -137,6 +159,35 @@ public class StringFlowObfTransformer extends Transformer<StringFlowObfTransform
                                     }
                                 }
                             }
+                            if (insn instanceof TypeInsnNode && insn.getOpcode() == NEW && ((TypeInsnNode) insn).desc.equals("java/lang/String")) {
+                                AbstractInsnNode next = Utils.getNext(insn);
+                                if (next != null && next.getOpcode() == DUP) {
+                                    next = Utils.getNext(next);
+                                    if (TransformerHelper.isConstantString(next)) {
+                                        String value = TransformerHelper.getConstantString(next);
+                                        next = Utils.getNext(next);
+                                        if (TransformerHelper.isInvokeVirtual(next, "java/lang/String", "getBytes", null)) {
+                                            next = Utils.getNext(next);
+                                            if (TransformerHelper.isInvokeSpecial(next, "java/lang/String", "<init>", "([B)V")) {
+                                                method.instructions.insertBefore(insn, new LdcInsnNode(value));
+                                                method.instructions.remove(Utils.getNext(insn, 4));
+                                                method.instructions.remove(Utils.getNext(insn, 3));
+                                                method.instructions.remove(Utils.getNext(insn, 2));
+                                                method.instructions.remove(Utils.getNext(insn));
+                                                method.instructions.remove(insn);
+                                                modified = true;
+                                            }
+                                        } else if (TransformerHelper.isInvokeSpecial(next, "java/lang/String", "<init>", "(Ljava/lang/String;)V")) {
+                                            method.instructions.insertBefore(insn, new LdcInsnNode(value));
+                                            method.instructions.remove(Utils.getNext(insn, 3));
+                                            method.instructions.remove(Utils.getNext(insn, 2));
+                                            method.instructions.remove(Utils.getNext(insn));
+                                            method.instructions.remove(insn);
+                                            modified = true;
+                                        }
+                                    }
+                                }
+                            }
                         }
                     } while (modified);
                 }
@@ -147,6 +198,7 @@ public class StringFlowObfTransformer extends Transformer<StringFlowObfTransform
         }
         System.out.println("[Special] [StringFlowObfTransformer] Undid " + stringReplacements + " string replace instructions");
         System.out.println("[Special] [StringFlowObfTransformer] Undid " + base64 + " base64 instructions");
+        System.out.println("[Special] [StringFlowObfTransformer] Undid " + base32 + " base32 instructions");
         if (!erroredClasses.isEmpty()) {
             System.out.println("[Special] [StringFlowObfTransformer] Errors occurred during decryption of " + erroredClasses.size() + " classes:");
             for (String erroredClass : erroredClasses) {
