@@ -19,6 +19,7 @@ import org.objectweb.asm.tree.*;
 
 import java.util.Base64;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -140,7 +141,17 @@ public class StringFlowObfTransformer extends Transformer<StringFlowObfTransform
                                 if (TransformerHelper.isConstantString(next) && next.getNext() != null) {
                                     LdcInsnNode replacing = (LdcInsnNode) next;
                                     next = Utils.getNext(next);
-                                    if (TransformerHelper.isConstantString(next) && next.getNext() != null) {
+                                    if (TransformerHelper.isInvokeVirtual(next, "java/lang/String", "replace", "(Ljava/lang/CharSequence;Ljava/lang/CharSequence;)Ljava/lang/String;")) {
+                                        String junk = TransformerHelper.getConstantString(insn);
+                                        String junk1 = TransformerHelper.getConstantString(replacing);
+                                        if (Objects.equals(junk, junk1)) {
+                                            method.instructions.remove(insn);
+                                            method.instructions.remove(replacing);
+                                            method.instructions.remove(next);
+                                            stringReplacements.incrementAndGet();
+                                            modified = true;
+                                        }
+                                    } else if (TransformerHelper.isConstantString(next) && next.getNext() != null) {
                                         LdcInsnNode replaced = (LdcInsnNode) next;
                                         next = Utils.getNext(next);
                                         if (TransformerHelper.isInvokeVirtual(next, "java/lang/String", "replace", "(Ljava/lang/CharSequence;Ljava/lang/CharSequence;)Ljava/lang/String;")) {

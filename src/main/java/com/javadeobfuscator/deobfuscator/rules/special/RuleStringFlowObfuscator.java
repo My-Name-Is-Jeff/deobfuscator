@@ -12,6 +12,7 @@ import org.objectweb.asm.tree.MethodNode;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Objects;
 
 public class RuleStringFlowObfuscator implements Rule {
 
@@ -29,6 +30,9 @@ public class RuleStringFlowObfuscator implements Rule {
 						AbstractInsnNode next = Utils.getNext(insn);
 						if (TransformerHelper.isConstantString(next) && next.getNext() != null) {
 							next = Utils.getNext(next);
+							if (TransformerHelper.isInvokeVirtual(next, "java/lang/String", "replace", "(Ljava/lang/CharSequence;Ljava/lang/CharSequence;)Ljava/lang/String;") && Objects.equals(TransformerHelper.getConstantString(insn), "") && Objects.equals(TransformerHelper.getConstantString(Utils.getNext(insn)), "")) {
+								return "Skids like to use dumb stuff like replacing empty strings";
+							}
 							if (TransformerHelper.isConstantString(next) && next.getNext() != null) {
 								next = Utils.getNext(next);
 								if (TransformerHelper.isInvokeVirtual(next, "java/lang/String", "replace", "(Ljava/lang/CharSequence;Ljava/lang/CharSequence;)Ljava/lang/String;")) {
