@@ -32,20 +32,20 @@ import com.javadeobfuscator.deobfuscator.transformers.Transformer;
 public class IllegalTypeAnnotationRemover extends Transformer<TransformerConfig> {
     @Override
     public boolean transform() throws Throwable {
-    	CheckClassAdapter classAdapter = new CheckClassAdapter(null);
-    	CheckMethodAdapter methodAdapter = new CheckMethodAdapter(null);
-    	CheckFieldAdapter fieldAdapter = new CheckFieldAdapter(null);
-    	classAdapter.visit(Opcodes.V1_5, 0, "java/lang/Object", null, null, null);
+        CheckClassAdapter classAdapter = new CheckClassAdapter(null);
+        CheckMethodAdapter methodAdapter = new CheckMethodAdapter(null);
+        CheckFieldAdapter fieldAdapter = new CheckFieldAdapter(null);
+        classAdapter.visit(Opcodes.V1_5, 0, "java/lang/Object", null, null, null);
         classNodes().forEach(classNode -> {
-        	removeInvalidTypeAnnotations(classAdapter, classNode.invisibleTypeAnnotations, false);
-        	removeInvalidTypeAnnotations(classAdapter, classNode.visibleTypeAnnotations, true);
+            removeInvalidTypeAnnotations(classAdapter, classNode.invisibleTypeAnnotations, false);
+            removeInvalidTypeAnnotations(classAdapter, classNode.visibleTypeAnnotations, true);
             classNode.methods.forEach(methodNode -> {
-            	removeInvalidTypeAnnotations(methodAdapter, methodNode.invisibleTypeAnnotations, false);
-            	removeInvalidTypeAnnotations(methodAdapter, methodNode.visibleTypeAnnotations, true);
+                removeInvalidTypeAnnotations(methodAdapter, methodNode.invisibleTypeAnnotations, false);
+                removeInvalidTypeAnnotations(methodAdapter, methodNode.visibleTypeAnnotations, true);
             });
             classNode.fields.forEach(fieldNode -> {
-            	removeInvalidTypeAnnotations(fieldAdapter, fieldNode.invisibleTypeAnnotations, false);
-            	removeInvalidTypeAnnotations(fieldAdapter, fieldNode.visibleTypeAnnotations, true);
+                removeInvalidTypeAnnotations(fieldAdapter, fieldNode.invisibleTypeAnnotations, false);
+                removeInvalidTypeAnnotations(fieldAdapter, fieldNode.visibleTypeAnnotations, true);
             });
         });
         return true;
@@ -53,22 +53,22 @@ public class IllegalTypeAnnotationRemover extends Transformer<TransformerConfig>
     
     private void removeInvalidTypeAnnotations(Object visitor, List<TypeAnnotationNode> typeAnnots, boolean visible)
     {
-    	if(typeAnnots == null)
-    		return;
-    	Iterator<TypeAnnotationNode> itr = typeAnnots.iterator();
-    	while(itr.hasNext())
-    	{
-    		TypeAnnotationNode type = itr.next();
+        if(typeAnnots == null)
+            return;
+        Iterator<TypeAnnotationNode> itr = typeAnnots.iterator();
+        while(itr.hasNext())
+        {
+            TypeAnnotationNode type = itr.next();
             try {
-            	if(visitor instanceof CheckClassAdapter)
-            		((CheckClassAdapter)visitor).visitTypeAnnotation(type.typeRef, type.typePath, type.desc, visible);
-            	else if(visitor instanceof CheckMethodAdapter)
-            		((CheckMethodAdapter)visitor).visitTypeAnnotation(type.typeRef, type.typePath, type.desc, visible);
-            	else
-            		((CheckFieldAdapter)visitor).visitTypeAnnotation(type.typeRef, type.typePath, type.desc, visible);
+                if(visitor instanceof CheckClassAdapter)
+                    ((CheckClassAdapter)visitor).visitTypeAnnotation(type.typeRef, type.typePath, type.desc, visible);
+                else if(visitor instanceof CheckMethodAdapter)
+                    ((CheckMethodAdapter)visitor).visitTypeAnnotation(type.typeRef, type.typePath, type.desc, visible);
+                else
+                    ((CheckFieldAdapter)visitor).visitTypeAnnotation(type.typeRef, type.typePath, type.desc, visible);
             } catch (IllegalArgumentException | IllegalStateException ignored) {
                 itr.remove();
             }
-    	}
+        }
     }
 }

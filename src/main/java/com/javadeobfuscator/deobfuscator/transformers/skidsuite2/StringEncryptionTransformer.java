@@ -50,7 +50,7 @@ public class StringEncryptionTransformer extends Transformer<TransformerConfig> 
         provider.register(new JVMComparisonProvider());
 
         classNodes().forEach(classNode -> {
-        	Set<MethodNode> stringDecrypt = new HashSet<>();
+            Set<MethodNode> stringDecrypt = new HashSet<>();
             classNode.methods.forEach(methodNode -> {
                 AnalyzerResult result = MethodAnalyzer.analyze(classNode, methodNode);
 
@@ -138,7 +138,7 @@ public class StringEncryptionTransformer extends Transformer<TransformerConfig> 
                 });
             });
             stringDecrypt.forEach(m -> {
-            	classNode.methods.remove(m);
+                classNode.methods.remove(m);
             });
         });
 

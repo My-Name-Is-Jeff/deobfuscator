@@ -27,7 +27,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 public class RuleSourceFileAttribute implements Rule {
-	private static final Pattern fileEndingPattern = Pattern.compile("\\.\\w{1,10}$");
+    private static final Pattern fileEndingPattern = Pattern.compile("\\.\\w{1,10}$");
 
     @Override
     public String getDescription() {
@@ -60,21 +60,21 @@ public class RuleSourceFileAttribute implements Rule {
                 continue;
             }
 
-			if (similar(sourceFile, TransformerHelper.getOuterClassName(classNode.name))) {
-				continue;
-			}
+            if (similar(sourceFile, TransformerHelper.getOuterClassName(classNode.name))) {
+                continue;
+            }
 
-			if (similar(sourceFile, TransformerHelper.getMostOuterClassName(classNode.name))) {
-				continue;
-			}
+            if (similar(sourceFile, TransformerHelper.getMostOuterClassName(classNode.name))) {
+                continue;
+            }
 
             if (similar(sourceFile, TransformerHelper.getInnerClassName(classNode.name))) {
                 continue;
             }
 
-			if (similar(sourceFile, TransformerHelper.getInnerClassName(TransformerHelper.getOuterClassName(classNode.name)))) {
-				continue;
-			}
+            if (similar(sourceFile, TransformerHelper.getInnerClassName(TransformerHelper.getOuterClassName(classNode.name)))) {
+                continue;
+            }
 
             return "Found possible SourceFile attribute on " + classNode.name + ": " + classNode.sourceFile;
         }

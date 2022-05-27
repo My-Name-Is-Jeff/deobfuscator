@@ -13,10 +13,10 @@ public class LocalFrame extends Frame {
     }
     
     public int getLocal() {
-    	return local;
+        return local;
     }
     
     public Frame getValue() {
-    	return value;
+        return value;
     }
 }

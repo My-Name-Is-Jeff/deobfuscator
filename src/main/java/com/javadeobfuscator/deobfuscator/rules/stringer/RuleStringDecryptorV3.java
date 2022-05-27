@@ -74,6 +74,6 @@ public class RuleStringDecryptorV3 implements Rule {
     @Override
     public Collection<Class<? extends Transformer<?>>> getRecommendTransformers() {
         return Arrays.asList(StringEncryptionTransformer.class,
-        	com.javadeobfuscator.deobfuscator.transformers.stringer.v9.StringEncryptionTransformer.class);
+            com.javadeobfuscator.deobfuscator.transformers.stringer.v9.StringEncryptionTransformer.class);
     }
 }

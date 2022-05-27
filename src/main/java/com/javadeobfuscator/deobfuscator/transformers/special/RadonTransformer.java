@@ -243,7 +243,7 @@ public class RadonTransformer extends Transformer<RadonConfig> {
                 }
                 FieldNode fNode = owner.fields.stream().filter(f -> f.name.equals(fn.name) && f.desc.equals(fn.desc)).findFirst().orElse(null);
                 if(fakeFields.containsKey(owner))
-                	fakeFields.get(owner).remove(fNode);
+                    fakeFields.get(owner).remove(fNode);
             }
         }));
         fakeFields.entrySet().forEach(e -> e.getValue().forEach(f -> e.getKey().fields.remove(f)));

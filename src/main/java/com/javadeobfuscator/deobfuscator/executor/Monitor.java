@@ -11,7 +11,7 @@ public class Monitor {
     private final Map<Thread, AtomicInteger> counters = new HashMap<>();
 
     public void enter(Object obj) {
-    	if (((JavaValue)obj).value() == null) throw new NullPointerException();
+        if (((JavaValue)obj).value() == null) throw new NullPointerException();
 
         while (true) {
             synchronized (locks) {
@@ -37,7 +37,7 @@ public class Monitor {
     }
 
     public void exit(Object obj) {
-    	if (((JavaValue)obj).value() == null) throw new NullPointerException();
+        if (((JavaValue)obj).value() == null) throw new NullPointerException();
 
         boolean notify = false;
         Thread current = Thread.currentThread();

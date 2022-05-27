@@ -213,42 +213,42 @@ public class JavaClass {
         JavaClass clazz = this;
         while(true)
         {
-        	List<MethodNode> possibleMethods = new ArrayList<>();
-	        for (MethodNode methodNode : clazz.classNode.methods) {
-	        	if(!methodNode.name.startsWith("<") && Modifier.isPublic(methodNode.access))
-	        		possibleMethods.add(methodNode);
-	        }
-	        possibleMethods = possibleMethods.stream().filter(methodNode -> methodNode.name.equals(name) && methodNode.desc.startsWith(desc)).collect(Collectors.toList());
-	        if (possibleMethods.size() > 1) {
-	            List<Type> returnTypes = new ArrayList<>();
-	            for (MethodNode m : possibleMethods) {
-	                returnTypes.add(Type.getReturnType(m.desc));
-	            }
-	            Collections.sort(returnTypes, (o1, o2) -> {
-	                String s1 = o1.getInternalName();
-	                String s2 = o2.getInternalName();
-	                if (isAssignableFrom(s1, s2)) {
-	                    return 1;
-	                } else if (isAssignableFrom(s2, s1)) {
-	                    return -1;
-	                }
-	                return 0;
-	            });
-	            MethodNode target = possibleMethods.stream().filter(mn -> mn.desc.endsWith(returnTypes.get(0).getDescriptor())).findFirst().orElse(null);
-	            return new JavaMethod(clazz, target);
-	        } else if (possibleMethods.size() == 1) {
-	            return new JavaMethod(clazz, possibleMethods.get(0));
-	        }
-	        if(clazz.classNode.superName == null)
-	        	break;
-	        clazz = new JavaClass(clazz.classNode.superName, context);
+            List<MethodNode> possibleMethods = new ArrayList<>();
+            for (MethodNode methodNode : clazz.classNode.methods) {
+                if(!methodNode.name.startsWith("<") && Modifier.isPublic(methodNode.access))
+                    possibleMethods.add(methodNode);
+            }
+            possibleMethods = possibleMethods.stream().filter(methodNode -> methodNode.name.equals(name) && methodNode.desc.startsWith(desc)).collect(Collectors.toList());
+            if (possibleMethods.size() > 1) {
+                List<Type> returnTypes = new ArrayList<>();
+                for (MethodNode m : possibleMethods) {
+                    returnTypes.add(Type.getReturnType(m.desc));
+                }
+                Collections.sort(returnTypes, (o1, o2) -> {
+                    String s1 = o1.getInternalName();
+                    String s2 = o2.getInternalName();
+                    if (isAssignableFrom(s1, s2)) {
+                        return 1;
+                    } else if (isAssignableFrom(s2, s1)) {
+                        return -1;
+                    }
+                    return 0;
+                });
+                MethodNode target = possibleMethods.stream().filter(mn -> mn.desc.endsWith(returnTypes.get(0).getDescriptor())).findFirst().orElse(null);
+                return new JavaMethod(clazz, target);
+            } else if (possibleMethods.size() == 1) {
+                return new JavaMethod(clazz, possibleMethods.get(0));
+            }
+            if(clazz.classNode.superName == null)
+                break;
+            clazz = new JavaClass(clazz.classNode.superName, context);
         }
-    	for(String superItf : classNode.interfaces)
-    	{
-    		JavaMethod method = new JavaClass(superItf, context).getMethod0(name, params);
-    		if(method != null)
-    			return method;
-    	}
+        for(String superItf : classNode.interfaces)
+        {
+            JavaMethod method = new JavaClass(superItf, context).getMethod0(name, params);
+            if(method != null)
+                return method;
+        }
         Utils.sneakyThrow(new NoSuchMethodException(this.name + " " + name + desc));
         return null;
     }
@@ -263,11 +263,11 @@ public class JavaClass {
         String desc = descBuilder.toString();
 
         List<MethodNode> possibleMethods = new ArrayList<>();
-    	for (MethodNode methodNode : this.classNode.methods)
-        	if(!methodNode.name.startsWith("<") && Modifier.isPublic(methodNode.access)
-        		&& !Modifier.isStatic(methodNode.access))
-        		possibleMethods.add(methodNode);
-    	possibleMethods = possibleMethods.stream().filter(methodNode -> methodNode.name.equals(name) && methodNode.desc.startsWith(desc)).collect(Collectors.toList());
+        for (MethodNode methodNode : this.classNode.methods)
+            if(!methodNode.name.startsWith("<") && Modifier.isPublic(methodNode.access)
+                && !Modifier.isStatic(methodNode.access))
+                possibleMethods.add(methodNode);
+        possibleMethods = possibleMethods.stream().filter(methodNode -> methodNode.name.equals(name) && methodNode.desc.startsWith(desc)).collect(Collectors.toList());
         if (possibleMethods.size() > 1) {
             List<Type> returnTypes = new ArrayList<>();
             for (MethodNode m : possibleMethods) {
@@ -288,13 +288,13 @@ public class JavaClass {
         } else if (possibleMethods.size() == 1) {
             return new JavaMethod(this, possibleMethods.get(0));
         }
-    	for(String superItf : classNode.interfaces)
-    	{
-    		JavaMethod method = new JavaClass(superItf, context).getMethod0(name, params);
-    		if(method != null)
-    			return method;
-    	}
-    	return null;
+        for(String superItf : classNode.interfaces)
+        {
+            JavaMethod method = new JavaClass(superItf, context).getMethod0(name, params);
+            if(method != null)
+                return method;
+        }
+        return null;
     }
     
     public Type getType() {
@@ -320,65 +320,65 @@ public class JavaClass {
         JavaClass clazz = this;
         while(true)
         {
-        	for (MethodNode methodNode : clazz.classNode.methods) {
-        		if(!methodNode.name.startsWith("<") && Modifier.isPublic(methodNode.access))
-        		{
-        			boolean duplicate = false;
-        			for(JavaMethod jm : methods)
-        				if(jm.getName().equals(methodNode.name) && jm.getDesc().equals(methodNode.desc))
-        				{
-        					duplicate = true;
-        					break;
-        				}
-        			if(!duplicate)
-        				methods.add(new JavaMethod(clazz, methodNode));
-        		}
-        	}
-        	if(clazz.classNode.superName == null)
-        		break;
-        	clazz = new JavaClass(clazz.classNode.superName, context);
+            for (MethodNode methodNode : clazz.classNode.methods) {
+                if(!methodNode.name.startsWith("<") && Modifier.isPublic(methodNode.access))
+                {
+                    boolean duplicate = false;
+                    for(JavaMethod jm : methods)
+                        if(jm.getName().equals(methodNode.name) && jm.getDesc().equals(methodNode.desc))
+                        {
+                            duplicate = true;
+                            break;
+                        }
+                    if(!duplicate)
+                        methods.add(new JavaMethod(clazz, methodNode));
+                }
+            }
+            if(clazz.classNode.superName == null)
+                break;
+            clazz = new JavaClass(clazz.classNode.superName, context);
         }
-    	for(String superItf : classNode.interfaces)
-    		new JavaClass(superItf, context).getMethods0(methods);
+        for(String superItf : classNode.interfaces)
+            new JavaClass(superItf, context).getMethods0(methods);
         return methods.toArray(new JavaMethod[methods.size()]);
     }
     
     private void getMethods0(List<JavaMethod> methods)
     {
-    	for (MethodNode methodNode : this.classNode.methods)
-        	if(!methodNode.name.startsWith("<") && Modifier.isPublic(methodNode.access)
-        		&& !Modifier.isStatic(methodNode.access))
-        	{
-    			boolean duplicate = false;
-    			for(JavaMethod jm : methods)
-    				if(jm.getName().equals(methodNode.name) && jm.getDesc().equals(methodNode.desc))
-    				{
-    					duplicate = true;
-    					break;
-    				}
-    			if(!duplicate)
-        		methods.add(new JavaMethod(this, methodNode));
-        	}
-    	for(String superItf : classNode.interfaces)
-    		new JavaClass(superItf, context).getMethods0(methods);
+        for (MethodNode methodNode : this.classNode.methods)
+            if(!methodNode.name.startsWith("<") && Modifier.isPublic(methodNode.access)
+                && !Modifier.isStatic(methodNode.access))
+            {
+                boolean duplicate = false;
+                for(JavaMethod jm : methods)
+                    if(jm.getName().equals(methodNode.name) && jm.getDesc().equals(methodNode.desc))
+                    {
+                        duplicate = true;
+                        break;
+                    }
+                if(!duplicate)
+                methods.add(new JavaMethod(this, methodNode));
+            }
+        for(String superItf : classNode.interfaces)
+            new JavaClass(superItf, context).getMethods0(methods);
     }
     
     public JavaConstructor[] getDeclaredConstructors()
     {
-    	List<JavaConstructor> methods = new ArrayList<>();
-    	for(MethodNode methodNode : classNode.methods)
-    		if(methodNode.name.equals("<init>"))
-    			methods.add(new JavaConstructor(this, methodNode.desc));
-    	return methods.toArray(new JavaConstructor[methods.size()]);
+        List<JavaConstructor> methods = new ArrayList<>();
+        for(MethodNode methodNode : classNode.methods)
+            if(methodNode.name.equals("<init>"))
+                methods.add(new JavaConstructor(this, methodNode.desc));
+        return methods.toArray(new JavaConstructor[methods.size()]);
     }
     
     public JavaConstructor[] getConstructors()
     {
-    	List<JavaConstructor> methods = new ArrayList<>();
-    	for(MethodNode methodNode : classNode.methods)
-    		if(methodNode.name.equals("<init>") && Modifier.isPublic(methodNode.access))
-    			methods.add(new JavaConstructor(this, methodNode.desc));
-    	return methods.toArray(new JavaConstructor[methods.size()]);
+        List<JavaConstructor> methods = new ArrayList<>();
+        for(MethodNode methodNode : classNode.methods)
+            if(methodNode.name.equals("<init>") && Modifier.isPublic(methodNode.access))
+                methods.add(new JavaConstructor(this, methodNode.desc));
+        return methods.toArray(new JavaConstructor[methods.size()]);
     }
     
     public JavaConstructor getDeclaredConstructor(JavaClass[] clazz) {
@@ -426,34 +426,34 @@ public class JavaClass {
     
     public JavaField[] getFields() {
         List<JavaField> fields = new ArrayList<>();
-    	for (FieldNode fieldNode : classNode.fields) {
-    		if(Modifier.isPublic(fieldNode.access))
-    			fields.add(new JavaField(this, fieldNode));
-    	}
-    	for(String superItf : classNode.interfaces)
-    		new JavaClass(superItf, context).getFields0(fields);
+        for (FieldNode fieldNode : classNode.fields) {
+            if(Modifier.isPublic(fieldNode.access))
+                fields.add(new JavaField(this, fieldNode));
+        }
+        for(String superItf : classNode.interfaces)
+            new JavaClass(superItf, context).getFields0(fields);
         JavaClass clazz = this;
         while(true)
         {
-        	if(clazz.classNode.superName == null)
-        		break;
-        	clazz = new JavaClass(clazz.classNode.superName, context);
-        	for (FieldNode fieldNode : clazz.classNode.fields) {
-        		if(Modifier.isPublic(fieldNode.access))
-        			fields.add(new JavaField(clazz, fieldNode));
-        	}
+            if(clazz.classNode.superName == null)
+                break;
+            clazz = new JavaClass(clazz.classNode.superName, context);
+            for (FieldNode fieldNode : clazz.classNode.fields) {
+                if(Modifier.isPublic(fieldNode.access))
+                    fields.add(new JavaField(clazz, fieldNode));
+            }
         }
         return fields.toArray(new JavaField[fields.size()]);
     }
     
     private void getFields0(List<JavaField> fields)
     {
-    	for (FieldNode fieldNode : this.classNode.fields) {
-        	if(Modifier.isPublic(fieldNode.access))
-        		fields.add(new JavaField(this, fieldNode));
+        for (FieldNode fieldNode : this.classNode.fields) {
+            if(Modifier.isPublic(fieldNode.access))
+                fields.add(new JavaField(this, fieldNode));
         }
-    	for(String superItf : classNode.interfaces)
-    		new JavaClass(superItf, context).getFields0(fields);
+        for(String superItf : classNode.interfaces)
+            new JavaClass(superItf, context).getFields0(fields);
     }
     
     public JavaField getDeclaredField(String fieldName) {
@@ -467,24 +467,24 @@ public class JavaClass {
 
     public JavaField getField(String fieldName) {
         for (FieldNode fieldNode : this.classNode.fields) {
-        	if(Modifier.isPublic(fieldNode.access) && fieldNode.name.equals(fieldName))
-        		return new JavaField(this, fieldNode);
+            if(Modifier.isPublic(fieldNode.access) && fieldNode.name.equals(fieldName))
+                return new JavaField(this, fieldNode);
         }
-    	for(String superItf : classNode.interfaces) {
-    		JavaField field = new JavaClass(superItf, context).getField0(fieldName);
-    		if(field != null)
-    			return field;
-    	}
+        for(String superItf : classNode.interfaces) {
+            JavaField field = new JavaClass(superItf, context).getField0(fieldName);
+            if(field != null)
+                return field;
+        }
         JavaClass clazz = this;
         while(true)
         {
-	        if(clazz.classNode.superName == null)
-	        	break;
-	        clazz = new JavaClass(clazz.classNode.superName, context);
-	        for (FieldNode fieldNode : clazz.classNode.fields) {
-	        	if(Modifier.isPublic(fieldNode.access) && fieldNode.name.equals(fieldName))
-	        		return new JavaField(clazz, fieldNode);
-	        }
+            if(clazz.classNode.superName == null)
+                break;
+            clazz = new JavaClass(clazz.classNode.superName, context);
+            for (FieldNode fieldNode : clazz.classNode.fields) {
+                if(Modifier.isPublic(fieldNode.access) && fieldNode.name.equals(fieldName))
+                    return new JavaField(clazz, fieldNode);
+            }
         }
         Utils.sneakyThrow(new NoSuchFieldException(fieldName));
         return null;
@@ -492,16 +492,16 @@ public class JavaClass {
     
     private JavaField getField0(String fieldName)
     {
-    	for (FieldNode fieldNode : this.classNode.fields) {
-        	if(Modifier.isPublic(fieldNode.access) && fieldNode.name.equals(fieldName))
-        		return new JavaField(this, fieldNode);
+        for (FieldNode fieldNode : this.classNode.fields) {
+            if(Modifier.isPublic(fieldNode.access) && fieldNode.name.equals(fieldName))
+                return new JavaField(this, fieldNode);
         }
-    	for(String superItf : classNode.interfaces) {
-    		JavaField field = new JavaClass(superItf, context).getField0(fieldName);
-    		if(field != null)
-    			return field;
-    	}
-    	return null;
+        for(String superItf : classNode.interfaces) {
+            JavaField field = new JavaClass(superItf, context).getField0(fieldName);
+            if(field != null)
+                return field;
+        }
+        return null;
     }
     
     public JavaClass getSuperclass() {

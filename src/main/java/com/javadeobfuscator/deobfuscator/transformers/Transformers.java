@@ -44,7 +44,7 @@ public class Transformers {
     }
     
     public static class Smoke {
-    	public static final Class<? extends Transformer> STRING_ENCRYPTION = com.javadeobfuscator.deobfuscator.transformers.smoke.StringEncryptionTransformer.class;
+        public static final Class<? extends Transformer> STRING_ENCRYPTION = com.javadeobfuscator.deobfuscator.transformers.smoke.StringEncryptionTransformer.class;
         public static final Class<? extends Transformer> NUMBER_OBFUSCATION = com.javadeobfuscator.deobfuscator.transformers.smoke.NumberObfuscationTransformer.class;
         public static final Class<? extends Transformer> ILLEGAL_VARIABLE = com.javadeobfuscator.deobfuscator.transformers.smoke.IllegalVariableTransformer.class;
     }

@@ -66,7 +66,7 @@ public class RuleMethodParameterChangeStringEncryption implements Rule, Opcodes 
 
             if (isMPC) {
                 return "Found potential method parameter changed string encrypted class " + classNode.name + " without DES cipher"
-                	+ (containsLookup ? " (lookup found)" : " (lookup not found)");
+                    + (containsLookup ? " (lookup found)" : " (lookup not found)");
             }
         }
         
@@ -91,7 +91,7 @@ public class RuleMethodParameterChangeStringEncryption implements Rule, Opcodes 
 
             if (isMPC) {
                 return "Found potential method parameter changed string encrypted class " + classNode.name + " using DES cipher"
-                	+ (containsLookup ? " (lookup found)" : " (lookup not found)");
+                    + (containsLookup ? " (lookup found)" : " (lookup not found)");
             }
         }
 

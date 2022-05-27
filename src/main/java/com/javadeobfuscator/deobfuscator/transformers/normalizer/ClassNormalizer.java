@@ -26,13 +26,13 @@ public class ClassNormalizer extends AbstractNormalizer<ClassNormalizer.Config> 
     public void remap(CustomRemapper remapper) {
         AtomicInteger id = new AtomicInteger(0);
         classNodes().forEach(classNode -> {
-        	
-        	String newName = "Class";
-        	
-        	if(classNode.name.contains("/")){
+            
+            String newName = "Class";
+            
+            if(classNode.name.contains("/")){
             String packageName = classNode.name.substring(0, classNode.name.lastIndexOf('/'));
             newName = packageName + "/" + "Class";
-        	}
+            }
 
             String mappedName;
             

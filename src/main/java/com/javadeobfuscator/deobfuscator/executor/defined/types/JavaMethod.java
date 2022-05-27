@@ -84,89 +84,89 @@ public class JavaMethod {
     }
 
     public Object invoke(JavaValue instance, JavaValue argsObject, Context context) {
-    	Object[] args; 
-    	String[] argTypes;
-    	if(argsObject.value() == null) 
-    	{
-    		args = null;
-    		argTypes = null;
-    	}else
-    	{
-    		args = (Object[])((JavaArray)argsObject).value();
-    		argTypes = ((JavaArray)argsObject).getTypeArray();
-    	}
+        Object[] args; 
+        String[] argTypes;
+        if(argsObject.value() == null) 
+        {
+            args = null;
+            argTypes = null;
+        }else
+        {
+            args = (Object[])((JavaArray)argsObject).value();
+            argTypes = ((JavaArray)argsObject).getTypeArray();
+        }
         try {
-        	//Fix for unboxing/boxing
-        	List<Integer> fixed = new ArrayList<>();
+            //Fix for unboxing/boxing
+            List<Integer> fixed = new ArrayList<>();
             if(args != null && args.length == getParameterTypes().length)
-            	for(int i = 0; i < args.length; i++)
-            	{
-            		Object o = args[i];
-            		JavaClass[] params = getParameterTypes();
-            		JavaClass argClass = params[i];
-            		if(argClass.isPrimitive())
-            		{
-            			Object value = o;
-            			if(Primitives.unwrap(value.getClass()).getName().equals(argClass.getName()))
-	            			switch(argClass.getName())
-	            			{
-	            				case "boolean":
-	            					args[i] = new JavaBoolean((Boolean)o);
-	            					fixed.add(i);
-	            					break;
-	            				case "byte":
-	            					args[i] = new JavaByte((Byte)o);
-	            					fixed.add(i);
-	            					break;
-	            				case "char":
-	            					args[i] = new JavaCharacter((Character)o);
-	            					fixed.add(i);
-	            					break;
-	            				case "double":
-	            					args[i] = new JavaDouble((Double)o);
-	            					fixed.add(i);
-	            					break;
-	            				case "float":
-	            					args[i] = new JavaFloat((Float)o);
-	            					fixed.add(i);
-	            					break;
-	            				case "int":
-	            					args[i] = new JavaInteger((Integer)o);
-	            					fixed.add(i);
-	            					break;
-	            				case "long":
-	            					args[i] = new JavaLong((Long)o);
-	            					fixed.add(i);
-	            					break;
-	            				case "short":
-	            					args[i] = new JavaShort((Short)o);
-	            					fixed.add(i);
-	            					break;
-	            			}
-            		}
-            	}
+                for(int i = 0; i < args.length; i++)
+                {
+                    Object o = args[i];
+                    JavaClass[] params = getParameterTypes();
+                    JavaClass argClass = params[i];
+                    if(argClass.isPrimitive())
+                    {
+                        Object value = o;
+                        if(Primitives.unwrap(value.getClass()).getName().equals(argClass.getName()))
+                            switch(argClass.getName())
+                            {
+                                case "boolean":
+                                    args[i] = new JavaBoolean((Boolean)o);
+                                    fixed.add(i);
+                                    break;
+                                case "byte":
+                                    args[i] = new JavaByte((Byte)o);
+                                    fixed.add(i);
+                                    break;
+                                case "char":
+                                    args[i] = new JavaCharacter((Character)o);
+                                    fixed.add(i);
+                                    break;
+                                case "double":
+                                    args[i] = new JavaDouble((Double)o);
+                                    fixed.add(i);
+                                    break;
+                                case "float":
+                                    args[i] = new JavaFloat((Float)o);
+                                    fixed.add(i);
+                                    break;
+                                case "int":
+                                    args[i] = new JavaInteger((Integer)o);
+                                    fixed.add(i);
+                                    break;
+                                case "long":
+                                    args[i] = new JavaLong((Long)o);
+                                    fixed.add(i);
+                                    break;
+                                case "short":
+                                    args[i] = new JavaShort((Short)o);
+                                    fixed.add(i);
+                                    break;
+                            }
+                    }
+                }
             List<JavaValue> argsobjects = new ArrayList<>();
             if (args != null) {
                 for (int i = 0; i < args.length; i++) {
-                	Object o = args[i];
-                	if(!fixed.contains(i))
-                	{
-                		if(o != null && o.getClass().isArray())
-                			argsobjects.add(new JavaArray(o));
+                    Object o = args[i];
+                    if(!fixed.contains(i))
+                    {
+                        if(o != null && o.getClass().isArray())
+                            argsobjects.add(new JavaArray(o));
                         else
-                        	argsobjects.add(new JavaObject(o, argTypes[i]));
-                	}else
-                		argsobjects.add((JavaValue)o);
+                            argsobjects.add(new JavaObject(o, argTypes[i]));
+                    }else
+                        argsobjects.add((JavaValue)o);
                 }
             }
 
             if (context.provider.canInvokeMethod(this.clazz.getClassNode().name, this.method.name, this.method.desc, instance, argsobjects, context)) {
-            	Object o = this.clazz.getContext().provider.invokeMethod(this.clazz.getClassNode().name, this.method.name, this.method.desc, instance, argsobjects, context);
-            	context.pop();
-            	context.pop();
-            	context.pop();
-            	context.pop();
-            	return o;
+                Object o = this.clazz.getContext().provider.invokeMethod(this.clazz.getClassNode().name, this.method.name, this.method.desc, instance, argsobjects, context);
+                context.pop();
+                context.pop();
+                context.pop();
+                context.pop();
+                return o;
             }
         } catch (ExecutionException ex) {
             throw ex;

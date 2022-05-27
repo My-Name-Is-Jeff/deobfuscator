@@ -709,11 +709,11 @@ public class RadonTransformerV2 extends Transformer<RadonV2Config> {
                     }
                     FieldNode fNode = owner.fields.stream().filter(f -> f.name.equals(fn.name) && f.desc.equals(fn.desc)).findFirst().orElse(null);
                     if(remove.containsKey(owner))
-                    	remove.get(owner).remove(fNode);
+                        remove.get(owner).remove(fNode);
                 }
             }));
             for(Entry<ClassNode, Set<FieldNode>> entry : remove.entrySet())
-            	entry.getKey().fields.removeAll(entry.getValue());
+                entry.getKey().fields.removeAll(entry.getValue());
             //BlockSplitter
             for (ClassNode classNode : classNodes()) {
                 for (MethodNode method : classNode.methods) {

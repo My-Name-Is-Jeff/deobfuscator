@@ -241,15 +241,15 @@ public class MethodAnalyzer {
             Class<?> clazz = PrimitiveUtils.getPrimitiveByName(type.getClassName());
             int opcode;
             if(clazz == int.class)
-            	opcode = Opcodes.ISTORE;
+                opcode = Opcodes.ISTORE;
             else if(clazz == long.class)
-            	opcode = Opcodes.LSTORE;
+                opcode = Opcodes.LSTORE;
             else if(clazz == double.class)
-            	opcode = Opcodes.DSTORE;
+                opcode = Opcodes.DSTORE;
             else if(clazz == float.class)
-            	opcode = Opcodes.FSTORE;
+                opcode = Opcodes.FSTORE;
             else
-            	opcode = Opcodes.ASTORE;
+                opcode = Opcodes.ASTORE;
             ArgumentFrame frame = new ArgumentFrame(opcode, counter);
             counter++;
             if (clazz == null) {

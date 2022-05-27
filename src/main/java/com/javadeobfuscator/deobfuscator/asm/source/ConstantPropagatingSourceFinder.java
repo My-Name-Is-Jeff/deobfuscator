@@ -47,7 +47,7 @@ public class ConstantPropagatingSourceFinder extends SourceFinderConsumer {
             case ISHL:
             case ISHR:
             case IUSHR: {
-            	instructions.add(now);
+                instructions.add(now);
                 SourceResult bres = SourceFinder.findSource(methodNode, frames, instructions, this, now, curFrame.getStack(curFrame.getStackSize() - 2));
                 SourceResult ares = SourceFinder.findSource(methodNode, frames, instructions, this, now, curFrame.getStack(curFrame.getStackSize() - 1));
                 if (bres.isUnknown() || ares.isUnknown()) return SourceResult.unknown();
@@ -119,7 +119,7 @@ public class ConstantPropagatingSourceFinder extends SourceFinderConsumer {
             }
             case DUP2: 
             case SWAP: {
-            	instructions.add(now);
+                instructions.add(now);
                 if (getStackOffset(sourceFrame, want) == sourceFrame.getStackSize() - 1) {
                     return SourceFinder.findSource(methodNode, frames, instructions, this, now, curFrame.getStack(curFrame.getStackSize() - 2));
                 } else if (getStackOffset(sourceFrame, want) == sourceFrame.getStackSize() - 2) {
@@ -129,7 +129,7 @@ public class ConstantPropagatingSourceFinder extends SourceFinderConsumer {
             }
             case DUP:
             case DUP_X1: {
-            	instructions.add(now);
+                instructions.add(now);
                 return SourceFinder.findSource(methodNode, frames, instructions, this, now, curFrame.getStack(curFrame.getStackSize() - 1));
             }
         }

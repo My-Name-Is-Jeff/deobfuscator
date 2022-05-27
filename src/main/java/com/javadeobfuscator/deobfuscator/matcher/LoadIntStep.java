@@ -23,9 +23,9 @@ public class LoadIntStep extends OpcodeStep {
     public LoadIntStep() {
         super((a) -> 
         {
-        	if(!(a instanceof LdcInsnNode))
-        		return true;
-        	return ((LdcInsnNode)a).cst instanceof Integer;
+            if(!(a instanceof LdcInsnNode))
+                return true;
+            return ((LdcInsnNode)a).cst instanceof Integer;
         },Opcodes.ICONST_M1,
                 Opcodes.ICONST_0,
                 Opcodes.ICONST_1,

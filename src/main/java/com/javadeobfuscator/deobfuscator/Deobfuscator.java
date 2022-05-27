@@ -381,31 +381,31 @@ public class Deobfuscator {
             logger.info("Detecting known obfuscators");
 
             for (Rule rule : Rules.RULES) {
-            	try
-            	{
-	                String message = rule.test(this);
-	                if (message == null) {
-	                    continue;
-	                }
+                try
+                {
+                    String message = rule.test(this);
+                    if (message == null) {
+                        continue;
+                    }
 
-	                logger.info("");
-	                logger.info("{}: {}", rule.getClass().getSimpleName(), rule.getDescription());
-	                logger.info("\t{}", message);
-	                logger.info("Recommend transformers:");
-	                logger.info("(Choose one transformer. If there are multiple, it's recommended to try the transformer listed first)");
+                    logger.info("");
+                    logger.info("{}: {}", rule.getClass().getSimpleName(), rule.getDescription());
+                    logger.info("\t{}", message);
+                    logger.info("Recommend transformers:");
+                    logger.info("(Choose one transformer. If there are multiple, it's recommended to try the transformer listed first)");
 
-	                Collection<Class<? extends Transformer<?>>> recommended = rule.getRecommendTransformers();
-	                if (recommended == null) {
-	                    logger.info("\tNone");
-	                } else {
-	                    for (Class<? extends Transformer<?>> transformer : recommended) {
-	                        logger.info("\t{}", transformer.getName());
-	                    }
-	                }
-            	}catch(Exception e)
-            	{
-            		e.printStackTrace();
-            	}
+                    Collection<Class<? extends Transformer<?>>> recommended = rule.getRecommendTransformers();
+                    if (recommended == null) {
+                        logger.info("\tNone");
+                    } else {
+                        for (Class<? extends Transformer<?>> transformer : recommended) {
+                            logger.info("\t{}", transformer.getName());
+                        }
+                    }
+                }catch(Exception e)
+                {
+                    e.printStackTrace();
+                }
             }
 
             logger.info("All detectors have been run. If you do not see anything listed, check if your file only contains name obfuscation.");
@@ -417,14 +417,14 @@ public class Deobfuscator {
         computeCallers();
 
         if (configuration.isDeleteUselessClasses()) {
-        	logger.warn("Warning: You have enabled the option \"delete useless classes\".");
-        	logger.warn("This option will delete any classes whose superclasses or interfaces cannot be resolved for certain transformers.");
-        	logger.warn("This feature is only to be used when your file contains trash classes that prevent transformers from working.");
-        	logger.warn("All libraries must be added for this to work properly.");
+            logger.warn("Warning: You have enabled the option \"delete useless classes\".");
+            logger.warn("This option will delete any classes whose superclasses or interfaces cannot be resolved for certain transformers.");
+            logger.warn("This feature is only to be used when your file contains trash classes that prevent transformers from working.");
+            logger.warn("All libraries must be added for this to work properly.");
         }
 
         if (configuration.isSmartRedo()) {
-        	logger.warn("You have enabled \"smart redo\". For some transformers, this may result in an infinite loop.");
+            logger.warn("You have enabled \"smart redo\". For some transformers, this may result in an infinite loop.");
         }
 
         logger.info("Transforming");

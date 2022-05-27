@@ -34,7 +34,7 @@ public class DeadCodeRemover extends Transformer<TransformerConfig> {
 
                 Frame<BasicValue>[] frames;
                 try {
-                	frames = new Analyzer<>(new BasicInterpreter()).analyze(classNode.name, methodNode);
+                    frames = new Analyzer<>(new BasicInterpreter()).analyze(classNode.name, methodNode);
                 } catch (AnalyzerException e) {
                     oops("unexpected analyzer exception", e);
                     continue;

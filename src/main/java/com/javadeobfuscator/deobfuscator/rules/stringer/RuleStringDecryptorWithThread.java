@@ -34,7 +34,7 @@ public class RuleStringDecryptorWithThread implements Rule {
     @Override
     public String test(Deobfuscator deobfuscator) {
         for (ClassNode classNode : deobfuscator.getClasses().values()) {
-        	if (classNode.superName == null) {
+            if (classNode.superName == null) {
                 continue;
             }
             if (!classNode.superName.equals("java/lang/Thread")) {
@@ -65,6 +65,6 @@ public class RuleStringDecryptorWithThread implements Rule {
     @Override
     public Collection<Class<? extends Transformer<?>>> getRecommendTransformers() {
         return Arrays.asList(StringEncryptionTransformer.class,
-        	com.javadeobfuscator.deobfuscator.transformers.stringer.v3.StringEncryptionTransformer.class);
+            com.javadeobfuscator.deobfuscator.transformers.stringer.v3.StringEncryptionTransformer.class);
     }
 }

@@ -27,7 +27,7 @@ public class OpcodeStep implements Step {
     private Function<AbstractInsnNode, Boolean> function;
 
     public OpcodeStep(Function<AbstractInsnNode, Boolean> function, int... opcodes) {
-    	this.function = function;
+        this.function = function;
         this.wantOpcodes = new ArrayList<>();
         for (int opcode : opcodes) {
             this.wantOpcodes.add(opcode);

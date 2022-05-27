@@ -341,14 +341,14 @@ public class Utils {
     }
 
     public static AbstractInsnNode getIntInsn(int number) {
-    	if (number >= -1 && number <= 5)
-    		return new InsnNode(number + 3);
-    	else if (number >= -128 && number <= 127)
-    		return new IntInsnNode(Opcodes.BIPUSH, number);
-    	else if (number >= -32768 && number <= 32767)
-    		return new IntInsnNode(Opcodes.SIPUSH, number);
-    	else
-    		return new LdcInsnNode(number);
+        if (number >= -1 && number <= 5)
+            return new InsnNode(number + 3);
+        else if (number >= -128 && number <= 127)
+            return new IntInsnNode(Opcodes.BIPUSH, number);
+        else if (number >= -32768 && number <= 32767)
+            return new IntInsnNode(Opcodes.SIPUSH, number);
+        else
+            return new LdcInsnNode(number);
     }
     
     public static AbstractInsnNode getLongInsn(long number) {
@@ -384,68 +384,68 @@ public class Utils {
     } 
 
     public static boolean isInteger(AbstractInsnNode ain)
-	{
-    	if (ain == null) return false;
-		if((ain.getOpcode() >= Opcodes.ICONST_M1
-			&& ain.getOpcode() <= Opcodes.ICONST_5)
-			|| ain.getOpcode() == Opcodes.SIPUSH 
-			|| ain.getOpcode() == Opcodes.BIPUSH)
-			return true;
-		if(ain instanceof LdcInsnNode)
-		{
-			LdcInsnNode ldc = (LdcInsnNode)ain;
-			if(ldc.cst instanceof Integer)
-				return true;
-		}
-		return false;
-	}
+    {
+        if (ain == null) return false;
+        if((ain.getOpcode() >= Opcodes.ICONST_M1
+            && ain.getOpcode() <= Opcodes.ICONST_5)
+            || ain.getOpcode() == Opcodes.SIPUSH 
+            || ain.getOpcode() == Opcodes.BIPUSH)
+            return true;
+        if(ain instanceof LdcInsnNode)
+        {
+            LdcInsnNode ldc = (LdcInsnNode)ain;
+            if(ldc.cst instanceof Integer)
+                return true;
+        }
+        return false;
+    }
 
-	public static int getIntValue(AbstractInsnNode node)
-	{
-		if(node.getOpcode() >= Opcodes.ICONST_M1
-			&& node.getOpcode() <= Opcodes.ICONST_5)
-			return node.getOpcode() - 3;
-		if(node.getOpcode() == Opcodes.SIPUSH
-			|| node.getOpcode() == Opcodes.BIPUSH)
-			return ((IntInsnNode)node).operand;
-		if(node instanceof LdcInsnNode)
-		{
-			LdcInsnNode ldc = (LdcInsnNode)node;
-			if(ldc.cst instanceof Integer)
-				return (int)ldc.cst;
-		}
-		return 0;
-	}
+    public static int getIntValue(AbstractInsnNode node)
+    {
+        if(node.getOpcode() >= Opcodes.ICONST_M1
+            && node.getOpcode() <= Opcodes.ICONST_5)
+            return node.getOpcode() - 3;
+        if(node.getOpcode() == Opcodes.SIPUSH
+            || node.getOpcode() == Opcodes.BIPUSH)
+            return ((IntInsnNode)node).operand;
+        if(node instanceof LdcInsnNode)
+        {
+            LdcInsnNode ldc = (LdcInsnNode)node;
+            if(ldc.cst instanceof Integer)
+                return (int)ldc.cst;
+        }
+        return 0;
+    }
 
     public static boolean isLong(AbstractInsnNode ain)
-	{
-    	if (ain == null) return false;
-    	if(ain.getOpcode() == Opcodes.LCONST_0
-    		|| ain.getOpcode() == Opcodes.LCONST_1)
-    		return true;
-    	if(ain instanceof LdcInsnNode)
-		{
-			LdcInsnNode ldc = (LdcInsnNode)ain;
-			if(ldc.cst instanceof Long)
-				return true;
-		}
-		return false;
-	}
+    {
+        if (ain == null) return false;
+        if(ain.getOpcode() == Opcodes.LCONST_0
+            || ain.getOpcode() == Opcodes.LCONST_1)
+            return true;
+        if(ain instanceof LdcInsnNode)
+        {
+            LdcInsnNode ldc = (LdcInsnNode)ain;
+            if(ldc.cst instanceof Long)
+                return true;
+        }
+        return false;
+    }
     
-	public static long getLongValue(AbstractInsnNode node)
-	{
-		if(node.getOpcode() >= Opcodes.LCONST_0
-			&& node.getOpcode() <= Opcodes.LCONST_1)
-			return node.getOpcode() - 9;
-		if(node instanceof LdcInsnNode)
-		{
-			LdcInsnNode ldc = (LdcInsnNode)node;
-			if(ldc.cst instanceof Long)
-				return (long)ldc.cst;
-		}
-		return 0;
-	}
-	
+    public static long getLongValue(AbstractInsnNode node)
+    {
+        if(node.getOpcode() >= Opcodes.LCONST_0
+            && node.getOpcode() <= Opcodes.LCONST_1)
+            return node.getOpcode() - 9;
+        if(node instanceof LdcInsnNode)
+        {
+            LdcInsnNode ldc = (LdcInsnNode)node;
+            if(ldc.cst instanceof Long)
+                return (long)ldc.cst;
+        }
+        return 0;
+    }
+    
     public static List<byte[]> loadBytes(File input) {
         List<byte[]> result = new ArrayList<>();
 
@@ -488,203 +488,203 @@ public class Utils {
     
     public static int getPullValue(AbstractInsnNode ain, boolean includeShifts)
     {
-    	switch(ain.getOpcode())
-    	{
-    	    case IALOAD:
-    	    case LALOAD:
-    	    case FALOAD:
-    	    case DALOAD:
-    	    case AALOAD:
-    	    case BALOAD:
-    	    case CALOAD:
-    	    case SALOAD:
-    	    	return 2;
-    	    case ISTORE:
-    	    case FSTORE:
-    	    case ASTORE:
-    	    	return 1;
-    	    case LSTORE:
-    	    case DSTORE:
-    	    	return 2;
-    	    case IASTORE:
-    	    case FASTORE:
-    	    case AASTORE:
-    	    case BASTORE:
-    	    case CASTORE:
-    	    case SASTORE:
-    	    	return 3;
-    	    case LASTORE:
-    	    case DASTORE:
-    	    	return 4;
-    	    case POP:
-    	    	return 1;
-    	    case POP2:
-    	    	return 2;
-    	    case DUP:
-    	    	if(includeShifts)
-    	    		return 1;
-    	    	break;
-    	    case DUP_X1:
-    	    	if(includeShifts)
-    	    		return 1;
-    	    	break;
-    	    case DUP_X2:
-    	    	if(includeShifts)
-    	    		return 1;
-    	    	break;
-    	    case DUP2:
-    	    	if(includeShifts)
-    	    		return 2;
-    	    	break;
-    	    case DUP2_X1:
-    	    	if(includeShifts)
-    	    		return 2;
-    	    	break;
-    	    case DUP2_X2:
-    	    	if(includeShifts)
-    	    		return 2;
-    	    	break;
-    	    case SWAP:
-    	    	if(includeShifts)
-    	    		return 2;
-    	    	break;
-    	    case IADD:
-    	    case ISUB:
-    	    case IMUL:
-    	    case IDIV:
-    	    case IREM:
-    	    case ISHL:
-    	    case ISHR:
-    	    case IUSHR:
-    	    case IAND:
-    	    case IOR:
-    	    case IXOR:
-    	    	return 2;
-    	    case LADD:
-    	    case LSUB:
-    	    case LMUL:
-    	    case LDIV:
-    	    case LREM:
-    	    case LAND:
-    	    case LOR:
-    	    case LXOR:
-    	    case LCMP:
-    	    	return 4;
-    	    case LSHL:
-    	    case LSHR:
-    	    case LUSHR:
-    	    	return 3;
-    	    case FADD:
-    	    case FSUB:
-    	    case FMUL:
-    	    case FDIV:
-    	    case FREM:
-    	    case FCMPL:
-    	    case FCMPG:
-    	    	return 2;
-    	    case DADD:
-    	    case DSUB:
-    	    case DMUL:
-    	    case DDIV:
-    	    case DREM:
-    	    case DCMPL:
-    	    case DCMPG:
-    	    	return 4;
-    	    case INEG:
-    	    case FNEG:
-    	    	return 1;
-    	    case DNEG:
-    	    case LNEG:
-    	    	return 2;
-    	    case I2L:
-    	    case I2D:
-    	    case I2F:
-    	    	return 1;
-    	    case L2I:
-    	    case L2D:
-    	    case L2F:
-    	    	return 2;
-    	    case F2I:
-    	    case F2D:
-    	    case F2L:
-    	    	return 1;
-    	    case D2F:
-    	    case D2L:
-    	    case D2I:
-    	    	return 2;
-    	    case IFNE:
-    	    case IFEQ:
-    	    case IFLT:
-    	    case IFGE:
-    	    case IFGT:
-    	    case IFLE:
-    	    	return 1;
-    	    case IF_ICMPEQ:
-    	    case IF_ICMPNE:
-    	    case IF_ICMPLT:
-    	    case IF_ICMPGE:
-    	    case IF_ICMPGT:
-    	    case IF_ICMPLE:
-    	    case IF_ACMPNE:
-    	    case IF_ACMPEQ:
-    	    	return 2;
-    	    case TABLESWITCH:
-    	    case LOOKUPSWITCH:
-    	    	return 1;
-    	    case IRETURN:
-    	    case FRETURN:
-    	    case ARETURN:
-    	    	return 1;
-    	    case LRETURN:
-    	    case DRETURN:
-    	    	return 2;
-    	    case PUTSTATIC:
-    	    	if(Type.getType(((FieldInsnNode)ain).desc).getSort() == Type.LONG
-    	    	|| Type.getType(((FieldInsnNode)ain).desc).getSort() == Type.DOUBLE)
-    	    		return 2;
-    	    	return 1;
-    	    case GETFIELD:
-    	    	return 1;
-    	    case PUTFIELD:
-    	    	if(Type.getType(((FieldInsnNode)ain).desc).getSort() == Type.LONG
-    	    	|| Type.getType(((FieldInsnNode)ain).desc).getSort() == Type.DOUBLE)
-    	    		return 3;
-    	    	return 2;
-    	    case INVOKESTATIC:
-    	    case INVOKEVIRTUAL:
-    	    case INVOKEINTERFACE:
-    	    case INVOKESPECIAL:
-    	    	int args = 0;
-    	    	if(ain.getOpcode() != Opcodes.INVOKESTATIC)
-    	    		args++;
-    	    	for(Type t : Type.getArgumentTypes((((MethodInsnNode)ain).desc)))
-    	    		if(t.getSort() == Type.LONG || t.getSort() == Type.DOUBLE)
-    	    			args += 2;
-    	    		else
-    	    			args++;
-    	    	return args;
-    	    case INVOKEDYNAMIC:
-    	    	int args1 = 0;
-    	    	for(Type t : Type.getArgumentTypes((((InvokeDynamicInsnNode)ain).desc)))
-    	    		if(t.getSort() == Type.LONG || t.getSort() == Type.DOUBLE)
-    	    			args1 += 2;
-    	    		else
-    	    			args1++;
-    	    	return args1;
-    	    case NEWARRAY:
-    	    case ANEWARRAY:
-    	    case ARRAYLENGTH:
-    	    case ATHROW:
-    	    case CHECKCAST:
-    	    case INSTANCEOF:
-    	    case MONITORENTER:
-    	    case MONITOREXIT:
-    	    case IFNULL:
-    	    case IFNONNULL:
-    	    	return 1;
-    	    case MULTIANEWARRAY:
-    	    	return ((MultiANewArrayInsnNode)ain).dims;
-    	}
-    	return 0;
+        switch(ain.getOpcode())
+        {
+            case IALOAD:
+            case LALOAD:
+            case FALOAD:
+            case DALOAD:
+            case AALOAD:
+            case BALOAD:
+            case CALOAD:
+            case SALOAD:
+                return 2;
+            case ISTORE:
+            case FSTORE:
+            case ASTORE:
+                return 1;
+            case LSTORE:
+            case DSTORE:
+                return 2;
+            case IASTORE:
+            case FASTORE:
+            case AASTORE:
+            case BASTORE:
+            case CASTORE:
+            case SASTORE:
+                return 3;
+            case LASTORE:
+            case DASTORE:
+                return 4;
+            case POP:
+                return 1;
+            case POP2:
+                return 2;
+            case DUP:
+                if(includeShifts)
+                    return 1;
+                break;
+            case DUP_X1:
+                if(includeShifts)
+                    return 1;
+                break;
+            case DUP_X2:
+                if(includeShifts)
+                    return 1;
+                break;
+            case DUP2:
+                if(includeShifts)
+                    return 2;
+                break;
+            case DUP2_X1:
+                if(includeShifts)
+                    return 2;
+                break;
+            case DUP2_X2:
+                if(includeShifts)
+                    return 2;
+                break;
+            case SWAP:
+                if(includeShifts)
+                    return 2;
+                break;
+            case IADD:
+            case ISUB:
+            case IMUL:
+            case IDIV:
+            case IREM:
+            case ISHL:
+            case ISHR:
+            case IUSHR:
+            case IAND:
+            case IOR:
+            case IXOR:
+                return 2;
+            case LADD:
+            case LSUB:
+            case LMUL:
+            case LDIV:
+            case LREM:
+            case LAND:
+            case LOR:
+            case LXOR:
+            case LCMP:
+                return 4;
+            case LSHL:
+            case LSHR:
+            case LUSHR:
+                return 3;
+            case FADD:
+            case FSUB:
+            case FMUL:
+            case FDIV:
+            case FREM:
+            case FCMPL:
+            case FCMPG:
+                return 2;
+            case DADD:
+            case DSUB:
+            case DMUL:
+            case DDIV:
+            case DREM:
+            case DCMPL:
+            case DCMPG:
+                return 4;
+            case INEG:
+            case FNEG:
+                return 1;
+            case DNEG:
+            case LNEG:
+                return 2;
+            case I2L:
+            case I2D:
+            case I2F:
+                return 1;
+            case L2I:
+            case L2D:
+            case L2F:
+                return 2;
+            case F2I:
+            case F2D:
+            case F2L:
+                return 1;
+            case D2F:
+            case D2L:
+            case D2I:
+                return 2;
+            case IFNE:
+            case IFEQ:
+            case IFLT:
+            case IFGE:
+            case IFGT:
+            case IFLE:
+                return 1;
+            case IF_ICMPEQ:
+            case IF_ICMPNE:
+            case IF_ICMPLT:
+            case IF_ICMPGE:
+            case IF_ICMPGT:
+            case IF_ICMPLE:
+            case IF_ACMPNE:
+            case IF_ACMPEQ:
+                return 2;
+            case TABLESWITCH:
+            case LOOKUPSWITCH:
+                return 1;
+            case IRETURN:
+            case FRETURN:
+            case ARETURN:
+                return 1;
+            case LRETURN:
+            case DRETURN:
+                return 2;
+            case PUTSTATIC:
+                if(Type.getType(((FieldInsnNode)ain).desc).getSort() == Type.LONG
+                || Type.getType(((FieldInsnNode)ain).desc).getSort() == Type.DOUBLE)
+                    return 2;
+                return 1;
+            case GETFIELD:
+                return 1;
+            case PUTFIELD:
+                if(Type.getType(((FieldInsnNode)ain).desc).getSort() == Type.LONG
+                || Type.getType(((FieldInsnNode)ain).desc).getSort() == Type.DOUBLE)
+                    return 3;
+                return 2;
+            case INVOKESTATIC:
+            case INVOKEVIRTUAL:
+            case INVOKEINTERFACE:
+            case INVOKESPECIAL:
+                int args = 0;
+                if(ain.getOpcode() != Opcodes.INVOKESTATIC)
+                    args++;
+                for(Type t : Type.getArgumentTypes((((MethodInsnNode)ain).desc)))
+                    if(t.getSort() == Type.LONG || t.getSort() == Type.DOUBLE)
+                        args += 2;
+                    else
+                        args++;
+                return args;
+            case INVOKEDYNAMIC:
+                int args1 = 0;
+                for(Type t : Type.getArgumentTypes((((InvokeDynamicInsnNode)ain).desc)))
+                    if(t.getSort() == Type.LONG || t.getSort() == Type.DOUBLE)
+                        args1 += 2;
+                    else
+                        args1++;
+                return args1;
+            case NEWARRAY:
+            case ANEWARRAY:
+            case ARRAYLENGTH:
+            case ATHROW:
+            case CHECKCAST:
+            case INSTANCEOF:
+            case MONITORENTER:
+            case MONITOREXIT:
+            case IFNULL:
+            case IFNONNULL:
+                return 1;
+            case MULTIANEWARRAY:
+                return ((MultiANewArrayInsnNode)ain).dims;
+        }
+        return 0;
     }
 }

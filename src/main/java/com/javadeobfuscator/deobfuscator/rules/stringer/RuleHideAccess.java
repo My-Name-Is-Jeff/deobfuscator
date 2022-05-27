@@ -31,26 +31,26 @@ public class RuleHideAccess implements Rule, Opcodes {
     @Override
     public String getDescription() {
         return "Stringer most likely uses a seperate class to decrypt the encrypted calls. It then calls "
-        	+ "the encrypted class directly or through invokedynamic";
+            + "the encrypted class directly or through invokedynamic";
     }
 
     @Override
     public String test(Deobfuscator deobfuscator) {
         for (ClassNode classNode : deobfuscator.getClasses().values()) {
-        	if(classNode.version == 49 && Modifier.isFinal(classNode.access) && classNode.superName.equals("java/lang/Object")) {
-        		List<String> methodsDesc = classNode.methods.stream().map(m -> m.desc).collect(Collectors.toList());
-        		List<String> fieldsDesc = classNode.fields.stream().map(f -> f.desc).collect(Collectors.toList());
-        		
-        		boolean isHideAccess = fieldsDesc.contains("[Ljava/lang/Object;") &&
-        			fieldsDesc.contains("[Ljava/lang/Class;") &&
-        			methodsDesc.contains("(II)Ljava/lang/Class;") &&
-        			methodsDesc.contains("(I)Ljava/lang/reflect/Method;") &&
-        			methodsDesc.contains("(I)Ljava/lang/reflect/Field;");
-        		
-        		if (isHideAccess) {
-        			return "Found potential hideaccess decryptor class " + classNode.name;
-        		}
-        	}
+            if(classNode.version == 49 && Modifier.isFinal(classNode.access) && classNode.superName.equals("java/lang/Object")) {
+                List<String> methodsDesc = classNode.methods.stream().map(m -> m.desc).collect(Collectors.toList());
+                List<String> fieldsDesc = classNode.fields.stream().map(f -> f.desc).collect(Collectors.toList());
+                
+                boolean isHideAccess = fieldsDesc.contains("[Ljava/lang/Object;") &&
+                    fieldsDesc.contains("[Ljava/lang/Class;") &&
+                    methodsDesc.contains("(II)Ljava/lang/Class;") &&
+                    methodsDesc.contains("(I)Ljava/lang/reflect/Method;") &&
+                    methodsDesc.contains("(I)Ljava/lang/reflect/Field;");
+                
+                if (isHideAccess) {
+                    return "Found potential hideaccess decryptor class " + classNode.name;
+                }
+            }
         }
 
         return null;
