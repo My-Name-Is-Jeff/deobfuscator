@@ -29,12 +29,15 @@ jobs:
       run: mvn -B package --file pom.xml
     - name: Rename final file
       run: mv target/deobfuscator-*.jar target/deobfuscator.jar
+    - name: Add SHORT_SHA env property with commit short sha
+      run: echo "SHORT_SHA=`git rev-parse --short ${GITHUB_SHA}`" >> $GITHUB_ENV
     - name: Prerelease
       uses: "marvinpinto/action-automatic-releases@latest"
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
+        automatic_release_tag: "${{ env.SHORT_SHA }}"
         prerelease: false
-        title: "Latest Build"
+        title: "Latest Build for ${{ env.SHORT_SHA }}"
         files: |
           LICENSE
           target/deobfuscator.jar
