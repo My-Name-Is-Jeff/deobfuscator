@@ -27,11 +27,13 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 public class RuleSourceFileAttribute implements Rule {
+
     private static final Pattern fileEndingPattern = Pattern.compile("\\.\\w{1,10}$");
 
     @Override
     public String getDescription() {
-        return "Some obfuscators don't remove the SourceFile attribute by default. This information can be recovered, and is very useful";
+        return "This suggests a class renamer. It does not make strings or numbers or weird array accesses readable. Some obfuscators don't remove the SourceFile " +
+               "attribute by default. This information can be recovered, and is very useful";
     }
 
     @Override
@@ -88,6 +90,8 @@ public class RuleSourceFileAttribute implements Rule {
         }
         if (simpleClassName.endsWith("Kt")) {
             simpleClassName = simpleClassName.substring(0, simpleClassName.length() - "Kt".length());
+        } else {
+            return false;
         }
         return sourceFile.equalsIgnoreCase(simpleClassName);
     }
