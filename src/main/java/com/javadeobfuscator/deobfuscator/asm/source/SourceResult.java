@@ -71,7 +71,7 @@ public class SourceResult {
     }
 
     public boolean isUnknown() {
-        return values.size() == 0 && exceptions.size() == 0;
+        return values.isEmpty() && exceptions.isEmpty();
     }
 
     @Override

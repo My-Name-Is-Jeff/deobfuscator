@@ -1775,7 +1775,7 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
                         clinit.instructions.remove(start2);
                         clinit.instructions.remove(end);
                     }
-                } else if (ran.size() > 0 && (ran.get(ran.size() - 1) == 1 || ran.get(ran.size() - 1) == 2)) {
+                } else if (!ran.isEmpty() && (ran.get(ran.size() - 1) == 1 || ran.get(ran.size() - 1) == 2)) {
                     //Inline private static final Strings
                     int counter = 0;
                     int lastIndex = -1;

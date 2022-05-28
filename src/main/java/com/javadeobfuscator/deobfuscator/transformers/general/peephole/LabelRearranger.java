@@ -26,7 +26,7 @@ public class LabelRearranger extends Transformer<TransformerConfig> {
             for (MethodNode method : classNode.methods) {
                 if (matchingFunc != null && !matchingFunc.apply(classNode, method))
                     continue;
-                if (method.localVariables != null && method.localVariables.size() > 0)
+                if (method.localVariables != null && !method.localVariables.isEmpty())
                     continue;
                 if (method.instructions.size() == 0)
                     continue;
@@ -676,7 +676,7 @@ public class LabelRearranger extends Transformer<TransformerConfig> {
                         }
                     }
                 }
-                if (splits.size() > 0)
+                if (!splits.isEmpty())
                     System.out.println("Irregular exception table at " + classNode.name + ", " + method.name + method.desc);
                 for (Entry<TryCatchChain, Set<LabelNode>> entry : splits.entrySet()) {
                     List<LabelNode> orderedSplits = new ArrayList<>(entry.getValue());
@@ -755,7 +755,7 @@ public class LabelRearranger extends Transformer<TransformerConfig> {
                         chains.remove(remove);
                     }
                 } while (modified1);
-                if (chains.size() > 0)
+                if (!chains.isEmpty())
                     throw new IllegalStateException("Impossible exception table at " + classNode.name + ", " + method.name + method.desc);
 
                 boolean same = method.tryCatchBlocks.size() == exceptions.size();

@@ -219,7 +219,7 @@ public class StringEncryptionTransformer extends Transformer<TransformerConfig> 
                             for (Frame f : toRemove) {
                                 methodNode.instructions.remove(analyzerResult.getInsnNode(f));
                             }
-                            if (args.size() != 0) {
+                            if (!args.isEmpty()) {
                                 String result = MethodExecutor.execute(classNode, methodNode, args, null, context);
                                 methodNode.instructions.set(min, new LdcInsnNode(result));
                                 total.getAndIncrement();
@@ -253,7 +253,7 @@ public class StringEncryptionTransformer extends Transformer<TransformerConfig> 
                             for (Frame f : toRemove) {
                                 methodNode.instructions.remove(analyzerResult.getInsnNode(f));
                             }
-                            if (args.size() != 0) {
+                            if (!args.isEmpty()) {
                                 String result = MethodExecutor.execute(classNode, methodNode, args, null, context);
                                 methodNode.instructions.set(min, new LdcInsnNode(result));
                                 total.getAndIncrement();

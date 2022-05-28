@@ -199,7 +199,7 @@ public class WrappedLocalsTransformer extends Transformer<TransformerConfig> {
                             ((IincInsnNode) ain).var = oldToNewLocals.get(((IincInsnNode) ain).var);
                     }
                 }
-                if (succeededStores.size() > 0) {
+                if (!succeededStores.isEmpty()) {
                     count.getAndAdd(succeededStores.size());
                     methods.incrementAndGet();
                 }

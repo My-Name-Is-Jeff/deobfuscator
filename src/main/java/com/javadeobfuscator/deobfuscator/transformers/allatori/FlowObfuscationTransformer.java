@@ -663,7 +663,7 @@ public class FlowObfuscationTransformer extends Transformer<TransformerConfig> {
                                         insertAnalyzer.setOnlyZero(true);
                                         ArgsAnalyzer.Result insert = insertAnalyzer.lookupArgs();
                                         if (insert instanceof ArgsAnalyzer.FailedResult || insert.getFirstArgInsn() == null
-                                            || insert.getArgsNeeded() > 0 || insert.getSkippedDups().size() > 0)
+                                            || insert.getArgsNeeded() > 0 || !insert.getSkippedDups().isEmpty())
                                         {
                                             i++;
                                             continue;
@@ -1182,19 +1182,19 @@ public class FlowObfuscationTransformer extends Transformer<TransformerConfig> {
                     labels.put(dupprev, new ArrayList<>());
                 dupprev = dupprev.getPrevious();
             }
-            if (labels.size() > 0)
+            if (!labels.isEmpty())
                 for (AbstractInsnNode a : method.instructions.toArray()) {
                     if (a instanceof JumpInsnNode && labels.containsKey(((JumpInsnNode) a).label))
                         labels.get(((JumpInsnNode) a).label).add(a);
                 }
             Map<AbstractInsnNode, List<AbstractInsnNode>> values = new HashMap<>();
             for (Entry<AbstractInsnNode, List<AbstractInsnNode>> entry : labels.entrySet()) {
-                if (entry.getValue().size() > 0)
+                if (!entry.getValue().isEmpty())
                     values.put(entry.getKey(), entry.getValue());
             }
             if (values.size() > 1)
                 return false;
-            if (values.size() > 0) {
+            if (!values.isEmpty()) {
                 Entry<AbstractInsnNode, List<AbstractInsnNode>> ent = values.entrySet().iterator().next();
                 ArgsAnalyzer analyzer = new ArgsAnalyzer(Utils.getPrevious(dup), 0, ArgsAnalyzer.Mode.BACKWARDS);
                 analyzer.setBreakpoint(ent.getKey());
@@ -1291,19 +1291,19 @@ public class FlowObfuscationTransformer extends Transformer<TransformerConfig> {
                         labels.put(dupprev, new ArrayList<>());
                     dupprev = dupprev.getPrevious();
                 }
-                if (labels.size() > 0)
+                if (!labels.isEmpty())
                     for (AbstractInsnNode a : method.instructions.toArray()) {
                         if (a instanceof JumpInsnNode && labels.containsKey(((JumpInsnNode) a).label))
                             labels.get(((JumpInsnNode) a).label).add(a);
                     }
                 Map<AbstractInsnNode, List<AbstractInsnNode>> values = new HashMap<>();
                 for (Entry<AbstractInsnNode, List<AbstractInsnNode>> entry : labels.entrySet()) {
-                    if (entry.getValue().size() > 0)
+                    if (!entry.getValue().isEmpty())
                         values.put(entry.getKey(), entry.getValue());
                 }
                 if (values.size() > 1)
                     return false;
-                if (values.size() > 0) {
+                if (!values.isEmpty()) {
                     Entry<AbstractInsnNode, List<AbstractInsnNode>> ent = values.entrySet().iterator().next();
                     ArgsAnalyzer analyzer = new ArgsAnalyzer(Utils.getPrevious(dup), 0, ArgsAnalyzer.Mode.BACKWARDS);
                     analyzer.setBreakpoint(ent.getKey());

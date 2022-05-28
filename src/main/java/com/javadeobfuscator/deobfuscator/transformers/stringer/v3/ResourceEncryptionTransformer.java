@@ -38,7 +38,7 @@ public class ResourceEncryptionTransformer extends Transformer<TransformerConfig
     @Override
     public boolean transform() throws Throwable {
         Set<String> decryptionClassnodes = new ResourceEncryptionClassFinder().findNames(classes.values());
-        if (decryptionClassnodes.size() == 0) {
+        if (decryptionClassnodes.isEmpty()) {
             return false;
         }
         if (decryptionClassnodes.size() > 1) {

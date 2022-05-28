@@ -27,7 +27,7 @@ public class FakeExceptionTransformer extends Transformer<TransformerConfig> {
                     String handler = tcbn.type;
                     if (handler != null && classes.containsKey(handler)) {
                         ClassNode handlerClass = classes.get(handler);
-                        if (handlerClass.methods.size() == 0 && handlerClass.superName.equals("java/lang/RuntimeException")) {
+                        if (handlerClass.methods.isEmpty() && handlerClass.superName.equals("java/lang/RuntimeException")) {
                             remove.add(tcbn);
                             fakeExceptionClass.add(handler);
                             counter.incrementAndGet();

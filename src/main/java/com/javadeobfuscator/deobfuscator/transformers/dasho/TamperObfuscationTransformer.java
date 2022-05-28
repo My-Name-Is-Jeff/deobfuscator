@@ -291,7 +291,7 @@ public class TamperObfuscationTransformer extends Transformer<TransformerConfig>
                         }
                     }
                 }
-                if (splits.size() > 0)
+                if (!splits.isEmpty())
                     System.out.println("Irregular exception table at " + classNode.name + ", " + method.name + method.desc);
                 for (Entry<TryCatchChain, Set<LabelNode>> entry : splits.entrySet()) {
                     List<LabelNode> orderedSplits = new ArrayList<>(entry.getValue());
@@ -377,7 +377,7 @@ public class TamperObfuscationTransformer extends Transformer<TransformerConfig>
                         chains.remove(remove);
                     }
                 } while (modified);
-                if (chains.size() > 0)
+                if (!chains.isEmpty())
                     throw new IllegalStateException("Impossible exception table at " + classNode.name + ", " + method.name + method.desc);
 
                 boolean same = true;

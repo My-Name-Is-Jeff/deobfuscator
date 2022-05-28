@@ -28,7 +28,7 @@ public class PackageNormalizer extends AbstractNormalizer<PackageNormalizer.Conf
         AtomicInteger id = new AtomicInteger(0);
         classNodes().forEach(classNode -> {
             String packageName = classNode.name.lastIndexOf('/') == -1 ? "" : classNode.name.substring(0, classNode.name.lastIndexOf('/'));
-            if (packageName.length() > 0) {
+            if (!packageName.isEmpty()) {
                 int lin = -1;
                 while ((lin = packageName.lastIndexOf('/')) != -1) {
                     String parentPackage = packageName.substring(0, lin);

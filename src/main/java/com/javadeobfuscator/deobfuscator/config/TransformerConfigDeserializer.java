@@ -56,7 +56,7 @@ public class TransformerConfigDeserializer extends JsonDeserializer<TransformerC
                 configs.add(mapper.readerForUpdating(config).readValue(field.getValue()));
             }
 
-            if (configs.size() == 0) {
+            if (configs.isEmpty()) {
                 throw new IllegalArgumentException("didn't see that coming " + node);
             } else if (configs.size() == 1) {
                 return configs.get(0);

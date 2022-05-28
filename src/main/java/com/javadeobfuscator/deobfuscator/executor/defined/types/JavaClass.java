@@ -178,7 +178,7 @@ public class JavaClass {
         String desc = descBuilder.toString();
 
         List<MethodNode> possibleMethods = classNode.methods.stream().filter(methodNode -> methodNode.name.equals(name) && methodNode.desc.startsWith(desc)).collect(Collectors.toList());
-        if (possibleMethods.size() == 0) {
+        if (possibleMethods.isEmpty()) {
             Utils.sneakyThrow(new NoSuchMethodException(this.name + " " + name + desc));
             return null;
         } else if (possibleMethods.size() > 1) {
@@ -388,7 +388,7 @@ public class JavaClass {
         String desc = descBuilder.toString();
 
         List<MethodNode> possibleMethods = classNode.methods.stream().filter(methodNode -> methodNode.name.equals("<init>") && methodNode.desc.startsWith(desc)).collect(Collectors.toList());
-        if (possibleMethods.size() == 0) {
+        if (possibleMethods.isEmpty()) {
             Utils.sneakyThrow(new NoSuchMethodException(this.name + " " + name + desc));
             return null;
         } else {
@@ -406,7 +406,7 @@ public class JavaClass {
 
         List<MethodNode> possibleMethods = classNode.methods.stream().filter(methodNode ->
                 Modifier.isPublic(methodNode.access) && methodNode.name.equals("<init>") && methodNode.desc.startsWith(desc)).collect(Collectors.toList());
-        if (possibleMethods.size() == 0) {
+        if (possibleMethods.isEmpty()) {
             Utils.sneakyThrow(new NoSuchMethodException(this.name + " " + name + desc));
             return null;
         } else {

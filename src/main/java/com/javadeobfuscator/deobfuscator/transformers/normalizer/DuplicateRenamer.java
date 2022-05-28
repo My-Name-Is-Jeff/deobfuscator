@@ -449,7 +449,7 @@ public class DuplicateRenamer extends AbstractNormalizer<DuplicateRenamer.Config
                         clazz = clazz.getSuperclass();
                     }
                     conflicters.addAll(getInterfaceConflicters(new JavaMethod(new JavaClass(classNode.name, context), methodNode), new JavaClass(classNode.name, context), remapper));
-                    if (conflicters.size() > 0) {
+                    if (!conflicters.isEmpty()) {
                         int id = methodIdNow.getAndIncrement();
                         while (true) {
                             String name = methodNode.name + "_" + id;
