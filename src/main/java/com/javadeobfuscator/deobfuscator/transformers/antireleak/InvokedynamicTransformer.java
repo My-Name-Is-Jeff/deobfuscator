@@ -16,6 +16,7 @@
 
 package com.javadeobfuscator.deobfuscator.transformers.antireleak;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -191,11 +192,11 @@ public class InvokedynamicTransformer extends Transformer<TransformerConfig> {
                                 MethodInsnNode replacement = null;
                                 switch (result.type) {
                                     case "virtual":
+                                        boolean isInterface = Modifier.isInterface(classpath.get(clazz).access);
                                         replacement = new MethodInsnNode(
-                                                (classpath.get(clazz).access & Opcodes.ACC_INTERFACE) != 0 ? Opcodes.INVOKEINTERFACE
-                                                        : Opcodes.INVOKEVIRTUAL, clazz,
+                                                isInterface ? Opcodes.INVOKEINTERFACE : Opcodes.INVOKEVIRTUAL, clazz,
                                                 result.name, result.desc,
-                                                (classpath.get(clazz).access & Opcodes.ACC_INTERFACE) != 0);
+                                                isInterface);
                                         break;
                                     case "static":
                                         replacement = new MethodInsnNode(
