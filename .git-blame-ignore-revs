@@ -1,2 +1,6 @@
 # reformat: change all tabs to spaces
 e002da3b28bf2db0104fb66517890980780d3b23
+# reformat: remove trailing white space. code style. require braces for all for,while statements. braces on same line exactly when not multiline
+4167796e933783baad89fe110b33b98df2b72d87
+# reformat: some manual newline removals & improvements
+26877790f203f76594fc35167f3d886b5b45c892
