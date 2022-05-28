@@ -49,7 +49,7 @@ public class StringEncryptionTransformer extends Transformer<TransformerConfig> 
     /**
      * Contains a map of patched objects and their objects to null
      */
-    private Map<ClassNode, FieldNode> patched = new HashMap<>();
+    private final Map<ClassNode, FieldNode> patched = new HashMap<>();
 
     @Override
     public boolean transform() {
@@ -80,8 +80,7 @@ public class StringEncryptionTransformer extends Transformer<TransformerConfig> 
             @Override
             public boolean checkcast(JavaValue target, Type type, Context context) {
                 if (type.getDescriptor().equals("[C"))
-                    if (!(target.value() instanceof char[]))
-                        return false;
+                    return target.value() instanceof char[];
                 return true;
             }
 

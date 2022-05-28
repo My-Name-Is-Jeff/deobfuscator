@@ -60,8 +60,8 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
         provider.register(new ComparisonProvider() {
             @Override
             public boolean instanceOf(JavaValue target, Type type, Context context) {
-                if (target.value() instanceof JavaObject && type.getInternalName().equals(((JavaObject) target.value()).type()))
-                    return true;
+                if (target.value() instanceof JavaObject)
+                    return type.getInternalName().equals(((JavaObject) target.value()).type());
                 return false;
             }
 

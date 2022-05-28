@@ -109,19 +109,16 @@ public class InvokedynamicTransformer extends Transformer<TransformerConfig> {
             @Override
             public boolean instanceOf(JavaValue target, Type type, Context context) {
                 if (type.getDescriptor().equals("Ljava/lang/String;"))
-                    if (!(target.value() instanceof String))
-                        return false;
+                    return target.value() instanceof String;
                 if (type.getDescriptor().equals("Ljava/lang/Integer;"))
-                    if (!(target.value() instanceof Integer))
-                        return false;
+                    return target.value() instanceof Integer;
                 return true;
             }
 
             @Override
             public boolean checkcast(JavaValue target, Type type, Context context) {
                 if (type.getDescriptor().equals("[C"))
-                    if (!(target.value() instanceof char[]))
-                        return false;
+                    return target.value() instanceof char[];
                 return true;
             }
 
