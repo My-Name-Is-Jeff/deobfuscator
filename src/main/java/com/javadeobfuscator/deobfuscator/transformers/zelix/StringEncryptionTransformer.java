@@ -59,41 +59,34 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
         provider.register(new MappedMethodProvider(classes));
         provider.register(new ComparisonProvider() {
             @Override
-            public boolean instanceOf(JavaValue target, Type type,
-                    Context context) {
-                if (target.value() instanceof JavaObject
-                    && type.getInternalName().equals(((JavaObject) target.value()).type()))
+            public boolean instanceOf(JavaValue target, Type type, Context context) {
+                if (target.value() instanceof JavaObject && type.getInternalName().equals(((JavaObject) target.value()).type()))
                     return true;
                 return false;
             }
 
             @Override
-            public boolean checkcast(JavaValue target, Type type,
-                    Context context) {
+            public boolean checkcast(JavaValue target, Type type, Context context) {
                 return true;
             }
 
             @Override
-            public boolean checkEquality(JavaValue first, JavaValue second,
-                    Context context) {
+            public boolean checkEquality(JavaValue first, JavaValue second, Context context) {
                 return false;
             }
 
             @Override
-            public boolean canCheckInstanceOf(JavaValue target, Type type,
-                    Context context) {
+            public boolean canCheckInstanceOf(JavaValue target, Type type, Context context) {
                 return true;
             }
 
             @Override
-            public boolean canCheckcast(JavaValue target, Type type,
-                    Context context) {
+            public boolean canCheckcast(JavaValue target, Type type, Context context) {
                 return true;
             }
 
             @Override
-            public boolean canCheckEquality(JavaValue first, JavaValue second,
-                    Context context) {
+            public boolean canCheckEquality(JavaValue first, JavaValue second, Context context) {
                 return false;
             }
         });
@@ -129,9 +122,9 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
                             && Type.getArgumentTypes(((MethodInsnNode) a).desc).length == 1
                             && Type.getReturnType(((MethodInsnNode) a).desc).getSort() == Type.VOID)
                         {
-                            MethodNode method = classNode.methods.stream().filter(m ->
-                                            m.name.equals(((MethodInsnNode) a).name) && m.desc.equals(((MethodInsnNode) a).desc)).
-                                    findFirst().orElse(null);
+                            MethodNode method = classNode.methods.stream()
+                                    .filter(m -> m.name.equals(((MethodInsnNode) a).name) && m.desc.equals(((MethodInsnNode) a).desc))
+                                    .findFirst().orElse(null);
                             if (method != null && Modifier.isStatic(method.access)) {
                                 List<AbstractInsnNode> instrs = new ArrayList<>();
                                 for (AbstractInsnNode ain : method.instructions.toArray()) {
@@ -766,65 +759,35 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
                                             null, new String[zkm8ArraySize], context);
                                     List<MethodNode> decryptorMethods = new ArrayList<>();
                                     MethodNode decryptMethod = null;
-                                    for (MethodNode method : classNode.methods)
-                                    // We search, run, and fix all the methods that have
-                                    // obfuscated strings.
-                                    // Additionally, we also check to see if the method is a ZKM
-                                    // decrypt method.
-                                    // After a method is determined to be added by ZKM, it is
-                                    // put
-                                    // into a list.
-                                    {
+                                    // We search, run, and fix all the methods that have obfuscated strings.
+                                    // Additionally, we also check to see if the method is a ZKM decrypt method.
+                                    // After a method is determined to be added by ZKM, it is put into a list.
+                                    for (MethodNode method : classNode.methods) {
                                         for (AbstractInsnNode ain : method.instructions.toArray()) {
                                             if (ain.getOpcode() == Opcodes.INVOKESTATIC) {
                                                 MethodInsnNode min = (MethodInsnNode) ain;
-                                                if (min.desc.equals("(II)Ljava/lang/String;")
-                                                    && min.owner
-                                                            .equals(classNode.name))
-                                                {
-                                                    if (ain.getPrevious() != null
-                                                        && ain.getPrevious().getPrevious() != null)
-                                                    {
-                                                        decryptMethod =
-                                                                classNode.methods
-                                                                        .stream()
-                                                                        .filter(mn -> mn.name
-                                                                                              .equals(min.name)
-                                                                                      && mn.desc.equals(min.desc))
-                                                                        .findFirst().orElse(null);
-                                                        boolean isZKMMethod1 = decryptorMethods
-                                                                .contains(decryptMethod);
-                                                        if (isZKMMethod1
-                                                            || (decryptMethod != null
-                                                                && isZKMEnhancedMethod(decryptMethod, decrypted)))
-                                                        {
-                                                            if (!decryptorMethods
-                                                                    .contains(decryptMethod))
-                                                                decryptorMethods
-                                                                        .add(decryptMethod);
+                                                if (min.desc.equals("(II)Ljava/lang/String;") && min.owner.equals(classNode.name)) {
+                                                    if (ain.getPrevious() != null && ain.getPrevious().getPrevious() != null) {
+                                                        decryptMethod = classNode.methods.stream()
+                                                                .filter(mn -> mn.name.equals(min.name) && mn.desc.equals(min.desc))
+                                                                .findFirst().orElse(null);
+                                                        boolean isZKMMethod1 = decryptorMethods.contains(decryptMethod);
+                                                        if (isZKMMethod1 || (decryptMethod != null && isZKMEnhancedMethod(decryptMethod, decrypted))) {
+                                                            if (!decryptorMethods.contains(decryptMethod))
+                                                                decryptorMethods.add(decryptMethod);
                                                             if (Utils.isInteger(ain.getPrevious())
                                                                 && Utils.isInteger(ain.getPrevious().getPrevious()))
                                                             {
-                                                                int args1 = Utils.getIntValue(ain
-                                                                        .getPrevious().getPrevious());
-                                                                int args2 =
-                                                                        Utils.getIntValue(ain.getPrevious());
-                                                                List<JavaValue> args =
-                                                                        new ArrayList<>();
+                                                                int args1 = Utils.getIntValue(ain.getPrevious().getPrevious());
+                                                                int args2 = Utils.getIntValue(ain.getPrevious());
+                                                                List<JavaValue> args = new ArrayList<>();
                                                                 args.add(new JavaInteger(args1));
                                                                 args.add(new JavaInteger(args2));
-                                                                String result = MethodExecutor
-                                                                        .execute(classNode,
-                                                                                decryptMethod, args, null,
-                                                                                context);
+                                                                String result = MethodExecutor.execute(classNode, decryptMethod, args, null, context);
                                                                 if (result != null) {
-                                                                    method.instructions
-                                                                            .remove(ain.getPrevious()
-                                                                                    .getPrevious());
-                                                                    method.instructions
-                                                                            .remove(ain.getPrevious());
-                                                                    method.instructions.set(ain,
-                                                                            new LdcInsnNode(result));
+                                                                    method.instructions.remove(ain.getPrevious().getPrevious());
+                                                                    method.instructions.remove(ain.getPrevious());
+                                                                    method.instructions.set(ain, new LdcInsnNode(result));
                                                                     encStrings.incrementAndGet();
                                                                 }
                                                             } else {
@@ -845,74 +808,46 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
                                                                         new ArrayList<>();
                                                                 args.add(new JavaInteger(args1));
                                                                 args.add(new JavaInteger(args2));
-                                                                String result = MethodExecutor
-                                                                        .execute(classNode,
-                                                                                decryptMethod, args, null,
-                                                                                context);
+                                                                String result = MethodExecutor.execute(classNode, decryptMethod, args, null, context);
                                                                 if (result != null) {
                                                                     method.instructions.remove(a1);
                                                                     method.instructions.remove(a2);
-                                                                    method.instructions.set(ain,
-                                                                            new LdcInsnNode(result));
+                                                                    method.instructions.set(ain, new LdcInsnNode(result));
                                                                     encStrings.incrementAndGet();
                                                                 }
                                                             }
                                                         }
                                                     }
-                                                } else if (min.desc.equals("(III)Ljava/lang/String;")
-                                                           && min.owner.equals(classNode.name))
-                                                {
+                                                } else if (min.desc.equals("(III)Ljava/lang/String;") && min.owner.equals(classNode.name)) {
                                                     if (ain.getPrevious() != null
                                                         && ain.getPrevious().getPrevious() != null
                                                         && ain.getPrevious().getPrevious().getPrevious() != null)
                                                     {
-                                                        decryptMethod =
-                                                                classNode.methods
-                                                                        .stream()
-                                                                        .filter(mn -> mn.name
-                                                                                              .equals(min.name)
-                                                                                      && mn.desc.equals(min.desc))
-                                                                        .findFirst().orElse(null);
+                                                        decryptMethod = classNode.methods.stream()
+                                                                .filter(mn -> mn.name.equals(min.name) && mn.desc.equals(min.desc))
+                                                                .findFirst().orElse(null);
                                                         boolean isZKMMethod1 = decryptorMethods
                                                                 .contains(decryptMethod);
-                                                        if (isZKMMethod1
-                                                            || (decryptMethod != null
-                                                                && isZKM9EnhancedMethod(decryptMethod, decrypted)))
-                                                        {
-                                                            if (!decryptorMethods
-                                                                    .contains(decryptMethod))
-                                                                decryptorMethods
-                                                                        .add(decryptMethod);
+                                                        if (isZKMMethod1 || (decryptMethod != null && isZKM9EnhancedMethod(decryptMethod, decrypted))) {
+                                                            if (!decryptorMethods.contains(decryptMethod))
+                                                                decryptorMethods.add(decryptMethod);
                                                             if (Utils.isInteger(ain.getPrevious())
                                                                 && Utils.isInteger(ain.getPrevious().getPrevious())
                                                                 && Utils.isInteger(ain.getPrevious().getPrevious().getPrevious()))
                                                             {
-                                                                int args1 = Utils.getIntValue(ain
-                                                                        .getPrevious().getPrevious().getPrevious());
-                                                                int args2 = Utils.getIntValue(ain
-                                                                        .getPrevious().getPrevious());
-                                                                int args3 =
-                                                                        Utils.getIntValue(ain.getPrevious());
-                                                                List<JavaValue> args =
-                                                                        new ArrayList<>();
+                                                                int args1 = Utils.getIntValue(ain.getPrevious().getPrevious().getPrevious());
+                                                                int args2 = Utils.getIntValue(ain.getPrevious().getPrevious());
+                                                                int args3 = Utils.getIntValue(ain.getPrevious());
+                                                                List<JavaValue> args = new ArrayList<>();
                                                                 args.add(new JavaInteger(args1));
                                                                 args.add(new JavaInteger(args2));
                                                                 args.add(new JavaInteger(args3));
-                                                                String result = MethodExecutor
-                                                                        .execute(classNode,
-                                                                                decryptMethod, args, null,
-                                                                                context);
+                                                                String result = MethodExecutor.execute(classNode, decryptMethod, args, null, context);
                                                                 if (result != null) {
-                                                                    method.instructions
-                                                                            .remove(ain.getPrevious()
-                                                                                    .getPrevious().getPrevious());
-                                                                    method.instructions
-                                                                            .remove(ain.getPrevious()
-                                                                                    .getPrevious());
-                                                                    method.instructions
-                                                                            .remove(ain.getPrevious());
-                                                                    method.instructions.set(ain,
-                                                                            new LdcInsnNode(result));
+                                                                    method.instructions.remove(ain.getPrevious().getPrevious().getPrevious());
+                                                                    method.instructions.remove(ain.getPrevious().getPrevious());
+                                                                    method.instructions.remove(ain.getPrevious());
+                                                                    method.instructions.set(ain, new LdcInsnNode(result));
                                                                     encStrings.incrementAndGet();
                                                                 }
                                                             } else {
@@ -929,32 +864,24 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
                                                                 AbstractInsnNode a2 = f.getStack(f.getStackSize() - 2).insns.iterator().next();
                                                                 AbstractInsnNode a3 = f.getStack(f.getStackSize() - 1).insns.iterator().next();
                                                                 if (!Utils.isInteger(a3)) {
-                                                                    System.out
-                                                                            .println("[Zelix] [StringEncryptionTransformer] Warning: Unable to decrypt string"
-                                                                                     + " at method " + method.name + method.desc + " from class " + classNode.name
-                                                                                     + ". Other arguments: " + Utils.getIntValue(a1) + " " + Utils.getIntValue(a2));
+                                                                    System.out.println("[Zelix] [StringEncryptionTransformer] Warning: Unable to decrypt string"
+                                                                                       + " at method " + method.name + method.desc + " from class " + classNode.name
+                                                                                       + ". Other arguments: " + Utils.getIntValue(a1) + " " + Utils.getIntValue(a2));
                                                                     continue;
                                                                 }
                                                                 int args1 = Utils.getIntValue(a1);
-                                                                int args2 =
-                                                                        Utils.getIntValue(a2);
-                                                                int args3 =
-                                                                        Utils.getIntValue(a3);
-                                                                List<JavaValue> args =
-                                                                        new ArrayList<>();
+                                                                int args2 = Utils.getIntValue(a2);
+                                                                int args3 = Utils.getIntValue(a3);
+                                                                List<JavaValue> args = new ArrayList<>();
                                                                 args.add(new JavaInteger(args1));
                                                                 args.add(new JavaInteger(args2));
                                                                 args.add(new JavaInteger(args3));
-                                                                String result = MethodExecutor
-                                                                        .execute(classNode,
-                                                                                decryptMethod, args, null,
-                                                                                context);
+                                                                String result = MethodExecutor.execute(classNode, decryptMethod, args, null, context);
                                                                 if (result != null) {
                                                                     method.instructions.remove(a1);
                                                                     method.instructions.remove(a2);
                                                                     method.instructions.remove(a3);
-                                                                    method.instructions.set(ain,
-                                                                            new LdcInsnNode(result));
+                                                                    method.instructions.set(ain, new LdcInsnNode(result));
                                                                     encStrings.incrementAndGet();
                                                                 }
                                                             }
@@ -966,8 +893,7 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
                                     }
                                     // Remove the string encryption method
                                     if (getConfig().isCleanup()) {
-                                        Iterator<MethodNode> it =
-                                                classNode.methods.iterator();
+                                        Iterator<MethodNode> it = classNode.methods.iterator();
                                         while (it.hasNext()) {
                                             MethodNode node = it.next();
                                             for (MethodNode decrypt : decryptorMethods) {
@@ -1155,11 +1081,13 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
                                     clinit.instructions.remove(last);
                                     if (clinit1 != null && clinit2 != null) {
                                         final MethodInsnNode clinit1F = clinit1;
-                                        MethodNode clinit1Method = classNode.methods.stream().filter(m ->
-                                                m.name.equals(clinit1F.name) && m.desc.equals(clinit1F.desc)).findFirst().orElse(null);
+                                        MethodNode clinit1Method = classNode.methods.stream()
+                                                .filter(m -> m.name.equals(clinit1F.name) && m.desc.equals(clinit1F.desc))
+                                                .findFirst().orElse(null);
                                         final MethodInsnNode clinit2F = clinit2;
-                                        MethodNode clinit2Method = classNode.methods.stream().filter(m ->
-                                                m.name.equals(clinit2F.name) && m.desc.equals(clinit2F.desc)).findFirst().orElse(null);
+                                        MethodNode clinit2Method = classNode.methods.stream()
+                                                .filter(m -> m.name.equals(clinit2F.name) && m.desc.equals(clinit2F.desc))
+                                                .findFirst().orElse(null);
                                         classNode.methods.remove(clinit1Method);
                                         classNode.methods.remove(clinit2Method);
                                     }
@@ -1191,8 +1119,7 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
                                                 if (putStatic.name.equals(field.getName()) && putStatic.desc.equals(field.getDesc())
                                                     && putStatic.owner.equals(field.getOwner()))
                                                     clinit.instructions.set(entry.getKey(),
-                                                            new FieldInsnNode(Opcodes.GETSTATIC, field.getOwner(), field.getName(),
-                                                                    field.getDesc()));
+                                                            new FieldInsnNode(Opcodes.GETSTATIC, field.getOwner(), field.getName(), field.getDesc()));
                                             }
                                         }
                                     }
@@ -1301,11 +1228,13 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
                                     classNode.fields.remove(decryptedStrings);
                                     if (clinit1 != null && clinit2 != null) {
                                         final MethodInsnNode clinit1F = clinit1;
-                                        MethodNode clinit1Method = classNode.methods.stream().filter(m ->
-                                                m.name.equals(clinit1F.name) && m.desc.equals(clinit1F.desc)).findFirst().orElse(null);
+                                        MethodNode clinit1Method = classNode.methods.stream()
+                                                .filter(m -> m.name.equals(clinit1F.name) && m.desc.equals(clinit1F.desc))
+                                                .findFirst().orElse(null);
                                         final MethodInsnNode clinit2F = clinit2;
-                                        MethodNode clinit2Method = classNode.methods.stream().filter(m ->
-                                                m.name.equals(clinit2F.name) && m.desc.equals(clinit2F.desc)).findFirst().orElse(null);
+                                        MethodNode clinit2Method = classNode.methods.stream()
+                                                .filter(m -> m.name.equals(clinit2F.name) && m.desc.equals(clinit2F.desc))
+                                                .findFirst().orElse(null);
                                         classNode.methods.remove(clinit1Method);
                                         classNode.methods.remove(clinit2Method);
                                     }
@@ -1415,13 +1344,18 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
                                             //Remove jumpsite if unused
                                             boolean used = false;
                                             for (TryCatchBlockNode trycatch : clinit.tryCatchBlocks) {
-                                                if (trycatch.start == jumpSite)
+                                                if (trycatch.start == jumpSite) {
                                                     used = true;
+                                                    break;
+                                                }
                                             }
                                             for (AbstractInsnNode ain : clinit.instructions.toArray()) {
                                                 if (ain instanceof JumpInsnNode && ain != gotoNode
                                                     && ((JumpInsnNode) ain).label == jumpSite)
+                                                {
                                                     used = true;
+                                                    break;
+                                                }
                                             }
                                             if (!used)
                                                 clinit.instructions.remove(jumpSite);
@@ -1430,11 +1364,13 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
                                         clinit.instructions.remove(last);
                                         if (clinit1 != null && clinit2 != null) {
                                             final MethodInsnNode clinit1F = clinit1;
-                                            MethodNode clinit1Method = classNode.methods.stream().filter(m ->
-                                                    m.name.equals(clinit1F.name) && m.desc.equals(clinit1F.desc)).findFirst().orElse(null);
+                                            MethodNode clinit1Method = classNode.methods.stream()
+                                                    .filter(m -> m.name.equals(clinit1F.name) && m.desc.equals(clinit1F.desc))
+                                                    .findFirst().orElse(null);
                                             final MethodInsnNode clinit2F = clinit2;
-                                            MethodNode clinit2Method = classNode.methods.stream().filter(m ->
-                                                    m.name.equals(clinit2F.name) && m.desc.equals(clinit2F.desc)).findFirst().orElse(null);
+                                            MethodNode clinit2Method = classNode.methods.stream()
+                                                    .filter(m -> m.name.equals(clinit2F.name) && m.desc.equals(clinit2F.desc))
+                                                    .findFirst().orElse(null);
                                             classNode.methods.remove(clinit1Method);
                                             classNode.methods.remove(clinit2Method);
                                         }
@@ -1467,8 +1403,7 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
                                                     if (putStatic.name.equals(field.getName()) && putStatic.desc.equals(field.getDesc())
                                                         && putStatic.owner.equals(field.getOwner()))
                                                         clinit.instructions.set(entry.getKey(),
-                                                                new FieldInsnNode(Opcodes.GETSTATIC, field.getOwner(), field.getName(),
-                                                                        field.getDesc()));
+                                                                new FieldInsnNode(Opcodes.GETSTATIC, field.getOwner(), field.getName(), field.getDesc()));
                                                 }
                                             }
                                         }
@@ -1539,11 +1474,13 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
                                         clinit.instructions.remove(last);
                                         if (clinit1 != null && clinit2 != null) {
                                             final MethodInsnNode clinit1F = clinit1;
-                                            MethodNode clinit1Method = classNode.methods.stream().filter(m ->
-                                                    m.name.equals(clinit1F.name) && m.desc.equals(clinit1F.desc)).findFirst().orElse(null);
+                                            MethodNode clinit1Method = classNode.methods.stream()
+                                                    .filter(m -> m.name.equals(clinit1F.name) && m.desc.equals(clinit1F.desc))
+                                                    .findFirst().orElse(null);
                                             final MethodInsnNode clinit2F = clinit2;
-                                            MethodNode clinit2Method = classNode.methods.stream().filter(m ->
-                                                    m.name.equals(clinit2F.name) && m.desc.equals(clinit2F.desc)).findFirst().orElse(null);
+                                            MethodNode clinit2Method = classNode.methods.stream()
+                                                    .filter(m -> m.name.equals(clinit2F.name) && m.desc.equals(clinit2F.desc))
+                                                    .findFirst().orElse(null);
                                             classNode.methods.remove(clinit1Method);
                                             classNode.methods.remove(clinit2Method);
                                         }
@@ -1566,11 +1503,13 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
                                         clinit.instructions.remove(firstZKMInstr);
                                         if (clinit1 != null && clinit2 != null) {
                                             final MethodInsnNode clinit1F = clinit1;
-                                            MethodNode clinit1Method = classNode.methods.stream().filter(m ->
-                                                    m.name.equals(clinit1F.name) && m.desc.equals(clinit1F.desc)).findFirst().orElse(null);
+                                            MethodNode clinit1Method = classNode.methods.stream()
+                                                    .filter(m -> m.name.equals(clinit1F.name) && m.desc.equals(clinit1F.desc))
+                                                    .findFirst().orElse(null);
                                             final MethodInsnNode clinit2F = clinit2;
-                                            MethodNode clinit2Method = classNode.methods.stream().filter(m ->
-                                                    m.name.equals(clinit2F.name) && m.desc.equals(clinit2F.desc)).findFirst().orElse(null);
+                                            MethodNode clinit2Method = classNode.methods.stream()
+                                                    .filter(m -> m.name.equals(clinit2F.name) && m.desc.equals(clinit2F.desc))
+                                                    .findFirst().orElse(null);
                                             classNode.methods.remove(clinit1Method);
                                             classNode.methods.remove(clinit2Method);
                                         }
@@ -1598,8 +1537,7 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
                                             clinit.instructions.remove(firstZKMInstr.getNext().getNext().getNext());
                                             clinit.instructions.remove(firstZKMInstr.getNext().getNext());
                                         } else
-                                            clinit.instructions.set(firstZKMInstr.getNext().getNext(), new JumpInsnNode(
-                                                    Opcodes.GOTO, gotoNode.label));
+                                            clinit.instructions.set(firstZKMInstr.getNext().getNext(), new JumpInsnNode(Opcodes.GOTO, gotoNode.label));
                                         clinit.instructions.remove(firstZKMInstr.getNext());
                                         clinit.instructions.set(firstZKMInstr, new LdcInsnNode(res));
                                     } else {
@@ -1607,8 +1545,7 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
                                             clinit.instructions.remove(firstZKMInstr.getNext().getNext().getNext().getNext());
                                             clinit.instructions.remove(firstZKMInstr.getNext().getNext().getNext());
                                         } else
-                                            clinit.instructions.set(firstZKMInstr.getNext().getNext().getNext(), new JumpInsnNode(
-                                                    Opcodes.GOTO, gotoNode.label));
+                                            clinit.instructions.set(firstZKMInstr.getNext().getNext().getNext(), new JumpInsnNode(Opcodes.GOTO, gotoNode.label));
                                         clinit.instructions.remove(firstZKMInstr.getNext().getNext());
                                         clinit.instructions.remove(firstZKMInstr.getNext());
                                         clinit.instructions.set(firstZKMInstr, new LdcInsnNode(res));
@@ -1619,11 +1556,13 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
                                     if (clinit1 != null && clinit2 != null && toRemove.get(classNode) == null) {
                                         toRemove.put(classNode, new ArrayList<>());
                                         final MethodInsnNode clinit1F = clinit1;
-                                        toRemove.get(classNode).add(classNode.methods.stream().filter(m ->
-                                                m.name.equals(clinit1F.name) && m.desc.equals(clinit1F.desc)).findFirst().orElse(null));
+                                        toRemove.get(classNode).add(classNode.methods.stream()
+                                                .filter(m -> m.name.equals(clinit1F.name) && m.desc.equals(clinit1F.desc))
+                                                .findFirst().orElse(null));
                                         final MethodInsnNode clinit2F = clinit2;
-                                        toRemove.get(classNode).add(classNode.methods.stream().filter(m ->
-                                                m.name.equals(clinit2F.name) && m.desc.equals(clinit2F.desc)).findFirst().orElse(null));
+                                        toRemove.get(classNode).add(classNode.methods.stream()
+                                                .filter(m -> m.name.equals(clinit2F.name) && m.desc.equals(clinit2F.desc))
+                                                .findFirst().orElse(null));
                                     }
                                     modified = true;
                                 } else if ((firstZKMInstr.getOpcode() == Opcodes.LDC
@@ -1673,8 +1612,7 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
                                             clinit.instructions.remove(firstZKMInstr.getNext().getNext().getNext());
                                             clinit.instructions.remove(firstZKMInstr.getNext().getNext());
                                         } else
-                                            clinit.instructions.set(firstZKMInstr.getNext().getNext(), new JumpInsnNode(
-                                                    Opcodes.GOTO, jumpTo));
+                                            clinit.instructions.set(firstZKMInstr.getNext().getNext(), new JumpInsnNode(Opcodes.GOTO, jumpTo));
                                         clinit.instructions.remove(firstZKMInstr.getNext());
                                         clinit.instructions.set(firstZKMInstr, new LdcInsnNode(res));
                                     } else {
@@ -1682,8 +1620,7 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
                                             clinit.instructions.remove(firstZKMInstr.getNext().getNext().getNext().getNext());
                                             clinit.instructions.remove(firstZKMInstr.getNext().getNext().getNext());
                                         } else
-                                            clinit.instructions.set(firstZKMInstr.getNext().getNext().getNext(), new JumpInsnNode(
-                                                    Opcodes.GOTO, jumpTo));
+                                            clinit.instructions.set(firstZKMInstr.getNext().getNext().getNext(), new JumpInsnNode(Opcodes.GOTO, jumpTo));
                                         clinit.instructions.remove(firstZKMInstr.getNext().getNext());
                                         clinit.instructions.remove(firstZKMInstr.getNext());
                                         clinit.instructions.set(firstZKMInstr, new LdcInsnNode(res));
@@ -1692,11 +1629,13 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
                                     if (clinit1 != null && clinit2 != null && toRemove.get(classNode) == null) {
                                         toRemove.put(classNode, new ArrayList<>());
                                         final MethodInsnNode clinit1F = clinit1;
-                                        toRemove.get(classNode).add(classNode.methods.stream().filter(m ->
-                                                m.name.equals(clinit1F.name) && m.desc.equals(clinit1F.desc)).findFirst().orElse(null));
+                                        toRemove.get(classNode).add(classNode.methods.stream()
+                                                .filter(m -> m.name.equals(clinit1F.name) && m.desc.equals(clinit1F.desc))
+                                                .findFirst().orElse(null));
                                         final MethodInsnNode clinit2F = clinit2;
-                                        toRemove.get(classNode).add(classNode.methods.stream().filter(m ->
-                                                m.name.equals(clinit2F.name) && m.desc.equals(clinit2F.desc)).findFirst().orElse(null));
+                                        toRemove.get(classNode).add(classNode.methods.stream()
+                                                .filter(m -> m.name.equals(clinit2F.name) && m.desc.equals(clinit2F.desc))
+                                                .findFirst().orElse(null));
                                     }
                                     modified = true;
                                     encStrings.incrementAndGet();
@@ -1746,9 +1685,7 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
                         decrypted[done] = ((LdcInsnNode) ain.getNext().getNext()).cst;
                         done++;
                         i += 3;
-                    } else if (done == total && ain.getOpcode() == Opcodes.PUTSTATIC
-                               && ((FieldInsnNode) ain).owner.equals(classNode.name))
-                    {
+                    } else if (done == total && ain.getOpcode() == Opcodes.PUTSTATIC && ((FieldInsnNode) ain).owner.equals(classNode.name)) {
                         end = ain;
                         field = (FieldInsnNode) ain;
                         inline = true;
@@ -1799,8 +1736,10 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
                     }
                     boolean allUsed = true;
                     for (boolean b : refs) {
-                        if (!b)
+                        if (!b) {
                             allUsed = false;
+                            break;
+                        }
                     }
                     if (allUsed) {
                         for (MethodNode method : classNode.methods) {
@@ -1821,8 +1760,9 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
                             }
                         }
                         final FieldInsnNode fieldF = field;
-                        FieldNode decryptedField = classNode.fields.stream().filter(f -> f.name.equals(fieldF.name)
-                                                                                         && f.desc.equals(fieldF.desc)).findFirst().orElse(null);
+                        FieldNode decryptedField = classNode.fields.stream()
+                                .filter(f -> f.name.equals(fieldF.name) && f.desc.equals(fieldF.desc))
+                                .findFirst().orElse(null);
                         if (getConfig().isCleanup())
                             classNode.fields.remove(decryptedField);
                         AbstractInsnNode start2 = start;
@@ -1851,8 +1791,9 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
                     }
                     if (counter == 1 && ((FieldInsnNode) clinit.instructions.get(lastIndex + 1)).owner.equals(classNode.name)) {
                         FieldInsnNode fieldInsn = (FieldInsnNode) clinit.instructions.get(lastIndex + 1);
-                        FieldNode decryptedString = classNode.fields.stream().filter(f -> f.name.equals(fieldInsn.name)
-                                                                                          && f.desc.equals(fieldInsn.desc)).findFirst().orElse(null);
+                        FieldNode decryptedString = classNode.fields.stream()
+                                .filter(f -> f.name.equals(fieldInsn.name) && f.desc.equals(fieldInsn.desc))
+                                .findFirst().orElse(null);
                         if (Modifier.isPrivate(decryptedString.access) && Modifier.isStatic(decryptedString.access)
                             && Modifier.isFinal(decryptedString.access))
                         {
@@ -1874,7 +1815,9 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
                                             && ((FieldInsnNode) ain).owner.equals(fieldInsn.owner)
                                             && ((FieldInsnNode) ain).name.equals(fieldInsn.name)
                                             && ((FieldInsnNode) ain).desc.equals(fieldInsn.desc))
+                                        {
                                             methodNode.instructions.set(ain, new LdcInsnNode(cst));
+                                        }
                                     }
                                 }
                                 clinit.instructions.remove(clinit.instructions.get(lastIndex + 1));
@@ -1896,15 +1839,18 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
     private boolean isClinitMethod1(ClassNode classNode, MethodInsnNode insnNode) {
         if (!insnNode.owner.equals(classNode.name) || !insnNode.desc.equals("(Ljava/lang/String;)[C"))
             return false;
-        MethodNode method = classNode.methods.stream().filter(m -> m.desc.equals(insnNode.desc)
-                                                                   && m.name.equals(insnNode.name)).findFirst().orElse(null);
+        MethodNode method = classNode.methods.stream()
+                .filter(m -> m.desc.equals(insnNode.desc) && m.name.equals(insnNode.name))
+                .findFirst().orElse(null);
         if (method == null)
             return false;
         for (AbstractInsnNode ain : method.instructions.toArray()) {
             if (ain.getOpcode() == Opcodes.INVOKEVIRTUAL
                 && ((MethodInsnNode) ain).name.equals("toCharArray")
                 && ((MethodInsnNode) ain).owner.equals("java/lang/String"))
+            {
                 return true;
+            }
         }
         return false;
     }
@@ -1913,15 +1859,18 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
         if (!insnNode.owner.equals(classNode.name) || (!insnNode.desc.equals("([C)Ljava/lang/String;")
                                                        && !insnNode.desc.equals("(I[C)Ljava/lang/String;")))
             return false;
-        MethodNode method = classNode.methods.stream().filter(m -> m.desc.equals(insnNode.desc)
-                                                                   && m.name.equals(insnNode.name)).findFirst().orElse(null);
+        MethodNode method = classNode.methods.stream()
+                .filter(m -> m.desc.equals(insnNode.desc) && m.name.equals(insnNode.name))
+                .findFirst().orElse(null);
         if (method == null)
             return false;
         for (AbstractInsnNode ain : method.instructions.toArray()) {
             if (ain.getOpcode() == Opcodes.INVOKEVIRTUAL
                 && ((MethodInsnNode) ain).name.equals("intern")
                 && ((MethodInsnNode) ain).owner.equals("java/lang/String"))
+            {
                 return true;
+            }
         }
         return false;
     }

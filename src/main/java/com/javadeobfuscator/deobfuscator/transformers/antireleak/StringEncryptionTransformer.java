@@ -73,14 +73,12 @@ public class StringEncryptionTransformer extends Transformer<TransformerConfig> 
         provider.register(new MappedMethodProvider(classes));
         provider.register(new ComparisonProvider() {
             @Override
-            public boolean instanceOf(JavaValue target, Type type,
-                    Context context) {
+            public boolean instanceOf(JavaValue target, Type type, Context context) {
                 return true;
             }
 
             @Override
-            public boolean checkcast(JavaValue target, Type type,
-                    Context context) {
+            public boolean checkcast(JavaValue target, Type type, Context context) {
                 if (type.getDescriptor().equals("[C"))
                     if (!(target.value() instanceof char[]))
                         return false;
@@ -88,26 +86,22 @@ public class StringEncryptionTransformer extends Transformer<TransformerConfig> 
             }
 
             @Override
-            public boolean checkEquality(JavaValue first, JavaValue second,
-                    Context context) {
+            public boolean checkEquality(JavaValue first, JavaValue second, Context context) {
                 return true;
             }
 
             @Override
-            public boolean canCheckInstanceOf(JavaValue target, Type type,
-                    Context context) {
+            public boolean canCheckInstanceOf(JavaValue target, Type type, Context context) {
                 return true;
             }
 
             @Override
-            public boolean canCheckcast(JavaValue target, Type type,
-                    Context context) {
+            public boolean canCheckcast(JavaValue target, Type type, Context context) {
                 return true;
             }
 
             @Override
-            public boolean canCheckEquality(JavaValue first, JavaValue second,
-                    Context context) {
+            public boolean canCheckEquality(JavaValue first, JavaValue second, Context context) {
                 return false;
             }
         });
@@ -118,15 +112,13 @@ public class StringEncryptionTransformer extends Transformer<TransformerConfig> 
             classNode.methods.forEach(methodNode -> {
                 AnalyzerResult analyzerResult = null;
                 InsnList methodInsns = methodNode.instructions;
-                for (int insnIndex = 0; insnIndex < methodInsns
-                        .size(); insnIndex++) {
+                for (int insnIndex = 0; insnIndex < methodInsns.size(); insnIndex++) {
                     AbstractInsnNode ain = methodInsns.get(insnIndex);
                     if (ain.getOpcode() == Opcodes.INVOKESTATIC) {
                         MethodInsnNode min = (MethodInsnNode) ain;
                         AbstractInsnNode previous = ain.getPrevious();
                         if (min.owner.equals(classNode.name)
-                            && min.desc
-                                    .equals("(Ljava/lang/String;)Ljava/lang/String;")
+                            && min.desc.equals("(Ljava/lang/String;)Ljava/lang/String;")
                             && methodNode.desc.equals("(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;"
                                                       + "Ljava/lang/invoke/MethodType;Ljava/lang/Class;Ljava/lang/String;I)Ljava/lang/invoke/CallSite;")
                             && previous != null
@@ -137,21 +129,17 @@ public class StringEncryptionTransformer extends Transformer<TransformerConfig> 
                                 Context context = new Context(provider);
                                 MethodNode decryptMethod =
                                         classNode.methods.stream()
-                                                .filter(mn -> mn.name.equals(min.name)
-                                                              && mn.desc.equals(min.desc))
+                                                .filter(mn -> mn.name.equals(min.name) && mn.desc.equals(min.desc))
                                                 .findFirst().orElse(null);
                                 if (decryptMethod == null)
                                     throw new RuntimeException("Decrypt method cannot be found");
                                 String result =
                                         MethodExecutor.execute(
                                                 classes.get(min.owner), decryptMethod,
-                                                Arrays.asList(new JavaObject(ldc.cst,
-                                                        "java/lang/String")),
+                                                Arrays.asList(new JavaObject(ldc.cst, "java/lang/String")),
                                                 null, context);
-                                methodNode.instructions
-                                        .remove(ain.getPrevious());
-                                methodNode.instructions.set(ain,
-                                        new LdcInsnNode(result));
+                                methodNode.instructions.remove(ain.getPrevious());
+                                methodNode.instructions.set(ain, new LdcInsnNode(result));
                                 total.getAndIncrement();
                             }
                         } else if (min.desc.equals(methodNode.desc)
@@ -164,8 +152,7 @@ public class StringEncryptionTransformer extends Transformer<TransformerConfig> 
                             if (!patched.containsKey(classNode)) {
                                 FieldNode toNull = null;
                                 for (int i = 0; i < methodNode.instructions.size(); i++) {
-                                    AbstractInsnNode ain1 =
-                                            methodNode.instructions.get(i);
+                                    AbstractInsnNode ain1 = methodNode.instructions.get(i);
                                     if (ain1.getOpcode() == Opcodes.INVOKESTATIC) {
                                         MethodInsnNode methodInsn = (MethodInsnNode) ain1;
                                         if (methodInsn.desc.equals("(Ljava/lang/String;)Ljava/lang/String;")

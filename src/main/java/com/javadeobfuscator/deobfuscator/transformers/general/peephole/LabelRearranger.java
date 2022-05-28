@@ -164,19 +164,19 @@ public class LabelRearranger extends Transformer<TransformerConfig> {
                                 analyzer.analyze(method.instructions.getFirst(), breaks, switchBreaks, true, false);
                         if (reached.containsKey(next))
                             unreachable = false;
-                        if (!unreachable)
+                        if (!unreachable) {
                             tcbn:
-                                    for (TryCatchBlockNode tcbn : method.tryCatchBlocks) {
-                                        LinkedHashMap<LabelNode, List<AbstractInsnNode>> trycatchAnalysis =
-                                                analyzer.analyze(tcbn.handler, Arrays.asList(), new HashMap<>(), false, false);
-                                        for (Entry<LabelNode, List<AbstractInsnNode>> en : trycatchAnalysis.entrySet()) {
-                                            if (en.getKey() == next) {
-                                                excluded.add(next);
-                                                break tcbn;
-                                            }
-                                        }
+                            for (TryCatchBlockNode tcbn : method.tryCatchBlocks) {
+                                LinkedHashMap<LabelNode, List<AbstractInsnNode>> trycatchAnalysis =
+                                        analyzer.analyze(tcbn.handler, Arrays.asList(), new HashMap<>(), false, false);
+                                for (Entry<LabelNode, List<AbstractInsnNode>> en : trycatchAnalysis.entrySet()) {
+                                    if (en.getKey() == next) {
+                                        excluded.add(next);
+                                        break tcbn;
                                     }
-                        else
+                                }
+                            }
+                        } else
                             placeGoto = true;
                         int jumpQueueIndex = -1;
                         for (int i = 0; i < jumpQueue.size(); i++) {
@@ -249,11 +249,9 @@ public class LabelRearranger extends Transformer<TransformerConfig> {
                                 if (ain instanceof JumpInsnNode && ((JumpInsnNode) ain).label == jump)
                                     breaks.add(ain);
                                 else if ((ain instanceof TableSwitchInsnNode
-                                          && (((TableSwitchInsnNode) ain).labels.contains(jump)
-                                              || ((TableSwitchInsnNode) ain).dflt == jump))
+                                          && (((TableSwitchInsnNode) ain).labels.contains(jump) || ((TableSwitchInsnNode) ain).dflt == jump))
                                          || (ain instanceof LookupSwitchInsnNode
-                                             && (((LookupSwitchInsnNode) ain).labels.contains(jump)
-                                                 || ((LookupSwitchInsnNode) ain).dflt == jump)))
+                                             && (((LookupSwitchInsnNode) ain).labels.contains(jump) || ((LookupSwitchInsnNode) ain).dflt == jump)))
                                 {
                                     switchBreaks.putIfAbsent(ain, new ArrayList<>());
                                     switchBreaks.get(ain).add(label);
@@ -401,11 +399,9 @@ public class LabelRearranger extends Transformer<TransformerConfig> {
                                                     if (ain instanceof JumpInsnNode && ((JumpInsnNode) ain).label == next1)
                                                         breaks.add(ain);
                                                     else if ((ain instanceof TableSwitchInsnNode
-                                                              && (((TableSwitchInsnNode) ain).labels.contains(next1)
-                                                                  || ((TableSwitchInsnNode) ain).dflt == next1))
+                                                             && (((TableSwitchInsnNode) ain).labels.contains(next1) || ((TableSwitchInsnNode) ain).dflt == next1))
                                                              || (ain instanceof LookupSwitchInsnNode
-                                                                 && (((LookupSwitchInsnNode) ain).labels.contains(next1)
-                                                                     || ((LookupSwitchInsnNode) ain).dflt == next1)))
+                                                                && (((LookupSwitchInsnNode) ain).labels.contains(next1) || ((LookupSwitchInsnNode) ain).dflt == next1)))
                                                     {
                                                         switchBreaks.putIfAbsent(ain, new ArrayList<>());
                                                         switchBreaks.get(ain).add(label);
@@ -473,12 +469,10 @@ public class LabelRearranger extends Transformer<TransformerConfig> {
                                                 else if (orderedBlocks.contains(labelToBlock.get(label)))
                                                     if (ain instanceof JumpInsnNode && ((JumpInsnNode) ain).label == jump)
                                                         breaks.add(ain);
-                                                    else if ((ain instanceof TableSwitchInsnNode
-                                                              && (((TableSwitchInsnNode) ain).labels.contains(jump)
-                                                                  || ((TableSwitchInsnNode) ain).dflt == jump))
-                                                             || (ain instanceof LookupSwitchInsnNode
-                                                                 && (((LookupSwitchInsnNode) ain).labels.contains(jump)
-                                                                     || ((LookupSwitchInsnNode) ain).dflt == jump)))
+                                                    else if (ain instanceof TableSwitchInsnNode
+                                                             && (((TableSwitchInsnNode) ain).labels.contains(jump) || ((TableSwitchInsnNode) ain).dflt == jump)
+                                                             || ain instanceof LookupSwitchInsnNode
+                                                                && (((LookupSwitchInsnNode) ain).labels.contains(jump) || ((LookupSwitchInsnNode) ain).dflt == jump))
                                                     {
                                                         switchBreaks.putIfAbsent(ain, new ArrayList<>());
                                                         switchBreaks.get(ain).add(label);
