@@ -622,6 +622,25 @@ public class TransformerHelper implements Opcodes {
         return insns.stream().map(Utils::prettyprint).collect(Collectors.joining(",", "[", "]"));
     }
 
+    public static boolean doesSwitchHasLabel(AbstractInsnNode insn, AbstractInsnNode label) {
+        if (!(label instanceof LabelNode)) {
+            return false;
+        }
+        return TransformerHelper.doesSwitchHasLabel(insn, (LabelNode) label);
+    }
+
+    private static boolean doesSwitchHasLabel(AbstractInsnNode insn, LabelNode label) {
+        if (insn.getOpcode() == Opcodes.TABLESWITCH) {
+            TableSwitchInsnNode cast = (TableSwitchInsnNode) insn;
+            return cast.dflt == label || cast.labels.contains(label);
+        }
+        if (insn.getOpcode() == Opcodes.LOOKUPSWITCH) {
+            LookupSwitchInsnNode cast = (LookupSwitchInsnNode) insn;
+            return cast.dflt == label || cast.labels.contains(label);
+        }
+        return false;
+    }
+
     private static final Supplier<ExecutorService> ASYNC_SERVICE = Suppliers.memoize(Executors::newCachedThreadPool);
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TransformerHelper.class);

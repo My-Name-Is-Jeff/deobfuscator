@@ -5,6 +5,7 @@ import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
 
+import com.javadeobfuscator.deobfuscator.utils.TransformerHelper;
 import org.apache.commons.lang3.tuple.Triple;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
@@ -147,12 +148,7 @@ public class LabelRearranger extends Transformer<TransformerConfig> {
                             else if (orderedBlocks.contains(labelToBlock.get(label)))
                                 if (ain instanceof JumpInsnNode && ((JumpInsnNode) ain).label == next)
                                     breaks.add(ain);
-                                else if ((ain instanceof TableSwitchInsnNode
-                                          && (((TableSwitchInsnNode) ain).labels.contains(next)
-                                              || ((TableSwitchInsnNode) ain).dflt == next))
-                                         || (ain instanceof LookupSwitchInsnNode
-                                             && (((LookupSwitchInsnNode) ain).labels.contains(next)
-                                                 || ((LookupSwitchInsnNode) ain).dflt == next)))
+                                else if (TransformerHelper.doesSwitchHasLabel(ain, next))
                                 {
                                     switchBreaks.putIfAbsent(ain, new ArrayList<>());
                                     switchBreaks.get(ain).add(label);
@@ -248,10 +244,7 @@ public class LabelRearranger extends Transformer<TransformerConfig> {
                             else if (orderedBlocks.contains(labelToBlock.get(label)))
                                 if (ain instanceof JumpInsnNode && ((JumpInsnNode) ain).label == jump)
                                     breaks.add(ain);
-                                else if ((ain instanceof TableSwitchInsnNode
-                                          && (((TableSwitchInsnNode) ain).labels.contains(jump) || ((TableSwitchInsnNode) ain).dflt == jump))
-                                         || (ain instanceof LookupSwitchInsnNode
-                                             && (((LookupSwitchInsnNode) ain).labels.contains(jump) || ((LookupSwitchInsnNode) ain).dflt == jump)))
+                                else if (TransformerHelper.doesSwitchHasLabel(ain, jump))
                                 {
                                     switchBreaks.putIfAbsent(ain, new ArrayList<>());
                                     switchBreaks.get(ain).add(label);
@@ -271,21 +264,19 @@ public class LabelRearranger extends Transformer<TransformerConfig> {
                     if (!placeGoto && jumpQueue.isEmpty()) {
                         if (excluded.contains(next))
                             break;
-                        else {
-                            if (next == null) {
-                                boolean shouldBreak = true;
-                                for (Entry<LabelNode, AbstractInsnNode> entry : placeAfter) {
-                                    if (!orderedBlocks.contains(labelToBlock.get(entry.getKey()))) {
-                                        shouldBreak = false;
-                                        break;
-                                    }
-                                }
-                                if (shouldBreak)
+                        if (next == null) {
+                            boolean shouldBreak = true;
+                            for (Entry<LabelNode, AbstractInsnNode> entry : placeAfter) {
+                                if (!orderedBlocks.contains(labelToBlock.get(entry.getKey()))) {
+                                    shouldBreak = false;
                                     break;
+                                }
                             }
-                            System.out.println("Unknown pattern at method " + method.name + method.desc + ", class " + classNode.name);
-                            continue methodloop;
+                            if (shouldBreak)
+                                break;
                         }
+                        System.out.println("Unknown pattern at method " + method.name + method.desc + ", class " + classNode.name);
+                        continue methodloop;
                     }
                     if (!placeGoto)
                         jumpQueue.addAll(1, placeAfter);
@@ -398,10 +389,7 @@ public class LabelRearranger extends Transformer<TransformerConfig> {
                                                 else if (orderedBlocks.contains(labelToBlock.get(label)))
                                                     if (ain instanceof JumpInsnNode && ((JumpInsnNode) ain).label == next1)
                                                         breaks.add(ain);
-                                                    else if ((ain instanceof TableSwitchInsnNode
-                                                             && (((TableSwitchInsnNode) ain).labels.contains(next1) || ((TableSwitchInsnNode) ain).dflt == next1))
-                                                             || (ain instanceof LookupSwitchInsnNode
-                                                                && (((LookupSwitchInsnNode) ain).labels.contains(next1) || ((LookupSwitchInsnNode) ain).dflt == next1)))
+                                                    else if (TransformerHelper.doesSwitchHasLabel(ain, next1))
                                                     {
                                                         switchBreaks.putIfAbsent(ain, new ArrayList<>());
                                                         switchBreaks.get(ain).add(label);
@@ -469,11 +457,7 @@ public class LabelRearranger extends Transformer<TransformerConfig> {
                                                 else if (orderedBlocks.contains(labelToBlock.get(label)))
                                                     if (ain instanceof JumpInsnNode && ((JumpInsnNode) ain).label == jump)
                                                         breaks.add(ain);
-                                                    else if (ain instanceof TableSwitchInsnNode
-                                                             && (((TableSwitchInsnNode) ain).labels.contains(jump) || ((TableSwitchInsnNode) ain).dflt == jump)
-                                                             || ain instanceof LookupSwitchInsnNode
-                                                                && (((LookupSwitchInsnNode) ain).labels.contains(jump) || ((LookupSwitchInsnNode) ain).dflt == jump))
-                                                    {
+                                                    else if (TransformerHelper.doesSwitchHasLabel(ain, jump)) {
                                                         switchBreaks.putIfAbsent(ain, new ArrayList<>());
                                                         switchBreaks.get(ain).add(label);
                                                     }
@@ -598,11 +582,9 @@ public class LabelRearranger extends Transformer<TransformerConfig> {
                                 boolean found = false;
                                 for (TryCatchBlockNode tcbn2 : list) {
                                     if (tcbn.handler.equals(tcbn2.handler)
-                                        && ((tcbn.type == null && tcbn2.type == null) || tcbn.type.equals(tcbn2.type))
-                                        && ((tcbn.visibleTypeAnnotations == null && tcbn2.visibleTypeAnnotations == null)
-                                            || tcbn.visibleTypeAnnotations.equals(tcbn2.visibleTypeAnnotations))
-                                        && ((tcbn.invisibleTypeAnnotations == null && tcbn2.invisibleTypeAnnotations == null)
-                                            || tcbn.invisibleTypeAnnotations.equals(tcbn2.invisibleTypeAnnotations)))
+                                        && Objects.equals(tcbn.type, tcbn2.type)
+                                        && Objects.equals(tcbn.visibleTypeAnnotations, tcbn2.visibleTypeAnnotations)
+                                        && Objects.equals(tcbn.invisibleTypeAnnotations, tcbn2.invisibleTypeAnnotations))
                                     {
                                         chain.covered.add(labels.get(i));
                                         if (i + 1 >= labels.size()) {
@@ -638,11 +620,9 @@ public class LabelRearranger extends Transformer<TransformerConfig> {
                         for (int ii = 0; ii < resNow.get(start).size(); ii++) {
                             TryCatchBlockNode tcbn = resNow.get(start).get(ii);
                             if (tcbn.handler.equals(chain1.handler)
-                                && ((tcbn.type == null && chain1.type == null) || tcbn.type.equals(chain1.type))
-                                && ((tcbn.visibleTypeAnnotations == null && chain1.visibleTypeAnnotations == null)
-                                    || tcbn.visibleTypeAnnotations.equals(chain1.visibleTypeAnnotations))
-                                && ((tcbn.invisibleTypeAnnotations == null && chain1.invisibleTypeAnnotations == null)
-                                    || tcbn.invisibleTypeAnnotations.equals(chain1.invisibleTypeAnnotations)))
+                                && Objects.equals(tcbn.type, chain1.type)
+                                && Objects.equals(tcbn.visibleTypeAnnotations, chain1.visibleTypeAnnotations)
+                                && Objects.equals(tcbn.invisibleTypeAnnotations, chain1.invisibleTypeAnnotations))
                             {
                                 index1 = ii;
                                 break;
@@ -652,11 +632,9 @@ public class LabelRearranger extends Transformer<TransformerConfig> {
                         for (int ii = 0; ii < resNow.get(start).size(); ii++) {
                             TryCatchBlockNode tcbn = resNow.get(start).get(ii);
                             if (tcbn.handler.equals(chain2.handler)
-                                && ((tcbn.type == null && chain2.type == null) || tcbn.type.equals(chain2.type))
-                                && ((tcbn.visibleTypeAnnotations == null && chain2.visibleTypeAnnotations == null)
-                                    || tcbn.visibleTypeAnnotations.equals(chain2.visibleTypeAnnotations))
-                                && ((tcbn.invisibleTypeAnnotations == null && chain2.invisibleTypeAnnotations == null)
-                                    || tcbn.invisibleTypeAnnotations.equals(chain2.invisibleTypeAnnotations)))
+                                && Objects.equals(tcbn.type, chain2.type)
+                                && Objects.equals(tcbn.visibleTypeAnnotations, chain2.visibleTypeAnnotations)
+                                && Objects.equals(tcbn.invisibleTypeAnnotations, chain2.invisibleTypeAnnotations))
                             {
                                 index2 = ii;
                                 break;
@@ -670,11 +648,9 @@ public class LabelRearranger extends Transformer<TransformerConfig> {
                             for (int iii = 0; iii < resNow.get(now).size(); iii++) {
                                 TryCatchBlockNode tcbn = resNow.get(now).get(iii);
                                 if (tcbn.handler.equals(chain1.handler)
-                                    && ((tcbn.type == null && chain1.type == null) || tcbn.type.equals(chain1.type))
-                                    && ((tcbn.visibleTypeAnnotations == null && chain1.visibleTypeAnnotations == null)
-                                        || tcbn.visibleTypeAnnotations.equals(chain1.visibleTypeAnnotations))
-                                    && ((tcbn.invisibleTypeAnnotations == null && chain1.invisibleTypeAnnotations == null)
-                                        || tcbn.invisibleTypeAnnotations.equals(chain1.invisibleTypeAnnotations)))
+                                    && Objects.equals(tcbn.type, chain1.type)
+                                    && Objects.equals(tcbn.visibleTypeAnnotations, chain1.visibleTypeAnnotations)
+                                    && Objects.equals(tcbn.invisibleTypeAnnotations, chain1.invisibleTypeAnnotations))
                                 {
                                     index1 = iii;
                                     break;
@@ -683,11 +659,9 @@ public class LabelRearranger extends Transformer<TransformerConfig> {
                             for (int iii = 0; iii < resNow.get(now).size(); iii++) {
                                 TryCatchBlockNode tcbn = resNow.get(now).get(iii);
                                 if (tcbn.handler.equals(chain2.handler)
-                                    && ((tcbn.type == null && chain2.type == null) || tcbn.type.equals(chain2.type))
-                                    && ((tcbn.visibleTypeAnnotations == null && chain2.visibleTypeAnnotations == null)
-                                        || tcbn.visibleTypeAnnotations.equals(chain2.visibleTypeAnnotations))
-                                    && ((tcbn.invisibleTypeAnnotations == null && chain2.invisibleTypeAnnotations == null)
-                                        || tcbn.invisibleTypeAnnotations.equals(chain2.invisibleTypeAnnotations)))
+                                    && Objects.equals(tcbn.type, chain2.type)
+                                    && Objects.equals(tcbn.visibleTypeAnnotations, chain2.visibleTypeAnnotations)
+                                    && Objects.equals(tcbn.invisibleTypeAnnotations, chain2.invisibleTypeAnnotations))
                                 {
                                     index2 = iii;
                                     break;
@@ -706,12 +680,7 @@ public class LabelRearranger extends Transformer<TransformerConfig> {
                     System.out.println("Irregular exception table at " + classNode.name + ", " + method.name + method.desc);
                 for (Entry<TryCatchChain, Set<LabelNode>> entry : splits.entrySet()) {
                     List<LabelNode> orderedSplits = new ArrayList<>(entry.getValue());
-                    orderedSplits.sort(new Comparator<LabelNode>() {
-                        @Override
-                        public int compare(LabelNode l1, LabelNode l2) {
-                            return Integer.valueOf(labels.indexOf(l1)).compareTo(labels.indexOf(l2));
-                        }
-                    });
+                    orderedSplits.sort(Comparator.comparingInt(labels::indexOf));
                     List<TryCatchChain> replacements = new ArrayList<>();
                     replacements.add(entry.getKey());
                     for (LabelNode l : orderedSplits) {
@@ -760,11 +729,9 @@ public class LabelRearranger extends Transformer<TransformerConfig> {
                         for (LabelNode lbl : chain.covered) {
                             List<TryCatchBlockNode> list = resNow.get(lbl);
                             if (!(!list.isEmpty() && list.get(0).handler.equals(chain.handler)
-                                  && ((list.get(0).type == null && chain.type == null) || list.get(0).type.equals(chain.type))
-                                  && ((list.get(0).visibleTypeAnnotations == null && chain.visibleTypeAnnotations == null)
-                                      || list.get(0).visibleTypeAnnotations.equals(chain.visibleTypeAnnotations))
-                                  && ((list.get(0).invisibleTypeAnnotations == null && chain.invisibleTypeAnnotations == null)
-                                      || list.get(0).invisibleTypeAnnotations.equals(chain.invisibleTypeAnnotations))))
+                                  && (Objects.equals(list.get(0).type, chain.type))
+                                  && (Objects.equals(list.get(0).visibleTypeAnnotations, chain.visibleTypeAnnotations))
+                                  && (Objects.equals(list.get(0).invisibleTypeAnnotations, chain.invisibleTypeAnnotations))))
                             {
                                 failed = true;
                                 break;
@@ -791,9 +758,7 @@ public class LabelRearranger extends Transformer<TransformerConfig> {
                 if (chains.size() > 0)
                     throw new IllegalStateException("Impossible exception table at " + classNode.name + ", " + method.name + method.desc);
 
-                boolean same = true;
-                if (method.tryCatchBlocks.size() != exceptions.size())
-                    same = false;
+                boolean same = method.tryCatchBlocks.size() == exceptions.size();
                 if (same)
                     for (int i = 0; i < method.tryCatchBlocks.size(); i++) {
                         TryCatchBlockNode tcbn1 = method.tryCatchBlocks.get(i);
@@ -804,13 +769,11 @@ public class LabelRearranger extends Transformer<TransformerConfig> {
                             same = false;
                         else if (tcbn1.handler != tcbn2.handler)
                             same = false;
-                        else if (!((tcbn1.type == null && tcbn2.type == null) || tcbn1.type.equals(tcbn2.type)))
+                        else if (!Objects.equals(tcbn1.type, tcbn2.type))
                             same = false;
-                        else if (!((tcbn1.invisibleTypeAnnotations == null && tcbn2.invisibleTypeAnnotations == null)
-                                   || tcbn1.invisibleTypeAnnotations.equals(tcbn2.invisibleTypeAnnotations)))
+                        else if (!Objects.equals(tcbn1.invisibleTypeAnnotations, tcbn2.invisibleTypeAnnotations))
                             same = false;
-                        else if (!((tcbn1.visibleTypeAnnotations == null && tcbn2.visibleTypeAnnotations == null)
-                                   || tcbn1.visibleTypeAnnotations.equals(tcbn2.visibleTypeAnnotations)))
+                        else if (!Objects.equals(tcbn1.visibleTypeAnnotations, tcbn2.visibleTypeAnnotations))
                             same = false;
                         if (!same)
                             break;
