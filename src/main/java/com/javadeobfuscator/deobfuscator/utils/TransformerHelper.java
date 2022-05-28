@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -37,6 +38,7 @@ import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.google.common.primitives.Booleans;
 import com.javadeobfuscator.deobfuscator.transformers.Transformer;
+import com.javadeobfuscator.deobfuscator.transformers.special.TryCatchFixer;
 import com.javadeobfuscator.javavm.VirtualMachine;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
@@ -639,6 +641,13 @@ public class TransformerHelper implements Opcodes {
             return cast.dflt == label || cast.labels.contains(label);
         }
         return false;
+    }
+
+    public static boolean tryCatchChainFitting(TryCatchFixer.TryCatchChain chain, TryCatchBlockNode tcbn) {
+        return tcbn.handler.equals(chain.handler)
+               && Objects.equals(tcbn.type, chain.type)
+               && Objects.equals(tcbn.visibleTypeAnnotations, chain.visibleTypeAnnotations)
+               && Objects.equals(tcbn.invisibleTypeAnnotations, chain.invisibleTypeAnnotations);
     }
 
     private static final Supplier<ExecutorService> ASYNC_SERVICE = Suppliers.memoize(Executors::newCachedThreadPool);

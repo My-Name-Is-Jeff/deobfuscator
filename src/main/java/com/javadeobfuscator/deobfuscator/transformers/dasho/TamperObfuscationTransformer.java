@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.javadeobfuscator.deobfuscator.utils.TransformerHelper;
 import org.apache.commons.lang3.tuple.Triple;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
@@ -187,11 +188,9 @@ public class TamperObfuscationTransformer extends Transformer<TransformerConfig>
                                 boolean found = false;
                                 for (TryCatchBlockNode tcbn2 : list) {
                                     if (tcbn.handler.equals(tcbn2.handler)
-                                        && ((tcbn.type == null && tcbn2.type == null) || tcbn.type.equals(tcbn2.type))
-                                        && ((tcbn.visibleTypeAnnotations == null && tcbn2.visibleTypeAnnotations == null)
-                                            || tcbn.visibleTypeAnnotations.equals(tcbn2.visibleTypeAnnotations))
-                                        && ((tcbn.invisibleTypeAnnotations == null && tcbn2.invisibleTypeAnnotations == null)
-                                            || tcbn.invisibleTypeAnnotations.equals(tcbn2.invisibleTypeAnnotations)))
+                                        && Objects.equals(tcbn.type, tcbn2.type)
+                                        && Objects.equals(tcbn.visibleTypeAnnotations, tcbn2.visibleTypeAnnotations)
+                                        && Objects.equals(tcbn.invisibleTypeAnnotations, tcbn2.invisibleTypeAnnotations))
                                     {
                                         chain.covered.add(labels.get(i));
                                         if (i + 1 >= labels.size()) {
@@ -226,12 +225,7 @@ public class TamperObfuscationTransformer extends Transformer<TransformerConfig>
                         int index1 = -1;
                         for (int ii = 0; ii < resNow.get(start).size(); ii++) {
                             TryCatchBlockNode tcbn = resNow.get(start).get(ii);
-                            if (tcbn.handler.equals(chain1.handler)
-                                && ((tcbn.type == null && chain1.type == null) || tcbn.type.equals(chain1.type))
-                                && ((tcbn.visibleTypeAnnotations == null && chain1.visibleTypeAnnotations == null)
-                                    || tcbn.visibleTypeAnnotations.equals(chain1.visibleTypeAnnotations))
-                                && ((tcbn.invisibleTypeAnnotations == null && chain1.invisibleTypeAnnotations == null)
-                                    || tcbn.invisibleTypeAnnotations.equals(chain1.invisibleTypeAnnotations)))
+                            if (TransformerHelper.tryCatchChainFitting(chain1, tcbn))
                             {
                                 index1 = ii;
                                 break;
@@ -240,12 +234,7 @@ public class TamperObfuscationTransformer extends Transformer<TransformerConfig>
                         int index2 = -1;
                         for (int ii = 0; ii < resNow.get(start).size(); ii++) {
                             TryCatchBlockNode tcbn = resNow.get(start).get(ii);
-                            if (tcbn.handler.equals(chain2.handler)
-                                && ((tcbn.type == null && chain2.type == null) || tcbn.type.equals(chain2.type))
-                                && ((tcbn.visibleTypeAnnotations == null && chain2.visibleTypeAnnotations == null)
-                                    || tcbn.visibleTypeAnnotations.equals(chain2.visibleTypeAnnotations))
-                                && ((tcbn.invisibleTypeAnnotations == null && chain2.invisibleTypeAnnotations == null)
-                                    || tcbn.invisibleTypeAnnotations.equals(chain2.invisibleTypeAnnotations)))
+                            if (TransformerHelper.tryCatchChainFitting(chain2, tcbn))
                             {
                                 index2 = ii;
                                 break;
@@ -258,12 +247,7 @@ public class TamperObfuscationTransformer extends Transformer<TransformerConfig>
                             LabelNode now = labels.get(ii);
                             for (int iii = 0; iii < resNow.get(now).size(); iii++) {
                                 TryCatchBlockNode tcbn = resNow.get(now).get(iii);
-                                if (tcbn.handler.equals(chain1.handler)
-                                    && ((tcbn.type == null && chain1.type == null) || tcbn.type.equals(chain1.type))
-                                    && ((tcbn.visibleTypeAnnotations == null && chain1.visibleTypeAnnotations == null)
-                                        || tcbn.visibleTypeAnnotations.equals(chain1.visibleTypeAnnotations))
-                                    && ((tcbn.invisibleTypeAnnotations == null && chain1.invisibleTypeAnnotations == null)
-                                        || tcbn.invisibleTypeAnnotations.equals(chain1.invisibleTypeAnnotations)))
+                                if (TransformerHelper.tryCatchChainFitting(chain1, tcbn))
                                 {
                                     index1 = iii;
                                     break;
@@ -271,12 +255,7 @@ public class TamperObfuscationTransformer extends Transformer<TransformerConfig>
                             }
                             for (int iii = 0; iii < resNow.get(now).size(); iii++) {
                                 TryCatchBlockNode tcbn = resNow.get(now).get(iii);
-                                if (tcbn.handler.equals(chain2.handler)
-                                    && ((tcbn.type == null && chain2.type == null) || tcbn.type.equals(chain2.type))
-                                    && ((tcbn.visibleTypeAnnotations == null && chain2.visibleTypeAnnotations == null)
-                                        || tcbn.visibleTypeAnnotations.equals(chain2.visibleTypeAnnotations))
-                                    && ((tcbn.invisibleTypeAnnotations == null && chain2.invisibleTypeAnnotations == null)
-                                        || tcbn.invisibleTypeAnnotations.equals(chain2.invisibleTypeAnnotations)))
+                                if (TransformerHelper.tryCatchChainFitting(chain2, tcbn))
                                 {
                                     index2 = iii;
                                     break;
@@ -295,12 +274,7 @@ public class TamperObfuscationTransformer extends Transformer<TransformerConfig>
                     System.out.println("Irregular exception table at " + classNode.name + ", " + method.name + method.desc);
                 for (Entry<TryCatchChain, Set<LabelNode>> entry : splits.entrySet()) {
                     List<LabelNode> orderedSplits = new ArrayList<>(entry.getValue());
-                    orderedSplits.sort(new Comparator<LabelNode>() {
-                        @Override
-                        public int compare(LabelNode l1, LabelNode l2) {
-                            return Integer.valueOf(labels.indexOf(l1)).compareTo(labels.indexOf(l2));
-                        }
-                    });
+                    orderedSplits.sort(Comparator.comparingInt(labels::indexOf));
                     List<TryCatchChain> replacements = new ArrayList<>();
                     replacements.add(entry.getKey());
                     for (LabelNode l : orderedSplits) {
@@ -348,13 +322,12 @@ public class TamperObfuscationTransformer extends Transformer<TransformerConfig>
                         boolean failed = false;
                         for (LabelNode lbl : chain.covered) {
                             List<TryCatchBlockNode> list = resNow.get(lbl);
-                            if (!(!list.isEmpty() && list.get(0).handler.equals(chain.handler)
-                                  && ((list.get(0).type == null && chain.type == null) || list.get(0).type.equals(chain.type))
-                                  && ((list.get(0).visibleTypeAnnotations == null && chain.visibleTypeAnnotations == null)
-                                      || list.get(0).visibleTypeAnnotations.equals(chain.visibleTypeAnnotations))
-                                  && ((list.get(0).invisibleTypeAnnotations == null && chain.invisibleTypeAnnotations == null)
-                                      || list.get(0).invisibleTypeAnnotations.equals(chain.invisibleTypeAnnotations))))
-                            {
+                            if (list.isEmpty()) {
+                                failed = true;
+                                break;
+                            }
+                            TryCatchBlockNode tcbn = list.get(0);
+                            if (!TransformerHelper.tryCatchChainFitting(chain, tcbn)) {
                                 failed = true;
                                 break;
                             }
@@ -380,9 +353,7 @@ public class TamperObfuscationTransformer extends Transformer<TransformerConfig>
                 if (!chains.isEmpty())
                     throw new IllegalStateException("Impossible exception table at " + classNode.name + ", " + method.name + method.desc);
 
-                boolean same = true;
-                if (method.tryCatchBlocks.size() != exceptions.size())
-                    same = false;
+                boolean same = method.tryCatchBlocks.size() == exceptions.size();
                 if (same)
                     for (int i = 0; i < method.tryCatchBlocks.size(); i++) {
                         TryCatchBlockNode tcbn1 = method.tryCatchBlocks.get(i);
@@ -393,13 +364,11 @@ public class TamperObfuscationTransformer extends Transformer<TransformerConfig>
                             same = false;
                         else if (tcbn1.handler != tcbn2.handler)
                             same = false;
-                        else if (!((tcbn1.type == null && tcbn2.type == null) || tcbn1.type.equals(tcbn2.type)))
+                        else if (!Objects.equals(tcbn1.type, tcbn2.type))
                             same = false;
-                        else if (!((tcbn1.invisibleTypeAnnotations == null && tcbn2.invisibleTypeAnnotations == null)
-                                   || tcbn1.invisibleTypeAnnotations.equals(tcbn2.invisibleTypeAnnotations)))
+                        else if (!Objects.equals(tcbn1.invisibleTypeAnnotations, tcbn2.invisibleTypeAnnotations))
                             same = false;
-                        else if (!((tcbn1.visibleTypeAnnotations == null && tcbn2.visibleTypeAnnotations == null)
-                                   || tcbn1.visibleTypeAnnotations.equals(tcbn2.visibleTypeAnnotations)))
+                        else if (!Objects.equals(tcbn1.visibleTypeAnnotations, tcbn2.visibleTypeAnnotations))
                             same = false;
                         if (!same)
                             break;

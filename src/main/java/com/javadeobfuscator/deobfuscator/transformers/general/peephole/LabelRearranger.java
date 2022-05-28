@@ -619,10 +619,7 @@ public class LabelRearranger extends Transformer<TransformerConfig> {
                         int index1 = -1;
                         for (int ii = 0; ii < resNow.get(start).size(); ii++) {
                             TryCatchBlockNode tcbn = resNow.get(start).get(ii);
-                            if (tcbn.handler.equals(chain1.handler)
-                                && Objects.equals(tcbn.type, chain1.type)
-                                && Objects.equals(tcbn.visibleTypeAnnotations, chain1.visibleTypeAnnotations)
-                                && Objects.equals(tcbn.invisibleTypeAnnotations, chain1.invisibleTypeAnnotations))
+                            if (TransformerHelper.tryCatchChainFitting(chain1, tcbn))
                             {
                                 index1 = ii;
                                 break;
@@ -631,10 +628,7 @@ public class LabelRearranger extends Transformer<TransformerConfig> {
                         int index2 = -1;
                         for (int ii = 0; ii < resNow.get(start).size(); ii++) {
                             TryCatchBlockNode tcbn = resNow.get(start).get(ii);
-                            if (tcbn.handler.equals(chain2.handler)
-                                && Objects.equals(tcbn.type, chain2.type)
-                                && Objects.equals(tcbn.visibleTypeAnnotations, chain2.visibleTypeAnnotations)
-                                && Objects.equals(tcbn.invisibleTypeAnnotations, chain2.invisibleTypeAnnotations))
+                            if (TransformerHelper.tryCatchChainFitting(chain2, tcbn))
                             {
                                 index2 = ii;
                                 break;
@@ -647,10 +641,7 @@ public class LabelRearranger extends Transformer<TransformerConfig> {
                             LabelNode now = labels.get(ii);
                             for (int iii = 0; iii < resNow.get(now).size(); iii++) {
                                 TryCatchBlockNode tcbn = resNow.get(now).get(iii);
-                                if (tcbn.handler.equals(chain1.handler)
-                                    && Objects.equals(tcbn.type, chain1.type)
-                                    && Objects.equals(tcbn.visibleTypeAnnotations, chain1.visibleTypeAnnotations)
-                                    && Objects.equals(tcbn.invisibleTypeAnnotations, chain1.invisibleTypeAnnotations))
+                                if (TransformerHelper.tryCatchChainFitting(chain1, tcbn))
                                 {
                                     index1 = iii;
                                     break;
@@ -658,10 +649,7 @@ public class LabelRearranger extends Transformer<TransformerConfig> {
                             }
                             for (int iii = 0; iii < resNow.get(now).size(); iii++) {
                                 TryCatchBlockNode tcbn = resNow.get(now).get(iii);
-                                if (tcbn.handler.equals(chain2.handler)
-                                    && Objects.equals(tcbn.type, chain2.type)
-                                    && Objects.equals(tcbn.visibleTypeAnnotations, chain2.visibleTypeAnnotations)
-                                    && Objects.equals(tcbn.invisibleTypeAnnotations, chain2.invisibleTypeAnnotations))
+                                if (TransformerHelper.tryCatchChainFitting(chain2, tcbn))
                                 {
                                     index2 = iii;
                                     break;
@@ -728,11 +716,12 @@ public class LabelRearranger extends Transformer<TransformerConfig> {
                         boolean failed = false;
                         for (LabelNode lbl : chain.covered) {
                             List<TryCatchBlockNode> list = resNow.get(lbl);
-                            if (!(!list.isEmpty() && list.get(0).handler.equals(chain.handler)
-                                  && (Objects.equals(list.get(0).type, chain.type))
-                                  && (Objects.equals(list.get(0).visibleTypeAnnotations, chain.visibleTypeAnnotations))
-                                  && (Objects.equals(list.get(0).invisibleTypeAnnotations, chain.invisibleTypeAnnotations))))
-                            {
+                            if (list.isEmpty()) {
+                                failed = true;
+                                break;
+                            }
+                            TryCatchBlockNode tcbn = list.get(0);
+                            if (!TransformerHelper.tryCatchChainFitting(chain, tcbn)) {
                                 failed = true;
                                 break;
                             }
