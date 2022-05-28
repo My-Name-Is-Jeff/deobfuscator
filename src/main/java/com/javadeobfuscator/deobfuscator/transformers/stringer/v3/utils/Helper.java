@@ -24,7 +24,8 @@ import org.objectweb.asm.tree.AbstractInsnNode;
 public class Helper {
     public static InstructionMatcher findMatch(AbstractInsnNode start, InstructionPattern... patterns) {
         InstructionMatcher foundMatch = null;
-        for (InstructionPattern pattern : patterns) {InstructionMatcher matcher = pattern.matcher(start);
+        for (InstructionPattern pattern : patterns) {
+            InstructionMatcher matcher = pattern.matcher(start);
             if (matcher.find()) {
                 if (foundMatch != null) {
                     throw new WrongTransformerException("Only expected one decryptor, found at least two");

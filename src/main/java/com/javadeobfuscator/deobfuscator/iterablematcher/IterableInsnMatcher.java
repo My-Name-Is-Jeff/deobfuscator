@@ -115,7 +115,7 @@ public class IterableInsnMatcher {
 
     /**
      * perform previously set up replacement / removal
-     * 
+     *
      * iterator afterwards will be just after the last matched step
      *
      * @param iterator must be in same state as it was after match was called
@@ -157,7 +157,7 @@ public class IterableInsnMatcher {
         hasReplaced = false;
         endInserts.clear();
     }
-    
+
     public static int removeAll(IterableInsnMatcher matcher, InsnList insns) {
         int count = 0;
         ListIterator<AbstractInsnNode> it = insns.iterator();

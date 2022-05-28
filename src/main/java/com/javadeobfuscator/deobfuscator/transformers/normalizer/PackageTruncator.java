@@ -31,24 +31,23 @@ public class PackageTruncator extends AbstractNormalizer<PackageTruncator.Config
         remapper.setIgnorePackages(true);
         classNodes().forEach(classNode -> {
             int matches = StringUtils.countMatches(classNode.name, "/");
-            if(matches > getConfig().getPackageLayers())
-            {
+            if (matches > getConfig().getPackageLayers()) {
                 int lastIndex = classNode.name.lastIndexOf("/");
                 String packages = classNode.name.substring(0, lastIndex);
                 String name = classNode.name.substring(lastIndex, classNode.name.length());
                 int indexFromStart = StringUtils.ordinalIndexOf(packages, "/", getConfig().getPackageLayers()) + 1;
                 int indexFromEnd = StringUtils.lastOrdinalIndexOf(packages, "/", getConfig().getPackageLayers());
-                String newName = indexFromStart > packages.length() - indexFromEnd ? 
-                    packages.substring(0, indexFromStart) : packages.substring(indexFromEnd + 1, packages.length());
+                String newName = indexFromStart > packages.length() - indexFromEnd ?
+                        packages.substring(0, indexFromStart) : packages.substring(indexFromEnd + 1, packages.length());
                 newName += name;
                 int counter = 1;
                 boolean useCounter = false;
-                if(classes.containsKey(newName) || mappedNames.contains(newName))
-                {
+                if (classes.containsKey(newName) || mappedNames.contains(newName)) {
                     useCounter = true;
-                    while(classes.containsKey(newName + "_" + counter)
-                         || mappedNames.contains(newName + "_" + counter))
+                    while (classes.containsKey(newName + "_" + counter)
+                           || mappedNames.contains(newName + "_" + counter)) {
                         counter++;
+                    }
                 }
                 remapper.map(classNode.name, useCounter ? newName + "_" + counter : newName);
                 mappedNames.add(newName);
@@ -61,15 +60,15 @@ public class PackageTruncator extends AbstractNormalizer<PackageTruncator.Config
          * The number of package layers to allow before the class's packages should be truncated.
          */
         private int packageLayers = 15;
-        
+
         public Config() {
             super(PackageTruncator.class);
         }
-        
+
         public int getPackageLayers() {
             return packageLayers;
         }
-        
+
         public void setPackageLayers(int packageLayers) {
             this.packageLayers = packageLayers;
         }

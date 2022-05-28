@@ -29,7 +29,8 @@ public class RuleFakeException implements Rule {
                 for (TryCatchBlockNode tc : methodNode.tryCatchBlocks) {
                     if (tc.handler != null
                         && TransformerHelper.nullsafeOpcodeEqual(tc.handler.getNext(), ACONST_NULL)
-                        && TransformerHelper.nullsafeOpcodeEqual(tc.handler.getNext().getNext(), ATHROW)) {
+                        && TransformerHelper.nullsafeOpcodeEqual(tc.handler.getNext().getNext(), ATHROW))
+                    {
                         return "Found possible fake exception pattern in " + classNode.name + " " + methodNode.name + methodNode.desc;
                     }
                 }

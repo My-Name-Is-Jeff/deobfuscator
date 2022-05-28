@@ -31,8 +31,8 @@ public class RuleInvokedynamic1 implements Rule, Opcodes {
     @Override
     public String getDescription() {
         return "Stringer has several modes of invokedynamic obfuscation. " +
-                "This one creates a bootstrap method which decrypts the target method based on the given method name, and" +
-                "an additional string parameter. The MethodHandle is then resolved using findStatic() or findVirtual()";
+               "This one creates a bootstrap method which decrypts the target method based on the given method name, and" +
+               "an additional string parameter. The MethodHandle is then resolved using findStatic() or findVirtual()";
     }
 
     @Override

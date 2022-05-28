@@ -31,6 +31,7 @@ public class JavaCharacter extends JavaInteger {
     public JavaCharacter copy() {
         return new JavaCharacter(value);
     }
+
     public String toString() {
         return "JavaCharacter(value=" + value + ")";
     }

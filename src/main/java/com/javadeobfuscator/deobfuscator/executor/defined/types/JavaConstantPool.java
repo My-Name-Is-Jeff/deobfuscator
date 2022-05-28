@@ -24,7 +24,7 @@ public class JavaConstantPool {
     public JavaConstantPool(ConstantPool constantPool) {
         this.constantPool = constantPool;
     }
-    
+
     public int getSize() {
         return this.constantPool.getSize();
     }

@@ -40,7 +40,7 @@ public class ANewArrayStep implements Step {
         if (!(basic ? TransformerHelper.basicType(typeInsnNode.desc) : typeInsnNode.desc).equals(type)) {
             return null;
         }
-        
+
         return now.getNext();
     }
 }

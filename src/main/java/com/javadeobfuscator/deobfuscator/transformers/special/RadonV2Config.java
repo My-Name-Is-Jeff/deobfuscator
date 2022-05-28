@@ -42,7 +42,7 @@ public class RadonV2Config extends TransformerConfig {
     public void setAntiDebug(boolean antiDebug) {
         this.antiDebug = antiDebug;
     }
-    
+
     public boolean isTryCatch() {
         return tryCatch;
     }
@@ -58,7 +58,7 @@ public class RadonV2Config extends TransformerConfig {
     public void setFlowObf(boolean flowObf) {
         this.flowObf = flowObf;
     }
-    
+
     public boolean isStringPool() {
         return stringPool;
     }

@@ -98,8 +98,10 @@ public final class InheritanceGraphNode {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         InheritanceGraphNode that = (InheritanceGraphNode) o;
         return Objects.equals(owner, that.owner);
     }

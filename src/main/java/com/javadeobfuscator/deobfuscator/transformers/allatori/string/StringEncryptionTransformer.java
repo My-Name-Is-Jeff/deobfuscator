@@ -55,16 +55,19 @@ public class StringEncryptionTransformer extends Transformer<TransformerConfig> 
                 }
 
                 for (AbstractInsnNode abstractInsnNode : TransformerHelper.instructionIterator(methodNode)) {
-                    if (abstractInsnNode.getOpcode() != INVOKESTATIC) continue;
+                    if (abstractInsnNode.getOpcode() != INVOKESTATIC)
+                        continue;
 
                     MethodInsnNode methodInsnNode = (MethodInsnNode) abstractInsnNode;
-                    if (!methodInsnNode.desc.equals("(Ljava/lang/String;)Ljava/lang/String;")) continue;
+                    if (!methodInsnNode.desc.equals("(Ljava/lang/String;)Ljava/lang/String;"))
+                        continue;
 
                     Frame<SourceValue> currentFrame = frames[methodNode.instructions.indexOf(methodInsnNode)];
 
                     MethodNode decryptorMethod = new MethodNode(ACC_STATIC | ACC_PUBLIC, "decrypt" + decrypted, "()Ljava/lang/String;", null, null);
                     Optional<Object> consensus = SourceFinder.findSource(methodNode, frames, new ArrayList<>(), new ConstantPropagatingSourceFinder(), methodInsnNode, currentFrame.getStack(currentFrame.getStackSize() - 1)).consensus();
-                    if (!consensus.isPresent()) continue;
+                    if (!consensus.isPresent())
+                        continue;
 
                     decryptorMethod.instructions.add(new LdcInsnNode(consensus.get()));
                     decryptorMethod.instructions.add(methodInsnNode.clone(null));
@@ -88,7 +91,8 @@ public class StringEncryptionTransformer extends Transformer<TransformerConfig> 
                     }
 
                     String value = vm.convertJavaObjectToString(execution.getReturnValue());
-                    if (value == null) continue;
+                    if (value == null)
+                        continue;
 
                     logger.info("Decrypted string in {} {}{}: {}", classNode.name, methodNode.name, methodNode.desc, value);
 

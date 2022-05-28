@@ -50,22 +50,20 @@ public class IllegalTypeAnnotationRemover extends Transformer<TransformerConfig>
         });
         return true;
     }
-    
-    private void removeInvalidTypeAnnotations(Object visitor, List<TypeAnnotationNode> typeAnnots, boolean visible)
-    {
-        if(typeAnnots == null)
+
+    private void removeInvalidTypeAnnotations(Object visitor, List<TypeAnnotationNode> typeAnnots, boolean visible) {
+        if (typeAnnots == null)
             return;
         Iterator<TypeAnnotationNode> itr = typeAnnots.iterator();
-        while(itr.hasNext())
-        {
+        while (itr.hasNext()) {
             TypeAnnotationNode type = itr.next();
             try {
-                if(visitor instanceof CheckClassAdapter)
-                    ((CheckClassAdapter)visitor).visitTypeAnnotation(type.typeRef, type.typePath, type.desc, visible);
-                else if(visitor instanceof CheckMethodAdapter)
-                    ((CheckMethodAdapter)visitor).visitTypeAnnotation(type.typeRef, type.typePath, type.desc, visible);
+                if (visitor instanceof CheckClassAdapter)
+                    ((CheckClassAdapter) visitor).visitTypeAnnotation(type.typeRef, type.typePath, type.desc, visible);
+                else if (visitor instanceof CheckMethodAdapter)
+                    ((CheckMethodAdapter) visitor).visitTypeAnnotation(type.typeRef, type.typePath, type.desc, visible);
                 else
-                    ((CheckFieldAdapter)visitor).visitTypeAnnotation(type.typeRef, type.typePath, type.desc, visible);
+                    ((CheckFieldAdapter) visitor).visitTypeAnnotation(type.typeRef, type.typePath, type.desc, visible);
             } catch (IllegalArgumentException | IllegalStateException ignored) {
                 itr.remove();
             }

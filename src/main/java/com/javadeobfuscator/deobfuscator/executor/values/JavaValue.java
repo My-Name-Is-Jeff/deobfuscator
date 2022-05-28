@@ -24,9 +24,9 @@ import com.javadeobfuscator.deobfuscator.executor.defined.types.*;
 import com.javadeobfuscator.deobfuscator.executor.exceptions.ExecutionException;
 
 public abstract class JavaValue {
-    
-    public boolean booleanValue() { 
-        throw new ExecutionException(new UnsupportedOperationException()); 
+
+    public boolean booleanValue() {
+        throw new ExecutionException(new UnsupportedOperationException());
     }
 
     public int intValue() {
@@ -51,8 +51,8 @@ public abstract class JavaValue {
 
     public <T> T as(Class<T> clazz) {
         //TODO: Fix this
-        if(value() instanceof JavaValue)
-            return ((JavaValue)value()).as(clazz);
+        if (value() instanceof JavaValue)
+            return ((JavaValue) value()).as(clazz);
         if (Primitives.unwrap(clazz) != clazz) {
             throw new ExecutionException("Cannot call as(Class<T> clazz) with a primitive class");
         }
@@ -79,26 +79,26 @@ public abstract class JavaValue {
     }
 
     public static JavaValue valueOf(Object cst) {
-        if(cst == null)
+        if (cst == null)
             return new JavaObject(cst, "java/lang/Object");
-        else if(cst.getClass().isArray())
+        else if (cst.getClass().isArray())
             return new JavaObject(cst, "java/lang/Object");
-        else if(cst instanceof JavaThread)
+        else if (cst instanceof JavaThread)
             return new JavaObject(cst, "java/lang/Thread");
-        else if(cst instanceof JavaHandle)
+        else if (cst instanceof JavaHandle)
             return new JavaObject(cst, "java/lang/invoke/MethodHandle");
-        else if(cst instanceof JavaMethod)
+        else if (cst instanceof JavaMethod)
             return new JavaObject(cst, "java/lang/reflect/Method");
-        else if(cst instanceof JavaField)
+        else if (cst instanceof JavaField)
             return new JavaObject(cst, "java/lang/reflect/Field");
-        else if(cst instanceof JavaConstructor)
+        else if (cst instanceof JavaConstructor)
             return new JavaObject(cst, "java/lang/reflect/Constructor");
-        else if(cst instanceof JavaConstantPool)
+        else if (cst instanceof JavaConstantPool)
             return new JavaObject(cst, "sun/reflect/ConstantPool");
-        else if(cst instanceof JavaClass)
+        else if (cst instanceof JavaClass)
             return new JavaObject(cst, "java/lang/Class");
-        else if(cst instanceof JavaObject)
-            return new JavaObject(cst, ((JavaObject)cst).type());
+        else if (cst instanceof JavaObject)
+            return new JavaObject(cst, ((JavaObject) cst).type());
         else
             return new JavaObject(cst, Type.getType(cst.getClass()).getInternalName());
     }

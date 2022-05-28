@@ -8,7 +8,7 @@ import com.javadeobfuscator.deobfuscator.transformers.Transformer;
 import org.objectweb.asm.tree.AbstractInsnNode;
 
 public class NopRemover extends Transformer<TransformerConfig> {
-    
+
     @Override
     public boolean transform() throws Throwable {
         LongAdder counter = new LongAdder();

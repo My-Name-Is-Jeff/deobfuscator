@@ -6,14 +6,14 @@ import org.objectweb.asm.tree.AbstractInsnNode;
 public abstract class IterableStep<T extends AbstractInsnNode> implements Opcodes {
 
     private T captured;
-    
+
     public final void reset() {
         captured = null;
         reset0();
     }
-    
+
     public void reset0() {
-        
+
     }
 
     public final T getCaptured() {

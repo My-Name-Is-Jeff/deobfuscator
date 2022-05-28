@@ -65,7 +65,8 @@ public class RuleFlowObfuscation implements Rule {
                             && ((IincInsnNode) FlowObfuscationTransformer.getNext(ordered, result, jumpAnalysis, ain, 3)).incr == 1
                             && ((IincInsnNode) FlowObfuscationTransformer.getNext(ordered, result, jumpAnalysis, ain, 3)).var ==
                                ((VarInsnNode) FlowObfuscationTransformer.getNext(ordered, result, jumpAnalysis, ain, 1)).var
-                            && FlowObfuscationTransformer.getNext(ordered, result, jumpAnalysis, ain, 4).getOpcode() == Opcodes.ASTORE) {
+                            && FlowObfuscationTransformer.getNext(ordered, result, jumpAnalysis, ain, 4).getOpcode() == Opcodes.ASTORE)
+                        {
                             return "Found possible flow obfuscation pattern in " + classNode.name + "/" + method.name + method.desc;
                         }
                     }

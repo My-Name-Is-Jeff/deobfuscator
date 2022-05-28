@@ -30,7 +30,7 @@ public class RuleStringDecryptor implements Rule {
     @Override
     public String getDescription() {
         return "Dash-O string decryption can be identified by a function whose name belongs to a method within the JDK. " +
-                "It takes at least one int and one string parameter.";
+               "It takes at least one int and one string parameter.";
     }
 
     @Override
@@ -70,6 +70,6 @@ public class RuleStringDecryptor implements Rule {
     @Override
     public Collection<Class<? extends Transformer<?>>> getRecommendTransformers() {
         return Arrays.asList(com.javadeobfuscator.deobfuscator.transformers.dasho.StringEncryptionTransformer.class,
-            StringEncryptionTransformer.class);
+                StringEncryptionTransformer.class);
     }
 }

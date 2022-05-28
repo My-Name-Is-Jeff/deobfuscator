@@ -79,7 +79,7 @@ public class InvokedynamicTransformer extends Transformer<TransformerConfig> imp
                         vm.execute(classNode, decryptorMethod, null, Collections.<JavaWrapper>emptyList());
                     } catch (Throwable e) {
                         // dont care lol
-//                        vm.printException(e);
+                        //                        vm.printException(e);
                     }
                     classNode.methods.remove(decryptorMethod);
 

@@ -27,5 +27,4 @@ public class ArrayLengthFrame extends Frame {
         this.array.children.add(this);
         this.parents.add(array);
     }
-
 }

@@ -31,6 +31,7 @@ public class JavaFloat extends JavaValue {
     public JavaFloat copy() {
         return new JavaFloat(value);
     }
+
     public String toString() {
         return "JavaFloat(value=" + value + ")";
     }

@@ -28,8 +28,8 @@ public class RuleSimpleStringEncryption implements Rule {
     @Override
     public String getDescription() {
         return "Zelix Klassmaster has several modes of string encryption. " +
-                "This mode replaces string literals with a static string or string array, which are decrypted in <clinit> " +
-                "Note that this mode does not generate a method with signature (II)Ljava/lang/String;";
+               "This mode replaces string literals with a static string or string array, which are decrypted in <clinit> " +
+               "Note that this mode does not generate a method with signature (II)Ljava/lang/String;";
     }
 
     @Override

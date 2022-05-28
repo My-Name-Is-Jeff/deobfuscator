@@ -47,10 +47,10 @@ public class TrapHandlerMerger extends Transformer<TransformerConfig> {
                         for (AbstractInsnNode now = tryCatchBlockNode.handler; ; ) {
                             if (now.getType() != AbstractInsnNode.LABEL && now.getType() != AbstractInsnNode.FRAME && now.getType() != AbstractInsnNode.LINE) {
                                 // todo need some way of comparing insns
-//                                int oldindex = now.index;
-//                                now.index = 0;
-//                                insns.add(Utils.prettyprint(now));
-//                                now.index = oldindex;
+                                //                                int oldindex = now.index;
+                                //                                now.index = 0;
+                                //                                insns.add(Utils.prettyprint(now));
+                                //                                now.index = oldindex;
                                 switch (now.getOpcode()) {
                                     case RETURN:
                                     case ARETURN:

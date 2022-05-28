@@ -40,24 +40,24 @@ public class RuleStringDecryptor implements Rule, Opcodes {
                 if (!methodNode.desc.equals("(Ljava/lang/String;)Ljava/lang/String;")
                     || !Modifier.isStatic(methodNode.access) || methodNode.instructions == null)
                     continue;
-                
+
                 boolean isStringer = true;
-                
+
                 isStringer = isStringer && TransformerHelper.containsInvokeStatic(methodNode, "java/lang/Thread", "currentThread", "()Ljava/lang/Thread;");
                 isStringer = isStringer && TransformerHelper.containsInvokeVirtual(methodNode, "java/lang/Thread", "getStackTrace", "()[Ljava/lang/StackTraceElement;");
                 isStringer = isStringer && TransformerHelper.countOccurencesOf(methodNode, IAND) > 20;
                 isStringer = isStringer && TransformerHelper.countOccurencesOf(methodNode, IXOR) > 20;
                 isStringer = isStringer && TransformerHelper.countOccurencesOf(methodNode, IUSHR) > 10;
                 isStringer = isStringer && TransformerHelper.countOccurencesOf(methodNode, ISHL) > 10;
-                
+
                 if (!isStringer) {
                     continue;
                 }
-                
+
                 return "Found possible string decryption class " + classNode.name;
             }
         }
-        
+
         return null;
     }
 

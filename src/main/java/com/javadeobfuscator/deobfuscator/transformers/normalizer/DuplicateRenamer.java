@@ -33,34 +33,32 @@ import com.javadeobfuscator.deobfuscator.executor.providers.DelegatingProvider;
 import com.javadeobfuscator.deobfuscator.utils.ClassTree;
 
 @TransformerConfig.ConfigOptions(configClass = DuplicateRenamer.Config.class)
-public class DuplicateRenamer extends AbstractNormalizer<DuplicateRenamer.Config>
-{
+public class DuplicateRenamer extends AbstractNormalizer<DuplicateRenamer.Config> {
     private static final String[] ILLEGAL_WINDOWS_CHARACTERS = {
-        "aux", "con", "prn", "nul",
-        "com0", "com1", "com2", "com3", 
-        "com4", "com5", "com6", "com7",
-        "com8", "com9", "lpt0", "lpt1",
-        "lpt2", "lpt3", "lpt4", "lpt5",
-        "lpt6", "lpt7", "lpt8", "lpt9",
-    };
+            "aux", "con", "prn", "nul",
+            "com0", "com1", "com2", "com3",
+            "com4", "com5", "com6", "com7",
+            "com8", "com9", "lpt0", "lpt1",
+            "lpt2", "lpt3", "lpt4", "lpt5",
+            "lpt6", "lpt7", "lpt8", "lpt9",
+            };
     private static final String[] ILLEGAL_JAVA_NAMES = {
-        "abstract", "assert", "boolean", "break", 
-        "byte", "case", "catch", "char", "class", 
-        "const", "continue", "default", "do", 
-        "double", "else", "enum", "extends", 
-        "false", "final", "finally", "float", 
-        "for", "goto", "if", "implements", 
-        "import", "instanceof", "int", "interface", 
-        "long", "native", "new", "null", 
-        "package", "private", "protected", "public", 
-        "return", "short", "static", "strictfp", 
-        "super", "switch", "synchronized", "this", 
-        "throw", "throws", "transient", "true", 
-        "try", "void", "volatile", "while"};
+            "abstract", "assert", "boolean", "break",
+            "byte", "case", "catch", "char", "class",
+            "const", "continue", "default", "do",
+            "double", "else", "enum", "extends",
+            "false", "final", "finally", "float",
+            "for", "goto", "if", "implements",
+            "import", "instanceof", "int", "interface",
+            "long", "native", "new", "null",
+            "package", "private", "protected", "public",
+            "return", "short", "static", "strictfp",
+            "super", "switch", "synchronized", "this",
+            "throw", "throws", "transient", "true",
+            "try", "void", "volatile", "while"};
 
     @Override
-    public void remap(CustomRemapper remapper)
-    {
+    public void remap(CustomRemapper remapper) {
         //We must load the entire class tree so subclasses are correctly counted
         classNodes().forEach(classNode -> {
             ClassTree tree = this.getDeobfuscator().getClassTree(classNode.name);
@@ -80,49 +78,45 @@ public class DuplicateRenamer extends AbstractNormalizer<DuplicateRenamer.Config
         Map<String, AtomicInteger> names = new HashMap<>();
         classNodes().forEach(classNode -> {
             String classNodeName = classNode.name;
-            if(!names.containsKey(classNodeName.toLowerCase(Locale.ROOT)))
-            {
+            if (!names.containsKey(classNodeName.toLowerCase(Locale.ROOT))) {
                 names.put(classNodeName.toLowerCase(Locale.ROOT),
-                    new AtomicInteger());
-                if(getConfig().renameIllegalNames())
-                {
+                        new AtomicInteger());
+                if (getConfig().renameIllegalNames()) {
                     String rawClassName = classNodeName;
-                    if(classNode.name.contains("/"))
+                    if (classNode.name.contains("/"))
                         rawClassName = classNodeName.substring(classNode.name.lastIndexOf('/') + 1);
                     boolean illegal = false;
-                    for(String s : ILLEGAL_WINDOWS_CHARACTERS)
-                        if(s.equals(rawClassName.toLowerCase(Locale.ROOT)))
-                        {
+                    for (String s : ILLEGAL_WINDOWS_CHARACTERS) {
+                        if (s.equals(rawClassName.toLowerCase(Locale.ROOT))) {
                             illegal = true;
                             break;
                         }
-                    for(String s : ILLEGAL_JAVA_NAMES)
-                        if(s.equals(rawClassName))
-                        {
+                    }
+                    for (String s : ILLEGAL_JAVA_NAMES) {
+                        if (s.equals(rawClassName)) {
                             illegal = true;
                             break;
                         }
-                    if(illegal)
-                    {
+                    }
+                    if (illegal) {
                         String newName = classNodeName;
                         do {
                             newName = newName + "_"
-                                + names.get(classNodeName.toLowerCase(Locale.ROOT))
-                                .getAndIncrement();
+                                      + names.get(classNodeName.toLowerCase(Locale.ROOT))
+                                              .getAndIncrement();
                         } while (!remapper.map(classNode.name, newName));
                     }
                 }
-            }else
-            {
+            } else {
                 String newName = classNodeName;
                 do {
                     newName = newName + "_"
-                        + names.get(classNodeName.toLowerCase(Locale.ROOT))
-                        .getAndIncrement();
+                              + names.get(classNodeName.toLowerCase(Locale.ROOT))
+                                      .getAndIncrement();
                 } while (!remapper.map(classNode.name, newName));
             }
         });
-        
+
         List<MethodArgs> methodNames = new ArrayList<>();
         // Aggressive method name obfuscation (same method name + same params)
         AtomicInteger methodIdNow = new AtomicInteger();
@@ -204,10 +198,8 @@ public class DuplicateRenamer extends AbstractNormalizer<DuplicateRenamer.Config
                     Type elementType = methodType.getElementType();
                     int layers = 1;
                     AtomicBoolean passed = new AtomicBoolean();
-                    while(true)
-                    {
-                        if(passed.get())
-                        {
+                    while (true) {
+                        if (passed.get()) {
                             layers++;
                             passed.set(false);
                         }
@@ -223,17 +215,18 @@ public class DuplicateRenamer extends AbstractNormalizer<DuplicateRenamer.Config
                                     Type otherType = Type.getMethodType(method.desc);
                                     if (methodNode.name.equals(method.name) && Arrays.equals(thisType.getArgumentTypes(), otherType.getArgumentTypes())) {
                                         Type otherEleType = otherType.getReturnType();
-                                        if(toTryParent.contains(node.name) && otherEleType.getSort() == Type.OBJECT
+                                        if (toTryParent.contains(node.name) && otherEleType.getSort() == Type.OBJECT
                                             && otherEleType.getInternalName().equals("java/lang/Object"))
                                         {
                                             //Passed (superclass has Object return)
                                             allMethodNodes.put(new AbstractMap.SimpleEntry<>(node, equalsMethod), true);
                                             break;
                                         }
-                                        if(otherEleType.getSort() != Type.ARRAY || otherEleType.getDimensions() < layersF)
+                                        if (otherEleType.getSort() != Type.ARRAY || otherEleType.getDimensions() < layersF)
                                             break;
-                                        for(int i = 0; i < layersF; i++)
+                                        for (int i = 0; i < layersF; i++) {
                                             otherEleType = otherEleType.getElementType();
+                                        }
                                         if (otherEleType.getSort() == Type.OBJECT) {
                                             foundSimilar = true;
                                             String child = otherEleType.getInternalName();
@@ -241,7 +234,8 @@ public class DuplicateRenamer extends AbstractNormalizer<DuplicateRenamer.Config
                                             this.getDeobfuscator().assureLoaded(child);
                                             if ((toTryChild.contains(node.name) && this.getDeobfuscator().isSubclass(parent, child))
                                                 || (toTryParent.contains(node.name) && this.getDeobfuscator().isSubclass(child, parent))
-                                                || child.equals(parent)) {
+                                                || child.equals(parent))
+                                            {
                                                 equals = true;
                                                 equalsMethod = method;
                                             }
@@ -267,17 +261,18 @@ public class DuplicateRenamer extends AbstractNormalizer<DuplicateRenamer.Config
                                     if (methodNode.name.equals(method.name) && Arrays.equals(thisType.getArgumentTypes(), otherType.getArgumentTypes())) {
                                         foundSimilar = true;
                                         Type otherEleType = otherType.getReturnType();
-                                        if(toTryParent.contains(node.name) && otherEleType.getSort() == Type.OBJECT
+                                        if (toTryParent.contains(node.name) && otherEleType.getSort() == Type.OBJECT
                                             && otherEleType.getInternalName().equals("java/lang/Object"))
                                         {
                                             //Passed (superclass has Object return)
                                             allMethodNodes.put(new AbstractMap.SimpleEntry<>(node, equalsMethod), true);
                                             break;
                                         }
-                                        if(otherEleType.getSort() != Type.ARRAY || otherEleType.getDimensions() < layersF)
+                                        if (otherEleType.getSort() != Type.ARRAY || otherEleType.getDimensions() < layersF)
                                             break;
-                                        for(int i = 0; i < layersF; i++)
+                                        for (int i = 0; i < layersF; i++) {
                                             otherEleType = otherEleType.getElementType();
+                                        }
                                         if (elementType.getSort() == otherEleType.getSort()) {
                                             equals = true;
                                             equalsMethod = method;
@@ -300,20 +295,20 @@ public class DuplicateRenamer extends AbstractNormalizer<DuplicateRenamer.Config
                                     Type otherType = Type.getMethodType(method.desc);
                                     if (methodNode.name.equals(method.name) && Arrays.equals(thisType.getArgumentTypes(), otherType.getArgumentTypes())) {
                                         Type otherEleType = otherType.getReturnType();
-                                        for(int i = 0; i < layersF; i++)
+                                        for (int i = 0; i < layersF; i++) {
                                             otherEleType = otherEleType.getElementType();
-                                        if (otherEleType.getSort() == Type.ARRAY)
-                                        {
+                                        }
+                                        if (otherEleType.getSort() == Type.ARRAY) {
                                             //Continue checking element
                                             passed.set(true);
                                             continue;
-                                        }else if(toTryParent.contains(node.name) && otherEleType.getSort() == Type.OBJECT
-                                            && otherEleType.getInternalName().equals("java/lang/Object"))
+                                        } else if (toTryParent.contains(node.name) && otherEleType.getSort() == Type.OBJECT
+                                                   && otherEleType.getInternalName().equals("java/lang/Object"))
                                         {
                                             //Passed (superclass has Object return)
                                             allMethodNodes.put(new AbstractMap.SimpleEntry<>(node, equalsMethod), true);
                                             break;
-                                        }else
+                                        } else
                                             //Fail
                                             break;
                                     }
@@ -338,12 +333,12 @@ public class DuplicateRenamer extends AbstractNormalizer<DuplicateRenamer.Config
                                     this.getDeobfuscator().assureLoaded(child);
                                     if ((toTryChild.contains(node.name) && this.getDeobfuscator().isSubclass(parent, child))
                                         || (toTryParent.contains(node.name) && this.getDeobfuscator().isSubclass(child, parent))
-                                        || child.equals(parent)) {
+                                        || child.equals(parent))
+                                    {
                                         equals = true;
                                         equalsMethod = method;
                                     }
-                                }else if (toTryParent.contains(node.name) && otherType.getSort() == Type.ARRAY)
-                                {
+                                } else if (toTryParent.contains(node.name) && otherType.getSort() == Type.ARRAY) {
                                     //Arrays extend object
                                     foundSimilar = true;
                                     equals = true;
@@ -366,55 +361,52 @@ public class DuplicateRenamer extends AbstractNormalizer<DuplicateRenamer.Config
                 });
 
                 if (!isLibrary.get()) {
-                    if(!methodNames.contains(
-                        new MethodArgs(classNode.name, methodNode.name, Type.getArgumentTypes(methodNode.desc))))
+                    if (!methodNames.contains(
+                            new MethodArgs(classNode.name, methodNode.name, Type.getArgumentTypes(methodNode.desc))))
                     {
-                        methodNames.add(new MethodArgs(classNode.name, 
-                            methodNode.name, Type.getArgumentTypes(methodNode.desc)));
-                        if(getConfig().renameIllegalNames())
-                        {
+                        methodNames.add(new MethodArgs(classNode.name,
+                                methodNode.name, Type.getArgumentTypes(methodNode.desc)));
+                        if (getConfig().renameIllegalNames()) {
                             boolean illegal = false;
-                            for(String s : ILLEGAL_JAVA_NAMES)
-                                if(s.equals(methodNode.name))
-                                {
+                            for (String s : ILLEGAL_JAVA_NAMES) {
+                                if (s.equals(methodNode.name)) {
                                     illegal = true;
                                     break;
                                 }
-                            if(illegal)
-                                while(true)
-                                {
+                            }
+                            if (illegal)
+                                while (true) {
                                     String name = methodNode.name + "_"
-                                        + methodIdNow.getAndIncrement();
-                                    if(remapper.mapMethodName(classNode.name,
-                                        methodNode.name, methodNode.desc, name,
-                                        false))
+                                                  + methodIdNow.getAndIncrement();
+                                    if (remapper.mapMethodName(classNode.name,
+                                            methodNode.name, methodNode.desc, name,
+                                            false))
                                     {
                                         allMethodNodes.keySet().forEach(ent -> {
                                             remapper.mapMethodName(
-                                                ent.getKey().name,
-                                                ent.getValue().name,
-                                                ent.getValue().desc, name, true);
+                                                    ent.getKey().name,
+                                                    ent.getValue().name,
+                                                    ent.getValue().desc, name, true);
                                         });
                                         break;
                                     }
                                 }
                         }
-                    }else if(!remapper.methodMappingExists(classNode.name,
-                        methodNode.name, methodNode.desc))
+                    } else if (!remapper.methodMappingExists(classNode.name,
+                            methodNode.name, methodNode.desc))
                     {
-                        while(true)
-                        {
+                        while (true) {
                             String name = methodNode.name + "_"
-                                + methodIdNow.getAndIncrement();
-                            if(remapper.mapMethodName(classNode.name,
-                                methodNode.name, methodNode.desc, name,
-                                false))
+                                          + methodIdNow.getAndIncrement();
+                            if (remapper.mapMethodName(classNode.name,
+                                    methodNode.name, methodNode.desc, name,
+                                    false))
                             {
                                 allMethodNodes.keySet().forEach(ent -> {
                                     remapper.mapMethodName(
-                                        ent.getKey().name,
-                                        ent.getValue().name,
-                                        ent.getValue().desc, name, true);
+                                            ent.getKey().name,
+                                            ent.getValue().name,
+                                            ent.getValue().desc, name, true);
                                 });
                                 break;
                             }
@@ -425,54 +417,51 @@ public class DuplicateRenamer extends AbstractNormalizer<DuplicateRenamer.Config
                     context.dictionary = classpath;
                     JavaClass clazz = new JavaClass(classNode.name, context);
                     List<JavaMethod> conflicters = new ArrayList<>();
-                    while(clazz != null && !getDeobfuscator().isLibrary(clazz.getClassNode()))
-                    {
-                        for(JavaMethod method : clazz.getDeclaredMethods())
-                            if(method.getName().equals(methodNode.name))
-                            {
+                    while (clazz != null && !getDeobfuscator().isLibrary(clazz.getClassNode())) {
+                        for (JavaMethod method : clazz.getDeclaredMethods()) {
+                            if (method.getName().equals(methodNode.name)) {
                                 Type[] types = Type.getArgumentTypes(method.getDesc());
                                 Type[] types2 = Type.getArgumentTypes(methodNode.desc);
                                 boolean typesEqual = true;
                                 boolean returnTypesEqual = false;
-                                if(types.length == types2.length)
-                                {
-                                    for(int i = 0; i < types.length; i++)
-                                        if(types[i].getSort() == Type.OBJECT && types2[i].getSort() == Type.OBJECT 
-                                        && !types[i].getInternalName().equals(types2[i].getInternalName()))
+                                if (types.length == types2.length) {
+                                    for (int i = 0; i < types.length; i++) {
+                                        if (types[i].getSort() == Type.OBJECT && types2[i].getSort() == Type.OBJECT
+                                            && !types[i].getInternalName().equals(types2[i].getInternalName()))
                                             typesEqual = false;
-                                        else if(!types2[i].equals(types[i]))
+                                        else if (!types2[i].equals(types[i]))
                                             typesEqual = false;
-                                }else
+                                    }
+                                } else
                                     typesEqual = false;
-                                String returnType = 
-                                    method.getDesc().substring(method.getDesc().indexOf(')') + 1, method.getDesc().length());
-                                String returnType2 = 
-                                    methodNode.desc.substring(methodNode.desc.indexOf(')') + 1, methodNode.desc.length());
-                                if(returnType.equals(returnType2))
+                                String returnType =
+                                        method.getDesc().substring(method.getDesc().indexOf(')') + 1, method.getDesc().length());
+                                String returnType2 =
+                                        methodNode.desc.substring(methodNode.desc.indexOf(')') + 1, methodNode.desc.length());
+                                if (returnType.equals(returnType2))
                                     returnTypesEqual = true;
-                                if(typesEqual && !returnTypesEqual && !remapper.methodMappingExists(classNode.name,
-                                    methodNode.name, methodNode.desc))
+                                if (typesEqual && !returnTypesEqual && !remapper.methodMappingExists(classNode.name,
+                                        methodNode.name, methodNode.desc))
                                     //Adds the conflicter to a mapping
                                     conflicters.add(method);
                             }
+                        }
                         clazz = clazz.getSuperclass();
                     }
                     conflicters.addAll(getInterfaceConflicters(new JavaMethod(new JavaClass(classNode.name, context), methodNode), new JavaClass(classNode.name, context), remapper));
-                    if(conflicters.size() > 0)
-                    {
+                    if (conflicters.size() > 0) {
                         int id = methodIdNow.getAndIncrement();
-                        while(true)
-                        {
+                        while (true) {
                             String name = methodNode.name + "_" + id;
-                            if(remapper.mapMethodName(classNode.name,
-                                methodNode.name, methodNode.desc, name,
-                                false))
+                            if (remapper.mapMethodName(classNode.name,
+                                    methodNode.name, methodNode.desc, name,
+                                    false))
                             {
                                 allMethodNodes.keySet().forEach(ent -> {
                                     remapper.mapMethodName(
-                                        ent.getKey().name,
-                                        ent.getValue().name,
-                                        ent.getValue().desc, name, true);
+                                            ent.getKey().name,
+                                            ent.getValue().name,
+                                            ent.getValue().desc, name, true);
                                 });
                                 break;
                             }
@@ -513,50 +502,48 @@ public class DuplicateRenamer extends AbstractNormalizer<DuplicateRenamer.Config
                         references.add(possibleClass);
                     }
                 }
-                if(!names.containsKey(classNode.name + fieldNode.name))
-                {
+                if (!names.containsKey(classNode.name + fieldNode.name)) {
                     names.put(classNode.name + fieldNode.name, new AtomicInteger());
-                    if(getConfig().renameIllegalNames())
-                    {
+                    if (getConfig().renameIllegalNames()) {
                         boolean illegal = false;
-                        for(String s : ILLEGAL_JAVA_NAMES)
-                            if(s.equals(fieldNode.name))
-                            {
+                        for (String s : ILLEGAL_JAVA_NAMES) {
+                            if (s.equals(fieldNode.name)) {
                                 illegal = true;
                                 break;
                             }
-                        if(illegal)
-                            while(true)
-                            {
+                        }
+                        if (illegal)
+                            while (true) {
                                 String newName = fieldNode.name + "_"
-                                    + names.get(
-                                        classNode.name + fieldNode.name)
-                                        .getAndIncrement();
-                                if(remapper.mapFieldName(classNode.name,
-                                    fieldNode.name, fieldNode.desc, newName, false))
+                                                 + names.get(
+                                                classNode.name + fieldNode.name)
+                                                         .getAndIncrement();
+                                if (remapper.mapFieldName(classNode.name,
+                                        fieldNode.name, fieldNode.desc, newName, false))
                                 {
-                                    for(String s : references)
+                                    for (String s : references) {
                                         remapper.mapFieldName(s, fieldNode.name,
-                                            fieldNode.desc, newName, true);
+                                                fieldNode.desc, newName, true);
+                                    }
                                     break;
                                 }
                             }
                     }
-                }else if(!remapper.fieldMappingExists(classNode.name,
-                    fieldNode.name, fieldNode.desc))
+                } else if (!remapper.fieldMappingExists(classNode.name,
+                        fieldNode.name, fieldNode.desc))
                 {
-                    while(true)
-                    {
+                    while (true) {
                         String newName = fieldNode.name + "_"
-                            + names.get(
-                                classNode.name + fieldNode.name)
-                            .getAndIncrement();
-                        if(remapper.mapFieldName(classNode.name,
-                            fieldNode.name, fieldNode.desc, newName, false))
+                                         + names.get(
+                                        classNode.name + fieldNode.name)
+                                                 .getAndIncrement();
+                        if (remapper.mapFieldName(classNode.name,
+                                fieldNode.name, fieldNode.desc, newName, false))
                         {
-                            for(String s : references)
+                            for (String s : references) {
                                 remapper.mapFieldName(s, fieldNode.name,
-                                    fieldNode.desc, newName, true);
+                                        fieldNode.desc, newName, true);
+                            }
                             break;
                         }
                     }
@@ -564,113 +551,104 @@ public class DuplicateRenamer extends AbstractNormalizer<DuplicateRenamer.Config
             }
         });
     }
-    
-    private Collection<JavaMethod> getInterfaceConflicters(JavaMethod method, JavaClass clazz, CustomRemapper remapper)
-    {
+
+    private Collection<JavaMethod> getInterfaceConflicters(JavaMethod method, JavaClass clazz, CustomRemapper remapper) {
         Collection<JavaMethod> toReturn = new ArrayList<>();
-        if(getDeobfuscator().isLibrary(clazz.getClassNode()))
+        if (getDeobfuscator().isLibrary(clazz.getClassNode()))
             return toReturn;
-        for(JavaClass interf : clazz.getInterfaces())
-            if(!getDeobfuscator().isLibrary(interf.getClassNode()))
-            {
-                for(JavaMethod m : interf.getDeclaredMethods())
-                    if(m.getName().equals(method.getName()))
-                    {
+        for (JavaClass interf : clazz.getInterfaces()) {
+            if (!getDeobfuscator().isLibrary(interf.getClassNode())) {
+                for (JavaMethod m : interf.getDeclaredMethods()) {
+                    if (m.getName().equals(method.getName())) {
                         Type[] types = Type.getArgumentTypes(m.getDesc());
                         Type[] types2 = Type.getArgumentTypes(method.getDesc());
                         boolean typesEqual = true;
                         boolean returnTypesEqual = false;
-                        if(types.length == types2.length)
-                        {
-                            for(int i = 0; i < types.length; i++)
-                                if(types[i].getSort() == Type.OBJECT && types2[i].getSort() == Type.OBJECT 
-                                && !types[i].getInternalName().equals(types2[i].getInternalName()))
+                        if (types.length == types2.length) {
+                            for (int i = 0; i < types.length; i++) {
+                                if (types[i].getSort() == Type.OBJECT && types2[i].getSort() == Type.OBJECT
+                                    && !types[i].getInternalName().equals(types2[i].getInternalName()))
                                     typesEqual = false;
-                                else if(!types2[i].equals(types[i]))
+                                else if (!types2[i].equals(types[i]))
                                     typesEqual = false;
-                        }else
+                            }
+                        } else
                             typesEqual = false;
-                        String returnType = 
-                            m.getDesc().substring(m.getDesc().indexOf(')') + 1, m.getDesc().length());
-                        String returnType2 = 
-                            method.getDesc().substring(method.getDesc().indexOf(')') + 1, method.getDesc().length());
-                        if(returnType.equals(returnType2))
+                        String returnType =
+                                m.getDesc().substring(m.getDesc().indexOf(')') + 1, m.getDesc().length());
+                        String returnType2 =
+                                method.getDesc().substring(method.getDesc().indexOf(')') + 1, method.getDesc().length());
+                        if (returnType.equals(returnType2))
                             returnTypesEqual = true;
-                        if(typesEqual && !returnTypesEqual && !remapper.methodMappingExists(method.getOwner(),
-                            method.getName(), method.getDesc()))
+                        if (typesEqual && !returnTypesEqual && !remapper.methodMappingExists(method.getOwner(),
+                                method.getName(), method.getDesc()))
                             //Adds the conflicter to a mapping
                             toReturn.add(m);
                     }
-                if(interf.getInterfaces() != null && interf.getInterfaces().length > 0)
+                }
+                if (interf.getInterfaces() != null && interf.getInterfaces().length > 0)
                     toReturn.addAll(getInterfaceConflicters(method, interf, remapper));
             }
+        }
         return toReturn;
     }
-    
-    private class MethodArgs
-    {
+
+    private class MethodArgs {
         public final String clazz;
         public final String methodName;
         public final Type[] args;
-        
-        public MethodArgs(String clazz, String methodName, Type[] args)
-        {
+
+        public MethodArgs(String clazz, String methodName, Type[] args) {
             this.clazz = clazz;
             this.methodName = methodName;
             this.args = args;
         }
-        
+
         @Override
-        public boolean equals(Object o)
-        {
-            if(!(o instanceof MethodArgs))
+        public boolean equals(Object o) {
+            if (!(o instanceof MethodArgs))
                 return false;
-            MethodArgs other = (MethodArgs)o;
-            if(!clazz.equals(other.clazz))
+            MethodArgs other = (MethodArgs) o;
+            if (!clazz.equals(other.clazz))
                 return false;
-            if(!methodName.equals(other.methodName))
+            if (!methodName.equals(other.methodName))
                 return false;
-            if(other.args.length != args.length)
+            if (other.args.length != args.length)
                 return false;
-            for(int i = 0; i < other.args.length; i++)
-            {
+            for (int i = 0; i < other.args.length; i++) {
                 Type t = other.args[i];
-                if(t.getSort() == Type.OBJECT && args[i].getSort() == Type.OBJECT 
+                if (t.getSort() == Type.OBJECT && args[i].getSort() == Type.OBJECT
                     && !t.getInternalName().equals(args[i].getInternalName()))
                     return false;
-                else if(!t.equals(args[i]))
+                else if (!t.equals(args[i]))
                     return false;
             }
             return true;
         }
-        
+
         @Override
-        public int hashCode()
-        {
+        public int hashCode() {
             int code = methodName.hashCode();
             code += clazz.hashCode();
-            for(Type t : args)
+            for (Type t : args) {
                 code += t.hashCode();
+            }
             return code;
         }
     }
-    
-    public static class Config extends AbstractNormalizer.Config 
-    {
+
+    public static class Config extends AbstractNormalizer.Config {
         private boolean renameIllegalNames = false;
-        
-        public Config() 
-        {
+
+        public Config() {
             super(DuplicateRenamer.class);
         }
-        
-        public boolean renameIllegalNames() 
-        {
+
+        public boolean renameIllegalNames() {
             return renameIllegalNames;
         }
 
-        public void setRenameIllegalNames(boolean renameIllegalNames) 
-        {
+        public void setRenameIllegalNames(boolean renameIllegalNames) {
             this.renameIllegalNames = renameIllegalNames;
         }
     }

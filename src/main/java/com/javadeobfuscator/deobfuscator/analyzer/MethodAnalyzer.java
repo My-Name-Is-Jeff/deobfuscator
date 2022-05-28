@@ -230,7 +230,7 @@ public class MethodAnalyzer {
 
         List<StackObject> stack = new ArrayList<>();
         List<StackObject> locals = new ArrayList<>();
-        
+
         int counter = 0;
         if (!Modifier.isStatic(method.access)) {
             locals.add(new StackObject(new ArgumentFrame(Opcodes.ASTORE, 0), classNode.name));
@@ -240,13 +240,13 @@ public class MethodAnalyzer {
         for (Type type : Type.getArgumentTypes(method.desc)) {
             Class<?> clazz = PrimitiveUtils.getPrimitiveByName(type.getClassName());
             int opcode;
-            if(clazz == int.class)
+            if (clazz == int.class)
                 opcode = Opcodes.ISTORE;
-            else if(clazz == long.class)
+            else if (clazz == long.class)
                 opcode = Opcodes.LSTORE;
-            else if(clazz == double.class)
+            else if (clazz == double.class)
                 opcode = Opcodes.DSTORE;
-            else if(clazz == float.class)
+            else if (clazz == float.class)
                 opcode = Opcodes.FSTORE;
             else
                 opcode = Opcodes.ASTORE;
@@ -318,7 +318,6 @@ public class MethodAnalyzer {
         Frame currentFrame = new MathFrame(opcode, target);
         stack.add(0, new StackObject(prim, currentFrame));
         return currentFrame;
-
     }
 
     @SuppressWarnings("unchecked")
@@ -341,7 +340,7 @@ public class MethodAnalyzer {
             "unused"
     })
     private static void execute(ClassNode classNode, MethodNode method, AbstractInsnNode now, List<StackObject> stack, List<StackObject> locals, Map<AbstractInsnNode, List<TryCatchBlockNode>> handlers, AnalyzerResult result, Set<Map.Entry<AbstractInsnNode, AbstractInsnNode>> jumped) {
-//        System.out.println("Executing " + classNode.name + " " + method.name + method.desc + " " + method.instructions.indexOf(now) + " " + Utils.prettyprint(now));
+        //        System.out.println("Executing " + classNode.name + " " + method.name + method.desc + " " + method.instructions.indexOf(now) + " " + Utils.prettyprint(now));
         boolean done = false;
         Frame currentFrame;
         List<AbstractInsnNode> successors = new ArrayList<>();
@@ -978,10 +977,10 @@ public class MethodAnalyzer {
                     throw new IllegalArgumentException(now.getOpcode() + " ");
                 }
             }
-//            System.out.println(method.instructions.indexOf(now) + " " + Utils.prettyprint(now).trim());
-//            System.out.println("\t Stack: " + stack); 
-//            System.out.println("\t Locals: " + locals); 
-//            System.out.println();
+            //            System.out.println(method.instructions.indexOf(now) + " " + Utils.prettyprint(now).trim());
+            //            System.out.println("\t Stack: " + stack); 
+            //            System.out.println("\t Locals: " + locals); 
+            //            System.out.println();
             if (currentFrame != null) {
                 List<Frame> thisFrame = result.frames.computeIfAbsent(now, k -> new ArrayList<>());
                 thisFrame.add(currentFrame);
@@ -1009,7 +1008,6 @@ public class MethodAnalyzer {
                     String desc = type == ValueType.UNINITIALIZED_THIS ? classNode.name : object.initType;
                     currentFrame.pushStack(new Value(type, desc));
                 }
-
             }
             List<TryCatchBlockNode> handler = handlers.get(now);
             if (handler != null) {

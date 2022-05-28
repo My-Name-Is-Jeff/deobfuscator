@@ -35,7 +35,7 @@ public class MappedMethodProvider extends MethodProvider {
 
     public boolean canInvokeMethod(String className, String methodName, String methodDesc, JavaValue targetObject, List<JavaValue> args, Context context) {
         ClassNode classNode = classpath.get(className);
-        if(classNode == null)
+        if (classNode == null)
             return false;
         MethodNode methodNode = classNode.methods.stream().filter(mn -> mn.name.equals(methodName) && mn.desc.equals(methodDesc)).findFirst().orElse(null);
         return methodNode != null;

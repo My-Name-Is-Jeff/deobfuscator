@@ -439,7 +439,8 @@ public class ConstantFolder extends Transformer<ConstantFolder.Config> {
                                 for (Frame frame0 : frames) {
                                     PopFrame frame = (PopFrame) frame0;
                                     if (frame.getRemoved().get(0) instanceof LdcFrame &&
-                                        (ain.getOpcode() == POP2 ? frame.getRemoved().size() == 2 && frame.getRemoved().get(1) instanceof LdcFrame : true)) {
+                                        (ain.getOpcode() == POP2 ? frame.getRemoved().size() == 2 && frame.getRemoved().get(1) instanceof LdcFrame : true))
+                                    {
                                         for (Frame deletedFrame : frame.getRemoved()) {
                                             if (deletedFrame.getChildren().size() > 1) {
                                                 // ldc -> ldc -> swap -> pop = we can't even
@@ -448,7 +449,8 @@ public class ConstantFolder extends Transformer<ConstantFolder.Config> {
                                             remove.add(result.getMapping().get(deletedFrame));
                                         }
                                     } else if (ain.getOpcode() == POP2 && frame.getRemoved().size() == 1 && frame.getRemoved().get(0) instanceof LdcFrame &&
-                                               ((LdcFrame) frame.getRemoved().get(0)).getConstant() instanceof Long) {
+                                               ((LdcFrame) frame.getRemoved().get(0)).getConstant() instanceof Long)
+                                    {
                                         for (Frame deletedFrame : frame.getRemoved()) {
                                             if (deletedFrame.getChildren().size() > 1) {
                                                 break opcodes;
@@ -462,7 +464,8 @@ public class ConstantFolder extends Transformer<ConstantFolder.Config> {
                                             if (removed.getChildren().size() > 1 && removed.getChildren().indexOf(frame) - 1 >= 0
                                                 && removed.getChildren().get(removed.getChildren().indexOf(frame) - 1) instanceof LocalFrame
                                                 && removed.getChildren().get(removed.getChildren().indexOf(frame) - 1).getOpcode() >= ILOAD
-                                                && removed.getChildren().get(removed.getChildren().indexOf(frame) - 1).getOpcode() <= ALOAD) {
+                                                && removed.getChildren().get(removed.getChildren().indexOf(frame) - 1).getOpcode() <= ALOAD)
+                                            {
                                                 remove.add(result.getMapping().get(removed.getChildren().get(removed.getChildren().indexOf(frame) - 1)));
                                             } else {
                                                 break opcodes;
@@ -477,13 +480,15 @@ public class ConstantFolder extends Transformer<ConstantFolder.Config> {
                                                 && removed1.getChildren().get(removed1.getChildren().indexOf(frame) - 1).getOpcode() <= ALOAD
                                                 && removed1.getChildren().get(removed1.getChildren().indexOf(frame) - 2) instanceof LocalFrame
                                                 && removed1.getChildren().get(removed1.getChildren().indexOf(frame) - 2).getOpcode() >= ILOAD
-                                                && removed1.getChildren().get(removed1.getChildren().indexOf(frame) - 2).getOpcode() <= ALOAD) {
+                                                && removed1.getChildren().get(removed1.getChildren().indexOf(frame) - 2).getOpcode() <= ALOAD)
+                                            {
                                                 //Previous instruction loads the same thing (expected children: load, load, pop2)
                                                 remove.add(result.getMapping().get(removed1.getChildren().get(removed1.getChildren().indexOf(frame) - 1)));
                                                 remove.add(result.getMapping().get(removed1.getChildren().get(removed1.getChildren().indexOf(frame) - 2)));
                                             } else if (removed1.getChildren().size() > 1 && removed2.getChildren().size() > 1
                                                        && removed1.getChildren().get(removed1.getChildren().indexOf(frame) - 1) instanceof LocalFrame
-                                                       && removed2.getChildren().get(removed2.getChildren().indexOf(frame) - 1) instanceof LocalFrame) {
+                                                       && removed2.getChildren().get(removed2.getChildren().indexOf(frame) - 1) instanceof LocalFrame)
+                                            {
                                                 //Previous instruction is "load" and it loads different things
                                                 remove.add(result.getMapping().get(removed1.getChildren().get(removed1.getChildren().indexOf(frame) - 1)));
                                                 remove.add(result.getMapping().get(removed2.getChildren().get(removed2.getChildren().indexOf(frame) - 1)));

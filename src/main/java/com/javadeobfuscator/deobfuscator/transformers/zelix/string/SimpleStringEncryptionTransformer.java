@@ -99,12 +99,15 @@ public class SimpleStringEncryptionTransformer extends Transformer<SimpleStringE
             Set<Integer> registers = new HashSet<>();
             for (AbstractInsnNode insnNode : TransformerHelper.instructionIterator(clinit)) {
                 InstructionMatcher matcher = DECRYPT_PATTERN.matcher(insnNode);
-                if (!matcher.find()) continue;
+                if (!matcher.find())
+                    continue;
 
                 AbstractInsnNode source = getSource(clinit, analysis, matcher.getCapturedInstruction("load"), ANEWARRAY);
-                if (source == null) continue;
+                if (source == null)
+                    continue;
                 source = getSource(clinit, analysis, matcher.getCapturedInstruction("load"), ALOAD);
-                if (source == null) continue;
+                if (source == null)
+                    continue;
 
                 registers.add(((VarInsnNode) source).var);
                 clinitLocalStrings.add(matcher);
@@ -119,13 +122,16 @@ public class SimpleStringEncryptionTransformer extends Transformer<SimpleStringE
             Set<FieldNode> decryptedFields = new HashSet<>();
             Map<FieldNode, String> decryptedSingularStrings = new HashMap<>();
             for (AbstractInsnNode insn : TransformerHelper.instructionIterator(clinit)) {
-                if (insn.getOpcode() != PUTSTATIC) continue;
+                if (insn.getOpcode() != PUTSTATIC)
+                    continue;
 
                 FieldInsnNode fieldInsnNode = (FieldInsnNode) insn;
-                if (!fieldInsnNode.owner.equals(classNode.name)) continue;
+                if (!fieldInsnNode.owner.equals(classNode.name))
+                    continue;
 
                 FieldNode targetField = ASMHelper.findField(classNode, fieldInsnNode.name, fieldInsnNode.desc);
-                if (targetField == null) continue;
+                if (targetField == null)
+                    continue;
 
                 if (!fieldInsnNode.desc.equals("[Ljava/lang/String;") && !fieldInsnNode.desc.equals("Ljava/lang/String;"))
                     continue;
@@ -199,7 +205,8 @@ public class SimpleStringEncryptionTransformer extends Transformer<SimpleStringE
 
             Runnable tryDecryptFields = () -> {
                 for (Map.Entry<FieldNode, List<AbstractInsnNode>> entry : allPuts.entrySet()) {
-                    if (decryptedFields.contains(entry.getKey())) continue;
+                    if (decryptedFields.contains(entry.getKey()))
+                        continue;
 
                     InsnList insertBefore = parseDecrypted.apply(new AbstractMap.SimpleEntry<>(entry.getKey().name, entry.getKey().desc));
                     if (insertBefore != null) {
@@ -288,13 +295,16 @@ public class SimpleStringEncryptionTransformer extends Transformer<SimpleStringE
 
             // Replace all GETSTATIC of single strings
             for (AbstractInsnNode insnNode : TransformerHelper.instructionIterator(methodNode)) {
-                if (insnNode.getOpcode() != GETSTATIC) continue;
+                if (insnNode.getOpcode() != GETSTATIC)
+                    continue;
 
                 FieldInsnNode fieldInsnNode = (FieldInsnNode) insnNode;
-                if (!fieldInsnNode.owner.equals(classNode.name)) continue;
+                if (!fieldInsnNode.owner.equals(classNode.name))
+                    continue;
 
                 String value = decryptedSingularStrings.get(ASMHelper.findField(classNode, fieldInsnNode.name, fieldInsnNode.desc));
-                if (value == null) continue;
+                if (value == null)
+                    continue;
 
                 logger.info("Decrypted string in {} {}{}: {}", classNode.name, methodNode.name, methodNode.desc, value);
                 modifier.replace(insnNode, new LdcInsnNode(value));
@@ -303,13 +313,16 @@ public class SimpleStringEncryptionTransformer extends Transformer<SimpleStringE
             // Replace all (GETSTATIC|ALOAD),LDC [intvalue],AALOAD with strings
             for (AbstractInsnNode insnNode : TransformerHelper.instructionIterator(methodNode)) {
                 InstructionMatcher matcher = DECRYPT_PATTERN.matcher(insnNode);
-                if (!matcher.find()) continue;
+                if (!matcher.find())
+                    continue;
 
                 AbstractInsnNode source = getSource(methodNode, analysis, matcher.getCapturedInstruction("load"), GETSTATIC);
-                if (source == null) continue;
+                if (source == null)
+                    continue;
 
                 FieldInsnNode getstatic = (FieldInsnNode) source;
-                if (!getstatic.desc.equals("[Ljava/lang/String;")) continue;
+                if (!getstatic.desc.equals("[Ljava/lang/String;"))
+                    continue;
 
                 JavaWrapper field = JavaClass.forName(vm, classNode.name).getStaticField(getstatic.name, getstatic.desc);
                 if (field.is(JavaValueType.NULL)) {
@@ -335,8 +348,10 @@ public class SimpleStringEncryptionTransformer extends Transformer<SimpleStringE
         Frame<SourceValue> currentFrame = frames[methodNode.instructions.indexOf(now)];
         SourceValue currentValue;
 
-        for (int want : wants)
-            if (want == now.getOpcode()) return now;
+        for (int want : wants) {
+            if (want == now.getOpcode())
+                return now;
+        }
         switch (now.getOpcode()) {
             case ALOAD: {
                 currentValue = currentFrame.getLocal(((VarInsnNode) now).var);

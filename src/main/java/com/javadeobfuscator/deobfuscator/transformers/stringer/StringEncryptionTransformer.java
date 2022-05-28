@@ -47,56 +47,56 @@ import java.util.concurrent.atomic.AtomicInteger;
 @TransformerConfig.ConfigOptions(configClass = StringEncryptionTransformer.Config.class)
 public class StringEncryptionTransformer extends Transformer<StringEncryptionTransformer.Config> {
     public static final InstructionPattern DECRYPT_PATTERN_LEGACY = new InstructionPattern(
-        new OpcodeStep(LDC),
-        new InvocationStep(INVOKESTATIC, null, null, "(Ljava/lang/String;)Ljava/lang/String;", false)
+            new OpcodeStep(LDC),
+            new InvocationStep(INVOKESTATIC, null, null, "(Ljava/lang/String;)Ljava/lang/String;", false)
     );
     public static final InstructionPattern DECRYPT_PATTERNV_3 = new InstructionPattern(
-        new OpcodeStep(LDC),
-        new InvocationStep(INVOKESTATIC, null, null, "(Ljava/lang/Object;)Ljava/lang/String;", false)
+            new OpcodeStep(LDC),
+            new InvocationStep(INVOKESTATIC, null, null, "(Ljava/lang/Object;)Ljava/lang/String;", false)
     );
     public static final InstructionPattern DECRYPT_PATTERNV_31 = new InstructionPattern(
-        new OpcodeStep(LDC),
-        new InvocationStep(INVOKEVIRTUAL, "java/lang/String", "toCharArray", "()[C", false),
-        new OpcodeStep(DUP),
-        new OpcodeStep(DUP),
-        new LoadIntStep(),
-        new OpcodeStep(DUP_X1),
-        new OpcodeStep(CALOAD),
-        new LoadIntStep(),
-        new OpcodeStep(IXOR),
-        new OpcodeStep(I2C),
-        new OpcodeStep(CASTORE),
-        new LoadIntStep(),
-        new LoadIntStep(),
-        new OpcodeStep(ISHL),
-        new LoadIntStep(),
-        new OpcodeStep(IOR),
-        new InvocationStep(INVOKESTATIC, null, null, "(Ljava/lang/Object;I)Ljava/lang/String;", false)
+            new OpcodeStep(LDC),
+            new InvocationStep(INVOKEVIRTUAL, "java/lang/String", "toCharArray", "()[C", false),
+            new OpcodeStep(DUP),
+            new OpcodeStep(DUP),
+            new LoadIntStep(),
+            new OpcodeStep(DUP_X1),
+            new OpcodeStep(CALOAD),
+            new LoadIntStep(),
+            new OpcodeStep(IXOR),
+            new OpcodeStep(I2C),
+            new OpcodeStep(CASTORE),
+            new LoadIntStep(),
+            new LoadIntStep(),
+            new OpcodeStep(ISHL),
+            new LoadIntStep(),
+            new OpcodeStep(IOR),
+            new InvocationStep(INVOKESTATIC, null, null, "(Ljava/lang/Object;I)Ljava/lang/String;", false)
     );
     public static final InstructionPattern DECRYPT_PATTERNV_91 = new InstructionPattern(
-        new OpcodeStep(LDC),
-        new InvocationStep(INVOKEVIRTUAL, "java/lang/String", "toCharArray", "()[C", false),
-        new OpcodeStep(DUP),
-        new OpcodeStep(DUP),
-        new LoadIntStep(),
-        new OpcodeStep(DUP_X1),
-        new OpcodeStep(CALOAD),
-        new LoadIntStep(),
-        new OpcodeStep(IXOR),
-        new OpcodeStep(I2C),
-        new OpcodeStep(CASTORE),
-        new LoadIntStep(),
-        new LoadIntStep(),
-        new LoadIntStep(),
-        new InvocationStep(INVOKESTATIC, null, null, "(Ljava/lang/Object;III)Ljava/lang/Object;", true)
+            new OpcodeStep(LDC),
+            new InvocationStep(INVOKEVIRTUAL, "java/lang/String", "toCharArray", "()[C", false),
+            new OpcodeStep(DUP),
+            new OpcodeStep(DUP),
+            new LoadIntStep(),
+            new OpcodeStep(DUP_X1),
+            new OpcodeStep(CALOAD),
+            new LoadIntStep(),
+            new OpcodeStep(IXOR),
+            new OpcodeStep(I2C),
+            new OpcodeStep(CASTORE),
+            new LoadIntStep(),
+            new LoadIntStep(),
+            new LoadIntStep(),
+            new InvocationStep(INVOKESTATIC, null, null, "(Ljava/lang/Object;III)Ljava/lang/Object;", true)
     );
     private List<ClassNode> decryptors = new ArrayList<>();
-    
+
     @Override
     public boolean transform() {
         System.out.println("[Stringer] [StringEncryptionTransformer] Starting");
         int concat = concatStrings();
-        if(concat > 0)
+        if (concat > 0)
             System.out.println("[Stringer] [StringEncryptionTransformer] Concatted " + concat + " strings");
         int count = count();
         System.out.println("[Stringer] [StringEncryptionTransformer] Found " + count + " encrypted strings");
@@ -110,26 +110,24 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
         System.out.println("[Stringer] [StringEncryptionTransformer] Done");
         return decrypted > 0;
     }
-    
-    private int concatStrings()
-    {
+
+    private int concatStrings() {
         int count = 0;
-        for(ClassNode classNode : classNodes())
-        {
-            for(MethodNode method : classNode.methods)
-            for(AbstractInsnNode ain : method.instructions.toArray())
-            {
-                if(ain.getOpcode() == Opcodes.LDC && ain.getNext() != null && ain.getNext().getOpcode() == Opcodes.LDC
-                    && ain.getNext().getNext() != null && ain.getNext().getNext().getOpcode() == Opcodes.INVOKEVIRTUAL
-                    && ((MethodInsnNode)ain.getNext().getNext()).name.equals("concat"))
-                {
-                    method.instructions.remove(ain.getNext().getNext());
-                    String first = (String)((LdcInsnNode)ain).cst;
-                    String sec = (String)((LdcInsnNode)ain.getNext()).cst;
-                    String res = first.concat(sec);
-                    method.instructions.remove(ain.getNext());
-                    ((LdcInsnNode)ain).cst = res;
-                    count++;
+        for (ClassNode classNode : classNodes()) {
+            for (MethodNode method : classNode.methods) {
+                for (AbstractInsnNode ain : method.instructions.toArray()) {
+                    if (ain.getOpcode() == Opcodes.LDC && ain.getNext() != null && ain.getNext().getOpcode() == Opcodes.LDC
+                        && ain.getNext().getNext() != null && ain.getNext().getNext().getOpcode() == Opcodes.INVOKEVIRTUAL
+                        && ((MethodInsnNode) ain.getNext().getNext()).name.equals("concat"))
+                    {
+                        method.instructions.remove(ain.getNext().getNext());
+                        String first = (String) ((LdcInsnNode) ain).cst;
+                        String sec = (String) ((LdcInsnNode) ain.getNext()).cst;
+                        String res = first.concat(sec);
+                        method.instructions.remove(ain.getNext());
+                        ((LdcInsnNode) ain).cst = res;
+                        count++;
+                    }
                 }
             }
         }
@@ -139,7 +137,7 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
     private int cleanup() {
         AtomicInteger total = new AtomicInteger();
         Set<String> remove = new HashSet<>();
-        if(getConfig().shouldRemoveAllStringerClasses())
+        if (getConfig().shouldRemoveAllStringerClasses())
             classNodes().forEach(classNode -> {
                 boolean method = false;
                 boolean field = false;
@@ -151,8 +149,9 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
                         break;
                     } else if ((node.desc.equals("(Ljava/lang/Object;I)Ljava/lang/String;") || node.desc.equals("(Ljava/lang/Object;)Ljava/lang/String;")) && classNode.superName.equals("java/lang/Thread")) {
                         method = true;
-                    } else if (TransformerHelper.basicType(node.desc).equals("(Ljava/lang/Object;III)Ljava/lang/Object;") 
-                        && Type.getReturnType(node.desc).getDescriptor().equals("Ljava/lang/String;")) {
+                    } else if (TransformerHelper.basicType(node.desc).equals("(Ljava/lang/Object;III)Ljava/lang/Object;")
+                               && Type.getReturnType(node.desc).getDescriptor().equals("Ljava/lang/String;"))
+                    {
                         method = true;
                     }
                 }
@@ -171,12 +170,13 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
             decryptors.forEach(classNode ->
             {
                 boolean resource = false;
-                for (MethodNode node : classNode.methods)
+                for (MethodNode node : classNode.methods) {
                     if (node.desc.equals("(Ljava/io/InputStream;)V")) //Don't delete resource decryptors yet
                     {
                         resource = true;
                         break;
                     }
+                }
                 if (!resource)
                     remove.add(classNode.name);
             });
@@ -235,8 +235,7 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
                         }
                         InstructionMatcher matcher1 = DECRYPT_PATTERNV_3.matcher(currentInsn);
                         boolean switched = false;
-                        if(!matcher1.find())
-                        {
+                        if (!matcher1.find()) {
                             matcher1 = DECRYPT_PATTERN_LEGACY.matcher(currentInsn);
                             switched = true;
                         }
@@ -342,65 +341,62 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
                                             MethodExecutor.execute(classes.get(strCl), clinitMethod, Collections.emptyList(), null, context);
                                         }
                                         // Map INDYs
-                                        if(!mapped.contains(innerClassNode)) {
-                                            for(MethodNode innerMethod : innerClassNode.methods)
-                                                for(AbstractInsnNode innerInsn : innerMethod.instructions.toArray())
-                                                    if(innerInsn instanceof InvokeDynamicInsnNode)
-                                                    {
-                                                        InvokeDynamicInsnNode innerIndy = (InvokeDynamicInsnNode)innerInsn;
+                                        if (!mapped.contains(innerClassNode)) {
+                                            for (MethodNode innerMethod : innerClassNode.methods) {
+                                                for (AbstractInsnNode innerInsn : innerMethod.instructions.toArray()) {
+                                                    if (innerInsn instanceof InvokeDynamicInsnNode) {
+                                                        InvokeDynamicInsnNode innerIndy = (InvokeDynamicInsnNode) innerInsn;
                                                         context.customMethodFunc.put(innerIndy, (args, ctx) -> {
                                                             MethodNode innerBootstrap = innerClassNode.methods.stream().filter(mn -> mn.name.equals(innerIndy.bsm.getName())
-                                                                && mn.desc.equals(innerIndy.bsm.getDesc())).findFirst().orElse(null);
+                                                                                                                                     && mn.desc.equals(innerIndy.bsm.getDesc())).findFirst().orElse(null);
                                                             //Execute bootstrap
                                                             List<JavaValue> bootstrapArgs = new ArrayList<>();
-                                                            for(int i = 0 ; i < innerIndy.bsmArgs.length + 3; i++)
+                                                            for (int i = 0; i < innerIndy.bsmArgs.length + 3; i++) {
                                                                 bootstrapArgs.add(args.remove(0));
+                                                            }
                                                             JavaMethodHandle handle = MethodExecutor.execute(innerClassNode, innerBootstrap, bootstrapArgs,
-                                                                null, ctx);
+                                                                    null, ctx);
                                                             Object result = null;
                                                             switch (handle.type) {
                                                                 case "virtual":
                                                                 case "static":
                                                                     JavaValue instanceArg = handle.type.equals("virtual") ? args.remove(0) : null;
                                                                     result = context.provider.invokeMethod(handle.clazz, handle.name,
-                                                                        handle.desc, instanceArg, args, ctx);
+                                                                            handle.desc, instanceArg, args, ctx);
                                                                     break;
                                                                 default:
                                                                     throw new IllegalStateException("Unexpected handle type " + handle.type);
                                                             }
                                                             Type returnType = Type.getReturnType(handle.desc);
-                                                            switch(returnType.getSort())
-                                                            {
+                                                            switch (returnType.getSort()) {
                                                                 case Type.VOID:
                                                                     return null;
                                                                 case Type.BOOLEAN:
-                                                                    return new JavaBoolean((Boolean)result);
+                                                                    return new JavaBoolean((Boolean) result);
                                                                 case Type.CHAR:
-                                                                    return new JavaCharacter((Character)result);
+                                                                    return new JavaCharacter((Character) result);
                                                                 case Type.BYTE:
-                                                                    return new JavaByte((Byte)result);
+                                                                    return new JavaByte((Byte) result);
                                                                 case Type.SHORT:
-                                                                    return new JavaShort((Short)result);
+                                                                    return new JavaShort((Short) result);
                                                                 case Type.INT:
-                                                                    return new JavaInteger((Integer)result);
+                                                                    return new JavaInteger((Integer) result);
                                                                 case Type.FLOAT:
-                                                                    return new JavaFloat((Float)result);
+                                                                    return new JavaFloat((Float) result);
                                                                 case Type.LONG:
-                                                                    return new JavaLong((Long)result);
+                                                                    return new JavaLong((Long) result);
                                                                 case Type.DOUBLE:
-                                                                    return new JavaDouble((Double)result);
+                                                                    return new JavaDouble((Double) result);
                                                                 case Type.ARRAY:
                                                                 case Type.OBJECT:
-                                                                    if(result != null && result.getClass().isArray())
-                                                                    {
-                                                                        if(TypeStore.getFieldFromStore(handle.clazz, handle.name, handle.desc, null) != null)
-                                                                        {
+                                                                    if (result != null && result.getClass().isArray()) {
+                                                                        if (TypeStore.getFieldFromStore(handle.clazz, handle.name, handle.desc, null) != null) {
                                                                             Entry<Object, String[]> entry = (Entry<Object, String[]>)
-                                                                                TypeStore.getFieldFromStore(handle.clazz, handle.name, handle.desc, null).getKey();
+                                                                                    TypeStore.getFieldFromStore(handle.clazz, handle.name, handle.desc, null).getKey();
                                                                             return new JavaArray(entry.getKey(), entry.getValue());
-                                                                        }else if(handle != null)
+                                                                        } else if (handle != null)
                                                                             return new JavaArray(result);
-                                                                    }else if(TypeStore.getFieldFromStore(handle.clazz, handle.name, handle.desc, null) == null)
+                                                                    } else if (TypeStore.getFieldFromStore(handle.clazz, handle.name, handle.desc, null) == null)
                                                                         return JavaValue.valueOf(result);
                                                                     else
                                                                         return new JavaObject(result, TypeStore.getFieldFromStore(handle.clazz, handle.name, handle.desc, null).getValue());
@@ -409,6 +405,8 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
                                                             }
                                                         });
                                                     }
+                                                }
+                                            }
                                             mapped.add(innerClassNode);
                                         }
                                         MethodNode decryptorMethod = new MethodNode(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC, methodNode.name, "()Ljava/lang/String;", null, null);
@@ -417,10 +415,11 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
                                         }
                                         decryptorMethod.instructions.add(new InsnNode(ARETURN));
                                         String result = MethodExecutor.execute(classNode, decryptorMethod, Arrays.asList(), null, context);
-                                        for(int i = 0; i < matcher91.getCapturedInstructions("all").size() - 1; i++)
+                                        for (int i = 0; i < matcher91.getCapturedInstructions("all").size() - 1; i++) {
                                             methodNode.instructions.remove(matcher91.getCapturedInstructions("all").get(i));
+                                        }
                                         methodNode.instructions.set(matcher91.getCapturedInstructions("all").get(
-                                            matcher91.getCapturedInstructions("all").size() - 1), new LdcInsnNode(result));
+                                                matcher91.getCapturedInstructions("all").size() - 1), new LdcInsnNode(result));
                                         total.incrementAndGet();
                                         int x = (int) ((total.get() * 1.0d / expected) * 100);
                                         if (x != 0 && x % 10 == 0 && !alerted[x - 1]) {
@@ -461,10 +460,11 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
                                         }
                                         decryptorMethod.instructions.add(new InsnNode(ARETURN));
                                         String result = MethodExecutor.execute(classNode, decryptorMethod, Arrays.asList(), null, context);
-                                        for(int i = 0; i < matcher31.getCapturedInstructions("all").size() - 1; i++)
+                                        for (int i = 0; i < matcher31.getCapturedInstructions("all").size() - 1; i++) {
                                             methodNode.instructions.remove(matcher31.getCapturedInstructions("all").get(i));
+                                        }
                                         methodNode.instructions.set(matcher31.getCapturedInstructions("all").get(
-                                            matcher31.getCapturedInstructions("all").size() - 1), new LdcInsnNode(result));
+                                                matcher31.getCapturedInstructions("all").size() - 1), new LdcInsnNode(result));
                                         total.incrementAndGet();
                                         int x = (int) ((total.get() * 1.0d / expected) * 100);
                                         if (x != 0 && x % 10 == 0 && !alerted[x - 1]) {
@@ -478,8 +478,7 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
                         }
                         InstructionMatcher matcher1 = DECRYPT_PATTERNV_3.matcher(currentInsn);
                         boolean switched = false;
-                        if(!matcher1.find())
-                        {
+                        if (!matcher1.find()) {
                             matcher1 = DECRYPT_PATTERN_LEGACY.matcher(currentInsn);
                             switched = true;
                         }
@@ -555,8 +554,7 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
                                     AbstractInsnNode innerCurrentInsn = innerMethodInsns.get(innerInsnIndex);
                                     InstructionMatcher matcher = DECRYPT_PATTERNV_3.matcher(innerCurrentInsn);
                                     boolean switched = false;
-                                    if(!matcher.find())
-                                    {
+                                    if (!matcher.find()) {
                                         matcher = DECRYPT_PATTERN_LEGACY.matcher(innerCurrentInsn);
                                         switched = true;
                                     }
@@ -595,9 +593,8 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
         }
         return total.get();
     }
-    
-    public static class Config extends TransformerConfig 
-    {
+
+    public static class Config extends TransformerConfig {
         /**
          * Should we remove all Stringer classes, regardless if they
          * are called or not?
@@ -606,18 +603,15 @@ public class StringEncryptionTransformer extends Transformer<StringEncryptionTra
         private boolean removeAllStringerClasses = true;
         private boolean keepDecryptorClasses = false;
 
-        public Config() 
-        {
+        public Config() {
             super(StringEncryptionTransformer.class);
         }
 
-        public boolean shouldRemoveAllStringerClasses() 
-        {
+        public boolean shouldRemoveAllStringerClasses() {
             return removeAllStringerClasses;
         }
 
-        public void setRemoveAllStringerClasses(boolean removeAllStringerClasses) 
-        {
+        public void setRemoveAllStringerClasses(boolean removeAllStringerClasses) {
             this.removeAllStringerClasses = removeAllStringerClasses;
         }
 

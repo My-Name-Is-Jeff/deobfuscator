@@ -29,7 +29,9 @@ public class MultiStep implements Step {
     @Override
     public AbstractInsnNode tryMatch(InstructionMatcher matcher, AbstractInsnNode now) {
         for (Step step : steps) {
-            while (!Utils.isInstruction(now)) now = now.getNext();
+            while (!Utils.isInstruction(now)) {
+                now = now.getNext();
+            }
             if (now == null) {
                 return null;
             }

@@ -39,7 +39,7 @@ public class FieldFrame extends Frame {
             this.obj.children.add(this);
         }
     }
-    
+
     public String getDesc() {
         return desc;
     }

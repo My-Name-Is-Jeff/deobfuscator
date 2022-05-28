@@ -82,7 +82,8 @@ public class EnhancedStringEncryptionTransformer extends Transformer<EnhancedStr
 
                     if (!getConfig().isSlowlyDetermineMagicNumbers()) {
                         InstructionMatcher matcher = DECRYPT_PATTERN.matcher(insnNode);
-                        if (!matcher.find()) continue;
+                        if (!matcher.find())
+                            continue;
 
                         decryptNode = new MethodNode(ASM6, ACC_PUBLIC | ACC_STATIC, "Decryptor", "()Ljava/lang/String;", null, null);
                         InsnList decryptInsns = new InsnList();
@@ -93,26 +94,34 @@ public class EnhancedStringEncryptionTransformer extends Transformer<EnhancedStr
                         decryptNode.instructions = decryptInsns;
                         invocation = matcher.getCapturedInstruction("invoke");
                     } else {
-                        if (insnNode.getOpcode() != INVOKESTATIC) continue;
+                        if (insnNode.getOpcode() != INVOKESTATIC)
+                            continue;
 
                         MethodInsnNode methodInsnNode = (MethodInsnNode) insnNode;
-                        if (!methodInsnNode.desc.equals("(II)Ljava/lang/String;")) continue;
+                        if (!methodInsnNode.desc.equals("(II)Ljava/lang/String;"))
+                            continue;
 
                         Frame<SourceValue>[] frames = framesSupplier.get();
-                        if (frames == null) continue;
+                        if (frames == null)
+                            continue;
 
                         Frame<SourceValue> frame = frames[methodNode.instructions.indexOf(insnNode)];
-                        if (frame == null) continue;
+                        if (frame == null)
+                            continue;
 
                         SourceValue cst1 = frame.getStack(frame.getStackSize() - 2);
                         SourceValue cst2 = frame.getStack(frame.getStackSize() - 1);
-                        if (cst1.insns.size() != 1) continue;
-                        if (cst2.insns.size() != 1) continue;
+                        if (cst1.insns.size() != 1)
+                            continue;
+                        if (cst2.insns.size() != 1)
+                            continue;
 
                         AbstractInsnNode insn1 = cst1.insns.iterator().next();
                         AbstractInsnNode insn2 = cst2.insns.iterator().next();
-                        if (insn1.getOpcode() != SIPUSH) continue;
-                        if (insn2.getOpcode() != SIPUSH) continue;
+                        if (insn1.getOpcode() != SIPUSH)
+                            continue;
+                        if (insn2.getOpcode() != SIPUSH)
+                            continue;
 
                         decryptNode = new MethodNode(ASM6, ACC_PUBLIC | ACC_STATIC, "Decryptor", "()Ljava/lang/String;", null, null);
                         InsnList decryptInsns = new InsnList();

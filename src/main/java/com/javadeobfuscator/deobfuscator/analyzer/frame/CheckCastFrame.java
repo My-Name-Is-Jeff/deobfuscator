@@ -27,5 +27,4 @@ public class CheckCastFrame extends Frame {
         this.check.children.add(this);
         this.parents.add(this.check);
     }
-
 }

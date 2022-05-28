@@ -9,13 +9,13 @@ public class LocalFrame extends Frame {
         this.local = local;
         this.value = value;
         if (this.value != null)
-        this.value.children.add(this);
+            this.value.children.add(this);
     }
-    
+
     public int getLocal() {
         return local;
     }
-    
+
     public Frame getValue() {
         return value;
     }

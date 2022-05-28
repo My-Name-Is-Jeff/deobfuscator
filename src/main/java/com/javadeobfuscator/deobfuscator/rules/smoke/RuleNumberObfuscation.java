@@ -51,7 +51,8 @@ public class RuleNumberObfuscation implements Rule {
                         }
                         break;
                     } else if (opcode != IADD && opcode != ISUB && opcode != IMUL && opcode != IDIV && opcode != IREM && opcode != IXOR
-                               && !Utils.isInteger(insn)) {
+                               && !Utils.isInteger(insn))
+                    {
                         break method;
                     }
                 }
@@ -73,7 +74,8 @@ public class RuleNumberObfuscation implements Rule {
                     if (ain instanceof MethodInsnNode &&
                         ((MethodInsnNode) ain).owner.equals("java/lang/String") &&
                         ((MethodInsnNode) ain).name.equals("length") &&
-                        ain.getPrevious() instanceof LdcInsnNode && ((LdcInsnNode) ain.getPrevious()).cst instanceof String) {
+                        ain.getPrevious() instanceof LdcInsnNode && ((LdcInsnNode) ain.getPrevious()).cst instanceof String)
+                    {
                         count++;
                     }
                 }

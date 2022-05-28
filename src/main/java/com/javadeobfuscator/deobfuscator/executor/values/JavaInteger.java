@@ -35,6 +35,7 @@ public class JavaInteger extends JavaValue {
     public void increment(int amount) {
         value += amount;
     }
+
     public String toString() {
         return "JavaInteger(value=" + value + ")";
     }

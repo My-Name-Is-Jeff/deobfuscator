@@ -51,7 +51,7 @@ public class ByteArrayStringTransformer extends Transformer<TransformerConfig> {
 
                         MethodInsnNode min = (MethodInsnNode) ain;
 
-                        if (!TransformerHelper.isInvokeSpecial(min,"java/lang/String", "<init>", "([B)V")) {
+                        if (!TransformerHelper.isInvokeSpecial(min, "java/lang/String", "<init>", "([B)V")) {
                             continue;
                         }
 

@@ -5,12 +5,11 @@ import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 public class StackStep extends IterableStep<VarInsnNode> {
-    
+
     private final Boolean isLoad;
     private final boolean twoSlotSize;
 
     /**
-     * 
      * @param isLoad true: load, false: store, null: both
      */
     public StackStep(Boolean isLoad, boolean twoSlotSize) {

@@ -54,11 +54,14 @@ public class Invokedynamic1Transformer extends Transformer<TransformerConfig> im
                 int decryptorMethodCount = 0;
 
                 for (AbstractInsnNode insn : TransformerHelper.instructionIterator(methodNode)) {
-                    if (!(insn instanceof InvokeDynamicInsnNode)) continue;
+                    if (!(insn instanceof InvokeDynamicInsnNode))
+                        continue;
 
                     InvokeDynamicInsnNode invokeDynamicInsnNode = (InvokeDynamicInsnNode) insn;
-                    if (!invokeDynamicInsnNode.bsm.getOwner().equals(classNode.name)) continue;
-                    if (!invokeDynamicInsnNode.bsm.getDesc().equals(BSM_DESC)) continue;
+                    if (!invokeDynamicInsnNode.bsm.getOwner().equals(classNode.name))
+                        continue;
+                    if (!invokeDynamicInsnNode.bsm.getDesc().equals(BSM_DESC))
+                        continue;
 
                     MethodNode decryptorMethod = new MethodNode(Opcodes.ACC_PUBLIC | Opcodes.ACC_STATIC, "Decrypt" + decryptorMethodCount++, "()V", null, null);
 
@@ -69,10 +72,10 @@ public class Invokedynamic1Transformer extends Transformer<TransformerConfig> im
                     decryptorMethod.instructions.add(invokeDynamicInsnNode.clone(null));
                     decryptorMethod.instructions.add(new InsnNode(RETURN));
 
-
                     vm.beforeCallHooks.add(info -> {
                         if (info.getClassNode().name.equals("java/lang/invoke/MethodHandles$Lookup")
-                                && info.getMethodNode().desc.equals("(Ljava/lang/Class;Ljava/lang/String;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/MethodHandle;")) {
+                            && info.getMethodNode().desc.equals("(Ljava/lang/Class;Ljava/lang/String;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/MethodHandle;"))
+                        {
                             // Make sure it's the BSM calling the find method and not the JVM
                             if (vm.getStacktrace().get(0).getClassNode() == classNode) {
                                 logger.info("got data " + info.getParams().get(0) + " " + vm.convertJavaObjectToString(info.getParams().get(1)));

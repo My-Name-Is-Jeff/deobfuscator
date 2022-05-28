@@ -139,7 +139,8 @@ public class RadonTransformer extends Transformer<RadonConfig> {
                             && ain.getNext() != null && ain.getNext().getOpcode() == Opcodes.IFEQ
                             && ain.getNext().getNext() != null && ain.getNext().getNext().getOpcode() == Opcodes.ACONST_NULL
                             && ain.getNext().getNext().getNext() != null
-                            && ain.getNext().getNext().getNext().getOpcode() == Opcodes.ATHROW) {
+                            && ain.getNext().getNext().getNext().getOpcode() == Opcodes.ATHROW)
+                        {
                             LabelNode jump = ((JumpInsnNode) ain.getNext()).label;
                             ClassNode owner = classNodes().stream().filter(c -> c.name.equals(((FieldInsnNode) ain).owner)).findFirst().orElse(null);
                             if (owner == null) {
@@ -181,7 +182,8 @@ public class RadonTransformer extends Transformer<RadonConfig> {
                                 continue;
                             }
                             if (Modifier.isStatic(field.access) && Modifier.isFinal(field.access)
-                                && ain.getNext() != null && ain.getNext().getOpcode() == Opcodes.ISTORE) {
+                                && ain.getNext() != null && ain.getNext().getOpcode() == Opcodes.ISTORE)
+                            {
                                 field = classNode.fields.stream().filter(f -> f.name.equals(((FieldInsnNode) ain).name)
                                                                               && f.desc.equals(((FieldInsnNode) ain).desc)).findFirst().orElse(null);
                                 var = ((VarInsnNode) ain.getNext()).var;
@@ -189,14 +191,16 @@ public class RadonTransformer extends Transformer<RadonConfig> {
                             }
                         }
                         if (var != -1 && ain.getOpcode() == Opcodes.ILOAD && ((VarInsnNode) ain).var == var
-                            && ain.getNext() != null && ain.getNext().getOpcode() == Opcodes.IFNE) {
+                            && ain.getNext() != null && ain.getNext().getOpcode() == Opcodes.IFNE)
+                        {
                             method.instructions.remove(ain.getNext());
                             method.instructions.remove(ain);
                         } else if (var != -1 && ain.getOpcode() == Opcodes.ILOAD && ((VarInsnNode) ain).var == var
                                    && ain.getNext() != null && ain.getNext().getOpcode() == Opcodes.IFEQ
                                    && ain.getNext().getNext() != null && ain.getNext().getNext().getOpcode() == Opcodes.ACONST_NULL
                                    && ain.getNext().getNext().getNext() != null
-                                   && ain.getNext().getNext().getNext().getOpcode() == Opcodes.ATHROW) {
+                                   && ain.getNext().getNext().getNext().getOpcode() == Opcodes.ATHROW)
+                        {
                             JumpInsnNode jump = (JumpInsnNode) ain.getNext();
                             method.instructions.remove(ain.getNext().getNext().getNext());
                             method.instructions.remove(ain.getNext().getNext());
@@ -206,7 +210,8 @@ public class RadonTransformer extends Transformer<RadonConfig> {
                                    && ain.getNext() != null && ain.getNext().getOpcode() == Opcodes.IFEQ
                                    && ain.getNext().getNext() != null && ain.getNext().getNext().getOpcode() == Opcodes.ACONST_NULL
                                    && ain.getNext().getNext().getNext() != null
-                                   && ain.getNext().getNext().getNext().getOpcode() == Opcodes.ATHROW) {
+                                   && ain.getNext().getNext().getNext().getOpcode() == Opcodes.ATHROW)
+                        {
                             LabelNode jump = ((JumpInsnNode) ain.getNext()).label;
                             FieldNode field1 = classNode.fields.stream().filter(f ->
                                     f.name.equals(((FieldInsnNode) ain).name) && f.desc.equals(((FieldInsnNode) ain).desc)).findFirst().orElse(null);
@@ -242,7 +247,7 @@ public class RadonTransformer extends Transformer<RadonConfig> {
                     continue;
                 }
                 FieldNode fNode = owner.fields.stream().filter(f -> f.name.equals(fn.name) && f.desc.equals(fn.desc)).findFirst().orElse(null);
-                if(fakeFields.containsKey(owner))
+                if (fakeFields.containsKey(owner))
                     fakeFields.get(owner).remove(fNode);
             }
         }));
@@ -252,14 +257,16 @@ public class RadonTransformer extends Transformer<RadonConfig> {
                 for (MethodNode method : classNode.methods) {
                     for (AbstractInsnNode ain : method.instructions.toArray()) {
                         if (Utils.isInteger(ain) && ain.getNext() != null && Utils.isInteger(ain.getNext())
-                            && ain.getNext().getNext() != null && ain.getNext().getNext().getOpcode() == Opcodes.IXOR) {
+                            && ain.getNext().getNext() != null && ain.getNext().getNext().getOpcode() == Opcodes.IXOR)
+                        {
                             int result = Utils.getIntValue(ain) ^ Utils.getIntValue(ain.getNext());
                             method.instructions.remove(ain.getNext().getNext());
                             method.instructions.remove(ain.getNext());
                             method.instructions.set(ain, Utils.getIntInsn(result));
                             number.incrementAndGet();
                         } else if (Utils.isLong(ain) && ain.getNext() != null && Utils.isLong(ain.getNext())
-                                   && ain.getNext().getNext() != null && ain.getNext().getNext().getOpcode() == Opcodes.LXOR) {
+                                   && ain.getNext().getNext() != null && ain.getNext().getNext().getOpcode() == Opcodes.LXOR)
+                        {
                             long result = Utils.getLongValue(ain) ^ Utils.getLongValue(ain.getNext());
                             method.instructions.remove(ain.getNext().getNext());
                             method.instructions.remove(ain.getNext());
@@ -283,7 +290,8 @@ public class RadonTransformer extends Transformer<RadonConfig> {
                             && ain.getNext().getNext().getNext().getNext().getNext() != null
                             && Utils.isInteger(ain.getNext().getNext().getNext().getNext().getNext())
                             && ain.getNext().getNext().getNext().getNext().getNext().getNext() != null
-                            && ain.getNext().getNext().getNext().getNext().getNext().getNext().getOpcode() == Opcodes.IXOR) {
+                            && ain.getNext().getNext().getNext().getNext().getNext().getNext().getOpcode() == Opcodes.IXOR)
+                        {
                             int result = Utils.getIntValue(ain) ^ Utils.getIntValue(
                                     ain.getNext().getNext().getNext().getNext().getNext());
                             method.instructions.remove(ain.getNext().getNext().getNext().getNext().getNext().getNext());
@@ -304,7 +312,8 @@ public class RadonTransformer extends Transformer<RadonConfig> {
                                    && ain.getNext().getNext().getNext().getNext().getNext() != null
                                    && Utils.isLong(ain.getNext().getNext().getNext().getNext().getNext())
                                    && ain.getNext().getNext().getNext().getNext().getNext().getNext() != null
-                                   && ain.getNext().getNext().getNext().getNext().getNext().getNext().getOpcode() == Opcodes.LXOR) {
+                                   && ain.getNext().getNext().getNext().getNext().getNext().getNext().getOpcode() == Opcodes.LXOR)
+                        {
                             long result = Utils.getLongValue(ain.getNext()) ^ Utils.getLongValue(
                                     ain.getNext().getNext().getNext().getNext().getNext());
                             method.instructions.remove(ain.getNext().getNext().getNext().getNext().getNext().getNext());
@@ -323,7 +332,8 @@ public class RadonTransformer extends Transformer<RadonConfig> {
                                    && ain.getNext().getNext().getNext().getNext() != null
                                    && ain.getNext().getNext().getNext().getNext().getOpcode() == Opcodes.LXOR
                                    && ain.getNext().getNext().getNext().getNext().getNext() != null
-                                   && ain.getNext().getNext().getNext().getNext().getNext().getOpcode() == Opcodes.L2I) {
+                                   && ain.getNext().getNext().getNext().getNext().getNext().getOpcode() == Opcodes.L2I)
+                        {
                             int result = (int) ((long) Utils.getIntValue(ain) ^ (long) Utils.getIntValue(
                                     ain.getNext().getNext()));
                             method.instructions.remove(ain.getNext().getNext().getNext().getNext().getNext());
@@ -347,7 +357,8 @@ public class RadonTransformer extends Transformer<RadonConfig> {
                     InstructionModifier modifier = new InstructionModifier();
                     for (AbstractInsnNode ain : TransformerHelper.instructionIterator(method)) {
                         if (ain.getOpcode() == Opcodes.INVOKESTATIC && ain.getPrevious() != null
-                            && Utils.isInteger(ain.getPrevious())) {
+                            && Utils.isInteger(ain.getPrevious()))
+                        {
                             ClassNode decryptorNode = classNodes().stream().filter(c -> c.name.equals(((MethodInsnNode) ain).owner)).findFirst().orElse(null);
                             MethodNode decryptorMethod = decryptorNode == null ? null : decryptorNode.methods.stream().filter(m ->
                                     m.name.equals(((MethodInsnNode) ain).name) && m.desc.equals(((MethodInsnNode) ain).desc)).findFirst().orElse(null);
@@ -378,7 +389,8 @@ public class RadonTransformer extends Transformer<RadonConfig> {
                 if (clinit != null) {
                     AbstractInsnNode firstInstr = clinit.instructions.getFirst();
                     if (firstInstr != null && firstInstr.getOpcode() == Opcodes.INVOKESTATIC
-                        && ((MethodInsnNode) firstInstr).owner.equals(classNode.name)) {
+                        && ((MethodInsnNode) firstInstr).owner.equals(classNode.name))
+                    {
                         MethodNode pool = classNode.methods.stream().filter(m -> m.name.equals(((MethodInsnNode) firstInstr).name)
                                                                                  && m.desc.equals(((MethodInsnNode) firstInstr).desc)).findFirst().orElse(null);
                         if (pool != null && isCorrectStringPool(pool, 1)) {
@@ -405,7 +417,8 @@ public class RadonTransformer extends Transformer<RadonConfig> {
                                                 && ((FieldInsnNode) ain).name.equals(poolField.name)
                                                 && ((FieldInsnNode) ain).desc.equals(poolField.desc)
                                                 && ain.getNext() != null && Utils.isInteger(ain.getNext())
-                                                && ain.getNext().getNext() != null && ain.getNext().getNext().getOpcode() == Opcodes.AALOAD) {
+                                                && ain.getNext().getNext() != null && ain.getNext().getNext().getOpcode() == Opcodes.AALOAD)
+                                            {
                                                 modifier.remove(ain.getNext().getNext());
                                                 modifier.remove(ain.getNext());
                                                 modifier.replace(ain, new LdcInsnNode(value[Utils.getIntValue(ain.getNext())]));
@@ -485,7 +498,8 @@ public class RadonTransformer extends Transformer<RadonConfig> {
                                             SourceValue value = frames[method.instructions.indexOf(a)].getStack(
                                                     frames[method.instructions.indexOf(a)].getStackSize() - 1);
                                             if (!value.insns.isEmpty()
-                                                && instructions.contains(value.insns.iterator().next())) {
+                                                && instructions.contains(value.insns.iterator().next()))
+                                            {
                                                 pops.add(a);
                                             }
                                         }
@@ -666,7 +680,8 @@ public class RadonTransformer extends Transformer<RadonConfig> {
                                     .findFirst()
                                     .orElse(null);
                             if ((!indyBootstrap1.containsKey(bootstrapClassNode) || !indyBootstrap1.get(bootstrapClassNode).contains(bootstrapMethodNode))
-                                && !isCorrectIndy(bootstrapMethodNode)) {
+                                && !isCorrectIndy(bootstrapMethodNode))
+                            {
                                 continue;
                             }
                             List<JavaValue> args = new ArrayList<>();
@@ -781,11 +796,13 @@ public class RadonTransformer extends Transformer<RadonConfig> {
                     ixor++;
                 } else if (ain.getOpcode() == Opcodes.INVOKEVIRTUAL
                            && ((MethodInsnNode) ain).name.equals("toCharArray")
-                           && ((MethodInsnNode) ain).owner.equals("java/lang/String")) {
+                           && ((MethodInsnNode) ain).owner.equals("java/lang/String"))
+                {
                     charArray++;
                 } else if (ain.getOpcode() == Opcodes.INVOKESTATIC
                            && ((MethodInsnNode) ain).desc.equals("(Ljava/lang/String;Ljava/lang/String;)V")
-                           && ((MethodInsnNode) ain).owner.equals(classNode.name)) {
+                           && ((MethodInsnNode) ain).owner.equals(classNode.name))
+                {
                     special++;
                 }
             }
@@ -805,37 +822,44 @@ public class RadonTransformer extends Transformer<RadonConfig> {
                     ixor++;
                 } else if (ain.getOpcode() == Opcodes.INVOKEVIRTUAL
                            && ((MethodInsnNode) ain).name.equals("toCharArray")
-                           && ((MethodInsnNode) ain).owner.equals("java/lang/String")) {
+                           && ((MethodInsnNode) ain).owner.equals("java/lang/String"))
+                {
                     charArray++;
                 } else if (ain.getOpcode() == Opcodes.INVOKEVIRTUAL
                            && ((MethodInsnNode) ain).name.equals("getStackTrace")
-                           && ((MethodInsnNode) ain).owner.equals("java/lang/Throwable")) {
+                           && ((MethodInsnNode) ain).owner.equals("java/lang/Throwable"))
+                {
                     stackTrace++;
                 } else if (ain.getOpcode() == Opcodes.INVOKEVIRTUAL
                            && ((MethodInsnNode) ain).name.equals("getStackTrace")
-                           && ((MethodInsnNode) ain).owner.equals("java/lang/Thread")) {
+                           && ((MethodInsnNode) ain).owner.equals("java/lang/Thread"))
+                {
                     stackTrace2++;
                 }
             }
             if (charArray == 1 && stackTrace == 1 && ixor == 3) {
                 return 0;
             } else if (charArray == 1 && stackTrace == 0 && stackTrace2 == 1
-                       && ixor == 8 && classNode.superName.equals("java/lang/Thread")) {
+                       && ixor == 8 && classNode.superName.equals("java/lang/Thread"))
+            {
                 return 1;
             }
         } else if (method.desc.equals("(Ljava/lang/Object;Ljava/lang/Object;I)Ljava/lang/String;")
-                   || method.desc.equals("(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String;")) {
+                   || method.desc.equals("(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String;"))
+        {
             int stackTrace = 0;
             int charArray = 0;
             for (AbstractInsnNode ain : method.instructions.toArray()) {
                 if (ain.getOpcode() == Opcodes.INVOKEVIRTUAL
                     && ((MethodInsnNode) ain).name.equals("toCharArray")
-                    && ((MethodInsnNode) ain).owner.equals("java/lang/String")) {
+                    && ((MethodInsnNode) ain).owner.equals("java/lang/String"))
+                {
                     charArray++;
                 } else if (ain.getOpcode() == Opcodes.INVOKEVIRTUAL
                            && ((MethodInsnNode) ain).name.equals("getStackTrace")
                            && (((MethodInsnNode) ain).owner.equals("java/lang/Thread")
-                               || ((MethodInsnNode) ain).owner.equals("java/lang/Throwable"))) {
+                               || ((MethodInsnNode) ain).owner.equals("java/lang/Throwable")))
+                {
                     stackTrace++;
                 }
             }
@@ -858,7 +882,8 @@ public class RadonTransformer extends Transformer<RadonConfig> {
                     string++;
                 } else if (ain.getOpcode() == Opcodes.INVOKEVIRTUAL
                            && ((MethodInsnNode) ain).name.startsWith("find")
-                           && ((MethodInsnNode) ain).owner.equals("java/lang/invoke/MethodHandles$Lookup")) {
+                           && ((MethodInsnNode) ain).owner.equals("java/lang/invoke/MethodHandles$Lookup"))
+                {
                     lookup++;
                 }
             }
@@ -872,7 +897,8 @@ public class RadonTransformer extends Transformer<RadonConfig> {
     private void patchMethodIndy(Context context, MethodNode method) {
         for (AbstractInsnNode ain : method.instructions.toArray()) {
             if (ain instanceof MethodInsnNode && (((MethodInsnNode) ain).owner.equals("java/lang/Runtime")
-                                                  || (((MethodInsnNode) ain).owner.equals("java/util/concurrent/ThreadLocalRandom")))) {
+                                                  || (((MethodInsnNode) ain).owner.equals("java/util/concurrent/ThreadLocalRandom"))))
+            {
                 if (((MethodInsnNode) ain).name.equals("nextInt")) {
                     method.instructions.remove(Utils.getNext(ain));
                 }
@@ -883,10 +909,12 @@ public class RadonTransformer extends Transformer<RadonConfig> {
         if (getConfig().isFastIndy()) {
             for (AbstractInsnNode ain : method.instructions.toArray()) {
                 if (ain.getOpcode() == Opcodes.INVOKESTATIC && ((MethodInsnNode) ain).owner.equals("java/lang/Class")
-                    && ((MethodInsnNode) ain).name.equals("forName")) {
+                    && ((MethodInsnNode) ain).name.equals("forName"))
+                {
                     method.instructions.remove(ain);
                 } else if (ain.getOpcode() == Opcodes.INVOKEVIRTUAL && ((MethodInsnNode) ain).owner.equals("java/lang/invoke/MethodHandle")
-                           && ((MethodInsnNode) ain).name.equals("asType")) {
+                           && ((MethodInsnNode) ain).name.equals("asType"))
+                {
                     method.instructions.set(ain, new InsnNode(Opcodes.POP));
                 } else if (ain.getOpcode() == Opcodes.INVOKEVIRTUAL && ((MethodInsnNode) ain).owner.equals("java/lang/invoke/MethodHandles$Lookup")) {
                     context.customMethodFunc.put(ain, (args, ctx) -> {
@@ -905,10 +933,12 @@ public class RadonTransformer extends Transformer<RadonConfig> {
         for (MethodNode method : classNode.methods) {
             for (AbstractInsnNode ain : method.instructions.toArray()) {
                 if (ain instanceof MethodInsnNode && ((MethodInsnNode) ain).name.equals("availableProcessors")
-                    && ((MethodInsnNode) ain).owner.equals("java/lang/Runtime")) {
+                    && ((MethodInsnNode) ain).owner.equals("java/lang/Runtime"))
+                {
                     method.instructions.set(ain, new LdcInsnNode(4));
                 } else if (ain instanceof MethodInsnNode && ((MethodInsnNode) ain).name.equals("getRuntime")
-                           && ((MethodInsnNode) ain).owner.equals("java/lang/Runtime")) {
+                           && ((MethodInsnNode) ain).owner.equals("java/lang/Runtime"))
+                {
                     method.instructions.set(ain, new InsnNode(Opcodes.ACONST_NULL));
                 }
             }

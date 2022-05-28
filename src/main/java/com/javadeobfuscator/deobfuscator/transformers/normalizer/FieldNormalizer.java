@@ -76,7 +76,7 @@ public class FieldNormalizer extends AbstractNormalizer<FieldNormalizer.Config> 
                 }
             }
             for (FieldNode fieldNode : classNode.fields) {
-                if(EXCLUDE_ENUMS && classNode.superName.equals("java/lang/Enum")
+                if (EXCLUDE_ENUMS && classNode.superName.equals("java/lang/Enum")
                     && Type.getType(fieldNode.desc).getSort() == Type.OBJECT
                     && Type.getType(fieldNode.desc).getInternalName().equals(classNode.name))
                     continue;

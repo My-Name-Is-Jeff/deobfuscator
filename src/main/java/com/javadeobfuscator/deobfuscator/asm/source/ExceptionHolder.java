@@ -46,11 +46,13 @@ public class ExceptionHolder {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         ExceptionHolder that = (ExceptionHolder) o;
         return Objects.equals(exceptionType, that.exceptionType) &&
-                Objects.equals(exceptionProperties, that.exceptionProperties);
+               Objects.equals(exceptionProperties, that.exceptionProperties);
     }
 
     @Override
@@ -62,8 +64,8 @@ public class ExceptionHolder {
     @Override
     public String toString() {
         return "ExceptionHolder{" +
-                "exceptionType='" + exceptionType + '\'' +
-                ", exceptionProperties=" + exceptionProperties +
-                '}';
+               "exceptionType='" + exceptionType + '\'' +
+               ", exceptionProperties=" + exceptionProperties +
+               '}';
     }
 }

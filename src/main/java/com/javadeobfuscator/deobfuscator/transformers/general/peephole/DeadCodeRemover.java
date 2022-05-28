@@ -28,7 +28,8 @@ public class DeadCodeRemover extends Transformer<TransformerConfig> {
         int deadInstructions = 0;
         for (ClassNode classNode : classes.values()) {
             for (MethodNode methodNode : classNode.methods) {
-                if (methodNode.instructions.getFirst() == null) continue;
+                if (methodNode.instructions.getFirst() == null)
+                    continue;
 
                 InstructionModifier modifier = new InstructionModifier();
 
@@ -40,8 +41,10 @@ public class DeadCodeRemover extends Transformer<TransformerConfig> {
                     continue;
                 }
                 for (int i = 0; i < methodNode.instructions.size(); i++) {
-                    if (!Utils.isInstruction(methodNode.instructions.get(i))) continue;
-                    if (frames[i] != null) continue;
+                    if (!Utils.isInstruction(methodNode.instructions.get(i)))
+                        continue;
+                    if (frames[i] != null)
+                        continue;
 
                     modifier.remove(methodNode.instructions.get(i));
                     deadInstructions++;

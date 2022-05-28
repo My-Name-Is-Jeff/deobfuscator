@@ -119,7 +119,8 @@ public class HideAccessObfuscationTransformer extends Transformer<HideAccessObfu
 
         decryptors.forEach(decryptor -> {
             MethodNode clinit = decryptor.methods.stream().filter(m -> m.name.equals("<clinit>")).findFirst().orElse(null);
-            if (clinit == null) throw new RuntimeException("Could not find a method <clinit> in " + decryptor.name);
+            if (clinit == null)
+                throw new RuntimeException("Could not find a method <clinit> in " + decryptor.name);
 
             MethodExecutor.execute(decryptor, clinit, Collections.emptyList(), null, context);
         });
@@ -137,7 +138,8 @@ public class HideAccessObfuscationTransformer extends Transformer<HideAccessObfu
                             if (bootstrap.getDesc().equals(bootstrapDesc)) {
                                 MethodNode bootstrapMethod = classNode.methods.stream().filter(m -> m.name.equals(bootstrap.getName()) && m.desc.equals(bootstrap.getDesc())).findFirst().orElse(null);
 
-                                if (bootstrapMethod == null) throw new RuntimeException("Could not find bootstrap");
+                                if (bootstrapMethod == null)
+                                    throw new RuntimeException("Could not find bootstrap");
                                 decryptMethods.add(bootstrapMethod);
 
                                 List<JavaValue> args = new ArrayList<>();
@@ -146,21 +148,18 @@ public class HideAccessObfuscationTransformer extends Transformer<HideAccessObfu
                                 args.add(new JavaObject(null, "java/lang/invoke/MethodType"));
 
                                 JavaMethodHandle result;
-                                try
-                                {
+                                try {
                                     result = MethodExecutor.execute(classNode, bootstrapMethod, args, null, context);
-                                    if(result == null)
+                                    if (result == null)
                                         throw new NullPointerException("Null result returned");
-                                }catch(Exception e)
-                                {
-                                    if(getConfig().shouldIgnoreFailures())
-                                    {
+                                } catch (Exception e) {
+                                    if (getConfig().shouldIgnoreFailures()) {
                                         System.out.println("Failed to decrypt invokedynamic call at class " + classNode.name
-                                            + " method " + methodNode.name + methodNode.desc);
+                                                           + " method " + methodNode.name + methodNode.desc);
                                         System.out.println(e.toString() + " @ " + e.getStackTrace()[0].toString());
                                         failedDecryptors.add(bootstrapMethod);
                                         continue;
-                                    }else
+                                    } else
                                         throw e;
                                 }
                                 switch (result.type) {
@@ -192,7 +191,8 @@ public class HideAccessObfuscationTransformer extends Transformer<HideAccessObfu
                                 case "(I[Ljava/lang/Object;)Ljava/lang/Object;": { // INVOKESTATIC and INVOKESPECIAL
                                     MethodNode hideAccessMethod = classes.get(owner).methods.stream().filter(m -> m.desc.equals(desc) && m.name.equals(name)).findFirst().orElse(null);
                                     if (hideAccessMethod != null && hideAccessMethod.instructions.size() > 2
-                                            && hideAccessMethod.instructions.get(2).getOpcode() == Opcodes.LDC) {
+                                        && hideAccessMethod.instructions.get(2).getOpcode() == Opcodes.LDC)
+                                    {
                                         if (insn.getPrevious().getOpcode() == Opcodes.SWAP) {
                                             Integer value = (Integer) ((LdcInsnNode) insn.getPrevious().getPrevious()).cst;
                                             AbstractInsnNode returnInsert = null;
@@ -200,12 +200,13 @@ public class HideAccessObfuscationTransformer extends Transformer<HideAccessObfu
                                             //Patches the hide access method first to return a constructor
                                             for (AbstractInsnNode ain : hideAccessMethod.instructions.toArray()) {
                                                 if (ain.getOpcode() == Opcodes.INVOKEVIRTUAL
-                                                        && ((MethodInsnNode) ain).name.equals("newInstance")
-                                                        && ((MethodInsnNode) ain).owner.equals("java/lang/reflect/Constructor")
-                                                        && ain.getPrevious() != null
-                                                        && ain.getPrevious().getOpcode() == Opcodes.ALOAD
-                                                        && ain.getPrevious().getPrevious() != null
-                                                        && ain.getPrevious().getPrevious().getOpcode() == Opcodes.ALOAD) {
+                                                    && ((MethodInsnNode) ain).name.equals("newInstance")
+                                                    && ((MethodInsnNode) ain).owner.equals("java/lang/reflect/Constructor")
+                                                    && ain.getPrevious() != null
+                                                    && ain.getPrevious().getOpcode() == Opcodes.ALOAD
+                                                    && ain.getPrevious().getPrevious() != null
+                                                    && ain.getPrevious().getPrevious().getOpcode() == Opcodes.ALOAD)
+                                                {
                                                     hideAccessMethod.instructions.insert(ain.getPrevious().getPrevious(),
                                                             returnInsert = new InsnNode(Opcodes.ARETURN));
                                                     break;
@@ -216,21 +217,18 @@ public class HideAccessObfuscationTransformer extends Transformer<HideAccessObfu
                                             args.add(new JavaInteger(value));
                                             args.add(new JavaObject(null, "java/lang/Object"));
                                             JavaConstructor result;
-                                            try
-                                            {
+                                            try {
                                                 result = MethodExecutor.execute(classes.get(owner), hideAccessMethod, Collections.singletonList(new JavaInteger(value)), null, context);
-                                                if(result == null)
+                                                if (result == null)
                                                     throw new NullPointerException("Null result returned");
-                                            }catch(Exception e)
-                                            {
-                                                if(getConfig().shouldIgnoreFailures())
-                                                {
+                                            } catch (Exception e) {
+                                                if (getConfig().shouldIgnoreFailures()) {
                                                     System.out.println("Failed to decrypt invokespecial call at class " + classNode.name
-                                                        + " method " + methodNode.name + methodNode.desc);
+                                                                       + " method " + methodNode.name + methodNode.desc);
                                                     System.out.println(e.toString() + " @ " + e.getStackTrace()[0].toString());
                                                     failedClasses.add(classes.get(owner));
                                                     continue;
-                                                }else
+                                                } else
                                                     throw e;
                                             }
                                             hideAccessMethod.instructions.remove(returnInsert);
@@ -247,30 +245,28 @@ public class HideAccessObfuscationTransformer extends Transformer<HideAccessObfu
                                                 methodNode.instructions.remove(insn.getPrevious());
                                             }
                                             AbstractInsnNode firstArgInsn = null;
-                                            if(Type.getArgumentTypes(result.getDesc()).length == 0)
+                                            if (Type.getArgumentTypes(result.getDesc()).length == 0)
                                                 firstArgInsn = insn;
-                                            else
-                                            {
+                                            else {
                                                 int length = 0;
-                                                for(Type t : Type.getArgumentTypes(result.getDesc()))
-                                                    if(t.getSort() == Type.LONG || t.getSort() == Type.DOUBLE)
+                                                for (Type t : Type.getArgumentTypes(result.getDesc())) {
+                                                    if (t.getSort() == Type.LONG || t.getSort() == Type.DOUBLE)
                                                         length += 2;
                                                     else
                                                         length++;
+                                                }
                                                 ArgsAnalyzer.Result res = new ArgsAnalyzer(insn.getPrevious(), length, ArgsAnalyzer.Mode.BACKWARDS).lookupArgs();
-                                                if(res instanceof ArgsAnalyzer.FailedResult)
-                                                {
+                                                if (res instanceof ArgsAnalyzer.FailedResult) {
                                                     boolean passed = false;
                                                     AbstractInsnNode replace;
                                                     methodNode.instructions.set(insn, replace = new MethodInsnNode(
-                                                        Opcodes.INVOKESPECIAL, result.getClassName(),
-                                                        "<init>", result.getDesc(), false));
+                                                            Opcodes.INVOKESPECIAL, result.getClassName(),
+                                                            "<init>", result.getDesc(), false));
                                                     AbstractInsnNode newInsn = new TypeInsnNode(Opcodes.NEW, result.getClassName());
                                                     AbstractInsnNode dupInsn = new InsnNode(Opcodes.DUP);
-                                                    for(int i1 = methodNode.instructions.indexOf(replace); i1 >= 0; i1--)
-                                                    {
+                                                    for (int i1 = methodNode.instructions.indexOf(replace); i1 >= 0; i1--) {
                                                         AbstractInsnNode a = methodNode.instructions.get(i1);
-                                                        if(!Utils.isInstruction(a) || a.getOpcode() == Opcodes.IINC)
+                                                        if (!Utils.isInstruction(a) || a.getOpcode() == Opcodes.IINC)
                                                             continue;
                                                         methodNode.instructions.insertBefore(a, newInsn);
                                                         methodNode.instructions.insertBefore(a, dupInsn);
@@ -280,18 +276,17 @@ public class HideAccessObfuscationTransformer extends Transformer<HideAccessObfu
                                                         } catch (AnalyzerException e) {
                                                             methodNode.instructions.remove(newInsn);
                                                             methodNode.instructions.remove(dupInsn);
-                                                             continue;
+                                                            continue;
                                                         }
                                                         Frame<SourceValue> currentFrame = tempFrames[methodNode.instructions.indexOf(replace)];
                                                         Set<AbstractInsnNode> insns = new HashSet<>(currentFrame.getStack(currentFrame.getStackSize() -
-                                                            Type.getArgumentTypes(result.getDesc()).length - 2).insns);
-                                                        if(insns.size() == 1)
-                                                        {
+                                                                                                                          Type.getArgumentTypes(result.getDesc()).length - 2).insns);
+                                                        if (insns.size() == 1) {
                                                             AbstractInsnNode singleton = null;
-                                                            for(AbstractInsnNode ain1 : insns)
+                                                            for (AbstractInsnNode ain1 : insns) {
                                                                 singleton = ain1;
-                                                            if(singleton == newInsn)
-                                                            {
+                                                            }
+                                                            if (singleton == newInsn) {
                                                                 passed = true;
                                                                 break;
                                                             }
@@ -299,11 +294,10 @@ public class HideAccessObfuscationTransformer extends Transformer<HideAccessObfu
                                                         methodNode.instructions.remove(newInsn);
                                                         methodNode.instructions.remove(dupInsn);
                                                     }
-                                                    if(!passed)
-                                                        for(int i1 = methodNode.instructions.indexOf(replace); i1 < methodNode.instructions.size(); i1++)
-                                                        {
+                                                    if (!passed)
+                                                        for (int i1 = methodNode.instructions.indexOf(replace); i1 < methodNode.instructions.size(); i1++) {
                                                             AbstractInsnNode a = methodNode.instructions.get(i1);
-                                                            if(!Utils.isInstruction(a) || a.getOpcode() == Opcodes.IINC)
+                                                            if (!Utils.isInstruction(a) || a.getOpcode() == Opcodes.IINC)
                                                                 continue;
                                                             methodNode.instructions.insertBefore(a, newInsn);
                                                             methodNode.instructions.insertBefore(a, dupInsn);
@@ -313,18 +307,17 @@ public class HideAccessObfuscationTransformer extends Transformer<HideAccessObfu
                                                             } catch (AnalyzerException e) {
                                                                 methodNode.instructions.remove(newInsn);
                                                                 methodNode.instructions.remove(dupInsn);
-                                                                 continue;
+                                                                continue;
                                                             }
                                                             Frame<SourceValue> currentFrame = tempFrames[methodNode.instructions.indexOf(replace)];
                                                             Set<AbstractInsnNode> insns = new HashSet<>(currentFrame.getStack(currentFrame.getStackSize() -
-                                                                Type.getArgumentTypes(result.getDesc()).length - 1).insns);
-                                                            if(insns.size() == 1)
-                                                            {
+                                                                                                                              Type.getArgumentTypes(result.getDesc()).length - 1).insns);
+                                                            if (insns.size() == 1) {
                                                                 AbstractInsnNode singleton = null;
-                                                                for(AbstractInsnNode ain1 : insns)
+                                                                for (AbstractInsnNode ain1 : insns) {
                                                                     singleton = ain1;
-                                                                if(singleton == newInsn)
-                                                                {
+                                                                }
+                                                                if (singleton == newInsn) {
                                                                     passed = true;
                                                                     break;
                                                                 }
@@ -332,11 +325,11 @@ public class HideAccessObfuscationTransformer extends Transformer<HideAccessObfu
                                                             methodNode.instructions.remove(newInsn);
                                                             methodNode.instructions.remove(dupInsn);
                                                         }
-                                                    if(!passed)
+                                                    if (!passed)
                                                         throw new RuntimeException("Could not insert constructor!");
                                                     count.getAndIncrement();
                                                     break;
-                                                }else
+                                                } else
                                                     firstArgInsn = res.getFirstArgInsn();
                                             }
                                             methodNode.instructions.insertBefore(firstArgInsn, new TypeInsnNode(Opcodes.NEW, result.getClassName()));
@@ -356,21 +349,18 @@ public class HideAccessObfuscationTransformer extends Transformer<HideAccessObfu
                                     if (insn.getPrevious().getOpcode() == Opcodes.SWAP) {
                                         Integer value = (Integer) ((LdcInsnNode) insn.getPrevious().getPrevious()).cst;
                                         JavaMethod result;
-                                        try
-                                        {
+                                        try {
                                             result = MethodExecutor.execute(classes.get(owner), decryptMethod, Collections.singletonList(new JavaInteger(value)), null, context);
-                                            if(result == null)
+                                            if (result == null)
                                                 throw new NullPointerException("Null result returned");
-                                        }catch(Exception e)
-                                        {
-                                            if(getConfig().shouldIgnoreFailures())
-                                            {
+                                        } catch (Exception e) {
+                                            if (getConfig().shouldIgnoreFailures()) {
                                                 System.out.println("Failed to decrypt encrypted method call at class " + classNode.name
-                                                    + " method " + methodNode.name + methodNode.desc);
+                                                                   + " method " + methodNode.name + methodNode.desc);
                                                 System.out.println(e.toString() + " @ " + e.getStackTrace()[0].toString());
                                                 failedClasses.add(classes.get(owner));
                                                 continue;
-                                            }else
+                                            } else
                                                 throw e;
                                         }
                                         //Remove the array of objects
@@ -387,14 +377,16 @@ public class HideAccessObfuscationTransformer extends Transformer<HideAccessObfu
                                         }
                                         //Remove extra pop
                                         if (Type.getReturnType(result.getDesc()).getSort() == Type.VOID &&
-                                                insn.getNext() != null && insn.getNext().getOpcode() == Opcodes.POP)
+                                            insn.getNext() != null && insn.getNext().getOpcode() == Opcodes.POP)
                                             methodNode.instructions.remove(insn.getNext());
                                         //Removes the casts from a primitive to non primitive (doesn't solve the cast problem completely)
                                         if (insn.getNext() != null && insn.getNext().getOpcode() == Opcodes.CHECKCAST
-                                                && insn.getNext().getNext() != null && insn.getNext().getNext().getOpcode() == Opcodes.INVOKEVIRTUAL) {
+                                            && insn.getNext().getNext() != null && insn.getNext().getNext().getOpcode() == Opcodes.INVOKEVIRTUAL)
+                                        {
                                             TypeInsnNode next = (TypeInsnNode) insn.getNext();
                                             if (isUnboxingMethod(next)
-                                                    && Type.getReturnType(result.getDesc()).getClassName().equals(getPrimitiveFromClass(next.desc))) {
+                                                && Type.getReturnType(result.getDesc()).getClassName().equals(getPrimitiveFromClass(next.desc)))
+                                            {
                                                 methodNode.instructions.remove(next.getNext());
                                                 methodNode.instructions.remove(next);
                                             }
@@ -418,26 +410,24 @@ public class HideAccessObfuscationTransformer extends Transformer<HideAccessObfu
                                     MethodNode decryptMethod = classes.get(owner).methods.stream().filter(m -> m.desc.equals("(I)Ljava/lang/reflect/Field;")).findFirst().orElse(null);
                                     Integer value = (Integer) ((LdcInsnNode) insn.getPrevious()).cst;
                                     JavaField result;
-                                    try
-                                    {
+                                    try {
                                         result = MethodExecutor.execute(classes.get(owner), decryptMethod, Collections.singletonList(new JavaInteger(value)), null, context);
-                                        if(result == null)
+                                        if (result == null)
                                             throw new NullPointerException("Null result returned");
-                                    }catch(Exception e)
-                                    {
-                                        if(getConfig().shouldIgnoreFailures())
-                                        {
+                                    } catch (Exception e) {
+                                        if (getConfig().shouldIgnoreFailures()) {
                                             System.out.println("Failed to decrypt getstatic call at class " + classNode.name
-                                                + " method " + methodNode.name + methodNode.desc);
+                                                               + " method " + methodNode.name + methodNode.desc);
                                             System.out.println(e.toString() + " @ " + e.getStackTrace()[0].toString());
                                             failedClasses.add(classes.get(owner));
                                             continue;
-                                        }else
+                                        } else
                                             throw e;
                                     }
-                                    
-                                    if (insn.getNext().getOpcode() == Opcodes.CHECKCAST && isUnboxingMethod((TypeInsnNode)insn.getNext())
-                                        && Type.getType(result.getDesc()).getClassName().equals(getPrimitiveFromClass(((TypeInsnNode)insn.getNext()).desc))) {
+
+                                    if (insn.getNext().getOpcode() == Opcodes.CHECKCAST && isUnboxingMethod((TypeInsnNode) insn.getNext())
+                                        && Type.getType(result.getDesc()).getClassName().equals(getPrimitiveFromClass(((TypeInsnNode) insn.getNext()).desc)))
+                                    {
                                         methodNode.instructions.remove(insn.getNext().getNext());
                                         methodNode.instructions.remove(insn.getNext());
                                     }
@@ -448,34 +438,31 @@ public class HideAccessObfuscationTransformer extends Transformer<HideAccessObfu
                                 }
                                 case "(ILjava/lang/Object;)V": { // PUTSTATIC
                                     MethodNode decryptMethod = classes.get(owner).methods.stream().filter(m -> m.desc.equals("(I)Ljava/lang/reflect/Field;")).findFirst().orElse(null);
-                                    
+
                                     boolean swap = insn.getPrevious().getOpcode() == Opcodes.SWAP;
                                     Integer value = (Integer) ((LdcInsnNode) insn.getPrevious().getPrevious()).cst;
                                     JavaField result;
-                                    try
-                                    {
+                                    try {
                                         result = MethodExecutor.execute(classes.get(owner), decryptMethod, Collections.singletonList(new JavaInteger(value)), null, context);
-                                        if(result == null)
+                                        if (result == null)
                                             throw new NullPointerException("Null result returned");
-                                    }catch(Exception e)
-                                    {
-                                        if(getConfig().shouldIgnoreFailures())
-                                        {
+                                    } catch (Exception e) {
+                                        if (getConfig().shouldIgnoreFailures()) {
                                             System.out.println("Failed to decrypt putstatic call at class " + classNode.name
-                                                + " method " + methodNode.name + methodNode.desc);
+                                                               + " method " + methodNode.name + methodNode.desc);
                                             System.out.println(e.toString() + " @ " + e.getStackTrace()[0].toString());
                                             failedClasses.add(classes.get(owner));
                                             continue;
-                                        }else
+                                        } else
                                             throw e;
                                     }
 
                                     methodNode.instructions.remove(insn.getPrevious().getPrevious());
-                                    if(swap)
+                                    if (swap)
                                         methodNode.instructions.remove(insn.getPrevious());
 
                                     if (isValueOf(insn.getPrevious())
-                                        && Type.getType(result.getDesc()).getClassName().equals(getPrimitiveFromClass(((MethodInsnNode)insn.getPrevious()).owner)))
+                                        && Type.getType(result.getDesc()).getClassName().equals(getPrimitiveFromClass(((MethodInsnNode) insn.getPrevious()).owner)))
                                         methodNode.instructions.remove(insn.getPrevious());
                                     methodNode.instructions.set(insn, new FieldInsnNode(Opcodes.PUTSTATIC, result.getClassName(), result.getName(), result.getDesc()));
                                     count.getAndIncrement();
@@ -485,26 +472,24 @@ public class HideAccessObfuscationTransformer extends Transformer<HideAccessObfu
                                     MethodNode decryptMethod = classes.get(owner).methods.stream().filter(m -> m.desc.equals("(I)Ljava/lang/reflect/Field;")).findFirst().orElse(null);
                                     Integer value = (Integer) ((LdcInsnNode) insn.getPrevious()).cst;
                                     JavaField result;
-                                    try
-                                    {
+                                    try {
                                         result = MethodExecutor.execute(classes.get(owner), decryptMethod, Collections.singletonList(new JavaInteger(value)), null, context);
-                                        if(result == null)
+                                        if (result == null)
                                             throw new NullPointerException("Null result returned");
-                                    }catch(Exception e)
-                                    {
-                                        if(getConfig().shouldIgnoreFailures())
-                                        {
+                                    } catch (Exception e) {
+                                        if (getConfig().shouldIgnoreFailures()) {
                                             System.out.println("Failed to decrypt getfield call at class " + classNode.name
-                                                + " method " + methodNode.name + methodNode.desc);
+                                                               + " method " + methodNode.name + methodNode.desc);
                                             System.out.println(e.toString() + " @ " + e.getStackTrace()[0].toString());
                                             failedClasses.add(classes.get(owner));
                                             continue;
-                                        }else
+                                        } else
                                             throw e;
                                     }
 
-                                    if (insn.getNext().getOpcode() == Opcodes.CHECKCAST && isUnboxingMethod((TypeInsnNode)insn.getNext())
-                                        && Type.getType(result.getDesc()).getClassName().equals(getPrimitiveFromClass(((TypeInsnNode)insn.getNext()).desc))) {
+                                    if (insn.getNext().getOpcode() == Opcodes.CHECKCAST && isUnboxingMethod((TypeInsnNode) insn.getNext())
+                                        && Type.getType(result.getDesc()).getClassName().equals(getPrimitiveFromClass(((TypeInsnNode) insn.getNext()).desc)))
+                                    {
                                         methodNode.instructions.remove(insn.getNext().getNext());
                                         methodNode.instructions.remove(insn.getNext());
                                     }
@@ -519,30 +504,27 @@ public class HideAccessObfuscationTransformer extends Transformer<HideAccessObfu
                                     boolean swap = insn.getPrevious().getOpcode() == Opcodes.SWAP;
                                     Integer value = (Integer) ((LdcInsnNode) insn.getPrevious().getPrevious()).cst;
                                     JavaField result;
-                                    try
-                                    {
+                                    try {
                                         result = MethodExecutor.execute(classes.get(owner), decryptMethod, Collections.singletonList(new JavaInteger(value)), null, context);
-                                        if(result == null)
+                                        if (result == null)
                                             throw new NullPointerException("Null result returned");
-                                    }catch(Exception e)
-                                    {
-                                        if(getConfig().shouldIgnoreFailures())
-                                        {
+                                    } catch (Exception e) {
+                                        if (getConfig().shouldIgnoreFailures()) {
                                             System.out.println("Failed to decrypt putfield call at class " + classNode.name
-                                                + " method " + methodNode.name + methodNode.desc);
+                                                               + " method " + methodNode.name + methodNode.desc);
                                             System.out.println(e.toString() + " @ " + e.getStackTrace()[0].toString());
                                             failedClasses.add(classes.get(owner));
                                             continue;
-                                        }else
+                                        } else
                                             throw e;
                                     }
 
                                     methodNode.instructions.remove(insn.getPrevious().getPrevious());
-                                    if(swap)
+                                    if (swap)
                                         methodNode.instructions.remove(insn.getPrevious());
 
                                     if (isValueOf(insn.getPrevious())
-                                        && Type.getType(result.getDesc()).getClassName().equals(getPrimitiveFromClass(((MethodInsnNode)insn.getPrevious()).owner)))
+                                        && Type.getType(result.getDesc()).getClassName().equals(getPrimitiveFromClass(((MethodInsnNode) insn.getPrevious()).owner)))
                                         methodNode.instructions.remove(insn.getPrevious());
                                     methodNode.instructions.set(insn, new FieldInsnNode(Opcodes.PUTFIELD, result.getClassName(), result.getName(), result.getDesc()));
                                     count.getAndIncrement();
@@ -566,46 +548,38 @@ public class HideAccessObfuscationTransformer extends Transformer<HideAccessObfu
 
     private void castFix(Context context) {
         classNodes().forEach(classNode -> {
-            for(MethodNode mn : classNode.methods)
-            {
+            for (MethodNode mn : classNode.methods) {
                 boolean modified;
-                do
-                {
+                do {
                     modified = false;
                     Set<AbstractInsnNode> set = new HashSet<>();
                     Frame<BasicValue>[] frames;
-                    try 
-                    {
+                    try {
                         frames = new Analyzer<>(new MyInterpreter()).analyze(classNode.name, mn);
-                    }catch(AnalyzerException e) 
-                    {
+                    } catch (AnalyzerException e) {
                         oops("unexpected analyzer exception", e);
                         continue;
                     }
-                    for(int i = 0; i < mn.instructions.size(); i++)
-                    {
+                    for (int i = 0; i < mn.instructions.size(); i++) {
                         AbstractInsnNode ain = mn.instructions.get(i);
-                        if(ain.getOpcode() == Opcodes.CHECKCAST && frames[i] != null)
-                        {
+                        if (ain.getOpcode() == Opcodes.CHECKCAST && frames[i] != null) {
                             Type typeBefore = frames[i].getStack(frames[i].getStackSize() - 1).getType();
-                            Type typeNow = Type.getObjectType(((TypeInsnNode)ain).desc);
-                            while(true)
-                            {
-                                if(typeBefore.equals(typeNow))
+                            Type typeNow = Type.getObjectType(((TypeInsnNode) ain).desc);
+                            while (true) {
+                                if (typeBefore.equals(typeNow))
                                     set.add(ain);
-                                else if(typeBefore.getSort() == Type.OBJECT && typeBefore.getInternalName().equals("null"))
+                                else if (typeBefore.getSort() == Type.OBJECT && typeBefore.getInternalName().equals("null"))
                                     set.add(ain);
-                                else if(typeNow.getSort() == Type.OBJECT && typeNow.getInternalName().equals("java/lang/Object")
-                                    && typeBefore.getSort() == Type.ARRAY)
+                                else if (typeNow.getSort() == Type.OBJECT && typeNow.getInternalName().equals("java/lang/Object")
+                                         && typeBefore.getSort() == Type.ARRAY)
                                     set.add(ain);
-                                else if(typeNow.getSort() == Type.OBJECT && typeBefore.getSort() == Type.OBJECT)
-                                    try
-                                    {
-                                        if(getDeobfuscator().isSubclass(typeNow.getInternalName(), typeBefore.getInternalName()))
+                                else if (typeNow.getSort() == Type.OBJECT && typeBefore.getSort() == Type.OBJECT)
+                                    try {
+                                        if (getDeobfuscator().isSubclass(typeNow.getInternalName(), typeBefore.getInternalName()))
                                             set.add(ain);
-                                    }catch(Exception e) {}    
-                                else if(typeNow.getSort() == Type.ARRAY && typeBefore.getSort() == Type.ARRAY)
-                                {
+                                    } catch (Exception e) {
+                                    }
+                                else if (typeNow.getSort() == Type.ARRAY && typeBefore.getSort() == Type.ARRAY) {
                                     typeBefore = typeBefore.getElementType();
                                     typeNow = typeNow.getElementType();
                                     continue;
@@ -614,10 +588,11 @@ public class HideAccessObfuscationTransformer extends Transformer<HideAccessObfu
                             }
                         }
                     }
-                    for(AbstractInsnNode ain : set)
+                    for (AbstractInsnNode ain : set) {
                         mn.instructions.remove(ain);
+                    }
                     modified = !set.isEmpty();
-                }while(modified);
+                } while (modified);
             }
         });
     }
@@ -630,11 +605,11 @@ public class HideAccessObfuscationTransformer extends Transformer<HideAccessObfu
             List<String> fieldsDesc = possibleClass.fields.stream().map(f -> f.desc).collect(Collectors.toList());
 
             if (fieldsDesc.contains("[Ljava/lang/Object;") &&
-                    fieldsDesc.contains("[Ljava/lang/Class;") &&
-                    methodsDesc.contains("(II)Ljava/lang/Class;") &&
-                    methodsDesc.contains("(I)Ljava/lang/reflect/Method;") &&
-                    methodsDesc.contains("(I)Ljava/lang/reflect/Field;")) decryptors.add(possibleClass);
-
+                fieldsDesc.contains("[Ljava/lang/Class;") &&
+                methodsDesc.contains("(II)Ljava/lang/Class;") &&
+                methodsDesc.contains("(I)Ljava/lang/reflect/Method;") &&
+                methodsDesc.contains("(I)Ljava/lang/reflect/Field;"))
+                decryptors.add(possibleClass);
         });
         return decryptors;
     }
@@ -713,20 +688,16 @@ public class HideAccessObfuscationTransformer extends Transformer<HideAccessObfu
         return null;
     }
 
-    private class MyInterpreter extends BasicInterpreter
-    {
-        public MyInterpreter()
-        {
+    private class MyInterpreter extends BasicInterpreter {
+        public MyInterpreter() {
             super(Opcodes.ASM8);
         }
-        
+
         @Override
-        public BasicValue newValue(final Type type)
-        {
-            if(type == null)
+        public BasicValue newValue(final Type type) {
+            if (type == null)
                 return new BasicValue(Type.getType("Ljava/lang/Object;"));
-            switch(type.getSort())
-            {
+            switch (type.getSort()) {
                 case Type.VOID:
                     return null;
                 case Type.BOOLEAN:
@@ -748,46 +719,40 @@ public class HideAccessObfuscationTransformer extends Transformer<HideAccessObfu
                     throw new Error("Internal error");
             }
         }
-        
+
         @Override
         public BasicValue binaryOperation(final AbstractInsnNode insn,
-            final BasicValue value1, final BasicValue value2)
-                throws AnalyzerException
-        {
-            if(insn.getOpcode() == Opcodes.AALOAD)
+                final BasicValue value1, final BasicValue value2)
+                throws AnalyzerException {
+            if (insn.getOpcode() == Opcodes.AALOAD)
                 return new BasicValue(value1.getType().getElementType());
             return super.binaryOperation(insn, value1, value2);
         }
-        
+
         @Override
-        public BasicValue merge(final BasicValue v, final BasicValue w)
-        {
-            if(!v.equals(w))
+        public BasicValue merge(final BasicValue v, final BasicValue w) {
+            if (!v.equals(w))
                 return new BasicValue(Type.getType("Ljava/lang/Object;"));
             return v;
         }
     }
-    
-    public static class Config extends TransformerConfig 
-    {
+
+    public static class Config extends TransformerConfig {
         /**
          * Should we skip calls that fail to decrypt? This is useful if there are
          * a few encrypted calls that cannot be resolved by adding libraries.
          */
         private boolean ignoreFailures = false;
 
-        public Config() 
-        {
+        public Config() {
             super(HideAccessObfuscationTransformer.class);
         }
 
-        public boolean shouldIgnoreFailures() 
-        {
+        public boolean shouldIgnoreFailures() {
             return ignoreFailures;
         }
 
-        public void setIgnoreFailures(boolean ignoreFailures) 
-        {
+        public void setIgnoreFailures(boolean ignoreFailures) {
             this.ignoreFailures = ignoreFailures;
         }
     }

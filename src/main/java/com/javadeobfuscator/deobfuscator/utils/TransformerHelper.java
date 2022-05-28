@@ -185,7 +185,8 @@ public class TransformerHelper implements Opcodes {
         List<FieldNode> fields = new ArrayList<>();
         for (FieldNode f : classNode.fields) {
             if ((name == null || f.name.equals(name)) &&
-                (desc == null || f.desc.equals(desc))) {
+                (desc == null || f.desc.equals(desc)))
+            {
                 fields.add(f);
             }
         }
@@ -262,9 +263,9 @@ public class TransformerHelper implements Opcodes {
         jvmFiles.addAll(loadBytes(javaLib("rt.jar")));
         jvmFiles.addAll(loadBytes(javaLib("jce.jar")));
         jvmFiles.addAll(loadBytes(javaLib("jsse.jar")));
-//        jvmFiles.addAll(loadBytes(javaLibExt("sunjce_provider.jar")));
-//        jvmFiles.addAll(loadBytes(javaLibExt("sunec.jar")));
-//        jvmFiles.addAll(loadBytes(javaLibExt("sunmscapi.jar")));
+        //        jvmFiles.addAll(loadBytes(javaLibExt("sunjce_provider.jar")));
+        //        jvmFiles.addAll(loadBytes(javaLibExt("sunec.jar")));
+        //        jvmFiles.addAll(loadBytes(javaLibExt("sunmscapi.jar")));
 
         VirtualMachine vm = new VirtualMachine(jvmFiles);
         vm.fullInitialization();
@@ -578,9 +579,12 @@ public class TransformerHelper implements Opcodes {
     }
 
     public static boolean isConstantInt(AbstractInsnNode insn) {
-        if (insn.getOpcode() >= ICONST_M1 && insn.getOpcode() <= ICONST_5) return true;
-        if (insn.getOpcode() == BIPUSH || insn.getOpcode() == SIPUSH) return true;
-        if (insn.getOpcode() == LDC) return ((LdcInsnNode) insn).cst instanceof Integer;
+        if (insn.getOpcode() >= ICONST_M1 && insn.getOpcode() <= ICONST_5)
+            return true;
+        if (insn.getOpcode() == BIPUSH || insn.getOpcode() == SIPUSH)
+            return true;
+        if (insn.getOpcode() == LDC)
+            return ((LdcInsnNode) insn).cst instanceof Integer;
         return false;
     }
 

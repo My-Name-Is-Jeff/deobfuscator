@@ -31,6 +31,7 @@ public class JavaDouble extends JavaValue {
     public JavaDouble copy() {
         return new JavaDouble(value);
     }
+
     public String toString() {
         return "JavaDouble(value=" + value + ")";
     }

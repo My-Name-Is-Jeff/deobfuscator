@@ -13,9 +13,9 @@ import com.javadeobfuscator.deobfuscator.transformers.special.BisGuardTransforme
 import org.objectweb.asm.tree.ClassNode;
 
 public class RuleBisguardClassEncryption implements Rule {
-    
+
     private static final Set<String> classNames = new HashSet<>();
-    
+
     static {
         classNames.add("JavaPreloader".toLowerCase(Locale.ROOT));
         classNames.add("JavaPreloader$Cipher".toLowerCase(Locale.ROOT));

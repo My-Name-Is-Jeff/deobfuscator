@@ -28,59 +28,58 @@ public class NumberObfuscationTransformer extends Transformer<TransformerConfig>
         AtomicInteger count = new AtomicInteger(0);
         Map<String, Integer> numberMethods = new HashMap<>();
         System.out.println("[Smoke] [NumberObfuscationTransformer] Starting");
-        
-        for(ClassNode classNode : classNodes())
-            for(MethodNode method : classNode.methods)
-                for(AbstractInsnNode ain : method.instructions.toArray())
-                    if(ain instanceof MethodInsnNode &&
+
+        for (ClassNode classNode : classNodes()) {
+            for (MethodNode method : classNode.methods) {
+                for (AbstractInsnNode ain : method.instructions.toArray()) {
+                    if (ain instanceof MethodInsnNode &&
                         ((MethodInsnNode) ain).owner.equals("java/lang/String") &&
                         ((MethodInsnNode) ain).name.equals("length") &&
-                        ain.getPrevious() instanceof LdcInsnNode && ((LdcInsnNode) ain.getPrevious()).cst instanceof String) {
+                        ain.getPrevious() instanceof LdcInsnNode && ((LdcInsnNode) ain.getPrevious()).cst instanceof String)
+                    {
                         AbstractInsnNode previous = ain.getPrevious();
-                        method.instructions.set(ain, Utils.getIntInsn(((String)((LdcInsnNode)ain.getPrevious()).cst).length()));
+                        method.instructions.set(ain, Utils.getIntInsn(((String) ((LdcInsnNode) ain.getPrevious()).cst).length()));
                         method.instructions.remove(previous);
                         count.getAndIncrement();
                     }
-        
-        for(ClassNode classNode : classes.values())
-            for(MethodNode method : classNode.methods)
-            {
+                }
+            }
+        }
+
+        for (ClassNode classNode : classes.values()) {
+            for (MethodNode method : classNode.methods) {
                 Map<AbstractInsnNode, Frame<SourceValue>> frames = new HashMap<>();
                 Map<AbstractInsnNode, AbstractInsnNode> replace = new LinkedHashMap<>();
-                try
-                {
+                try {
                     Frame<SourceValue>[] fr = new Analyzer<>(new SourceInterpreter()).analyze(classNode.name, method);
-                    for(int i = 0; i < fr.length; i++)
-                    {
+                    for (int i = 0; i < fr.length; i++) {
                         Frame<SourceValue> f = fr[i];
                         frames.put(method.instructions.get(i), f);
                     }
-                }catch(AnalyzerException e)
-                {
+                } catch (AnalyzerException e) {
                     oops("unexpected analyzer exception", e);
                     continue;
                 }
-                for(AbstractInsnNode ain : method.instructions.toArray())
-                {
-                    if(ain.getOpcode() == Opcodes.IADD || ain.getOpcode() == Opcodes.ISUB || ain.getOpcode() == Opcodes.IMUL
+                for (AbstractInsnNode ain : method.instructions.toArray()) {
+                    if (ain.getOpcode() == Opcodes.IADD || ain.getOpcode() == Opcodes.ISUB || ain.getOpcode() == Opcodes.IMUL
                         || ain.getOpcode() == Opcodes.IDIV || ain.getOpcode() == Opcodes.IREM || ain.getOpcode() == Opcodes.IXOR)
                     {
                         Frame<SourceValue> f = frames.get(ain);
                         SourceValue arg1 = f.getStack(f.getStackSize() - 1);
                         SourceValue arg2 = f.getStack(f.getStackSize() - 2);
-                        if(arg1.insns.size() != 1 || arg2.insns.size() != 1)
+                        if (arg1.insns.size() != 1 || arg2.insns.size() != 1)
                             continue;
                         AbstractInsnNode a1 = arg1.insns.iterator().next();
                         AbstractInsnNode a2 = arg2.insns.iterator().next();
-                        for(Entry<AbstractInsnNode, AbstractInsnNode> entry : replace.entrySet())
-                            if(entry.getKey() == a1)
+                        for (Entry<AbstractInsnNode, AbstractInsnNode> entry : replace.entrySet()) {
+                            if (entry.getKey() == a1)
                                 a1 = entry.getValue();
-                            else if(entry.getKey() == a2)
+                            else if (entry.getKey() == a2)
                                 a2 = entry.getValue();
-                        if(Utils.isInteger(a1) && Utils.isInteger(a2))
-                        {
+                        }
+                        if (Utils.isInteger(a1) && Utils.isInteger(a2)) {
                             Integer resultValue;
-                            if((resultValue = doMath(Utils.getIntValue(a1), Utils.getIntValue(a2), ain.getOpcode())) != null) {
+                            if ((resultValue = doMath(Utils.getIntValue(a1), Utils.getIntValue(a2), ain.getOpcode())) != null) {
                                 AbstractInsnNode newValue = Utils.getIntInsn(resultValue);
                                 replace.put(ain, newValue);
                                 method.instructions.set(ain, newValue);
@@ -92,9 +91,10 @@ public class NumberObfuscationTransformer extends Transformer<TransformerConfig>
                     }
                 }
             }
-    
-        for(ClassNode classNode : classNodes())
-            for(MethodNode method : classNode.methods)
+        }
+
+        for (ClassNode classNode : classNodes()) {
+            for (MethodNode method : classNode.methods) {
                 if (Modifier.isStatic(method.access) && method.desc.endsWith("()I")) {
                     int returnCount = Arrays.stream(method.instructions.toArray()).filter(insn -> insn.getOpcode() == Opcodes.IRETURN).collect(Collectors.toList()).size();
                     if (returnCount == 1) {
@@ -107,22 +107,26 @@ public class NumberObfuscationTransformer extends Transformer<TransformerConfig>
                         }
                     }
                 }
-        for(ClassNode classNode : classNodes())
-            for(MethodNode method : classNode.methods)
-                for(int i = 0; i < method.instructions.size(); i++) {
+            }
+        }
+        for (ClassNode classNode : classNodes()) {
+            for (MethodNode method : classNode.methods) {
+                for (int i = 0; i < method.instructions.size(); i++) {
                     AbstractInsnNode ain = method.instructions.get(i);
                     if (ain.getOpcode() == Opcodes.INVOKESTATIC) {
-                        Integer number = numberMethods.get(((MethodInsnNode)ain).owner + ((MethodInsnNode)ain).name + ((MethodInsnNode)ain).desc);
+                        Integer number = numberMethods.get(((MethodInsnNode) ain).owner + ((MethodInsnNode) ain).name + ((MethodInsnNode) ain).desc);
                         if (number != null) {
                             method.instructions.set(ain, Utils.getIntInsn(number));
                             count.getAndIncrement();
                         }
                     }
                 }
+            }
+        }
 
         classNodes().forEach(classNode ->
-            classNode.methods = classNode.methods.stream().filter(methodNode -> !numberMethods.containsKey(classNode.name + methodNode.name + methodNode.desc)).collect(Collectors.toList()));
-    
+                classNode.methods = classNode.methods.stream().filter(methodNode -> !numberMethods.containsKey(classNode.name + methodNode.name + methodNode.desc)).collect(Collectors.toList()));
+
         System.out.println("[Smoke] [NumberObfuscationTransformer] Removed " + count.get() + " instructions");
         return count.get() > 0;
     }

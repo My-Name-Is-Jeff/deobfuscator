@@ -31,6 +31,7 @@ public class JavaByte extends JavaInteger {
     public JavaByte copy() {
         return new JavaByte(value);
     }
+
     public String toString() {
         return "JavaByte(value=" + value + ")";
     }

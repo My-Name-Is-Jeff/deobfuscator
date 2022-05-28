@@ -62,7 +62,6 @@ public class CallGraph {
         return new Key(owner, name, desc);
     }
 
-
     static class Key {
         final String owner;
         final String name;
@@ -76,12 +75,14 @@ public class CallGraph {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o)
+                return true;
+            if (o == null || getClass() != o.getClass())
+                return false;
             Key key = (Key) o;
             return Objects.equals(owner, key.owner) &&
-                    Objects.equals(name, key.name) &&
-                    Objects.equals(desc, key.desc);
+                   Objects.equals(name, key.name) &&
+                   Objects.equals(desc, key.desc);
         }
 
         @Override

@@ -50,22 +50,20 @@ public class IllegalAnnotationRemover extends Transformer<TransformerConfig> {
         });
         return true;
     }
-    
-    private void removeInvalidAnnotations(Object visitor, List<AnnotationNode> annots, boolean visible)
-    {
-        if(annots == null)
+
+    private void removeInvalidAnnotations(Object visitor, List<AnnotationNode> annots, boolean visible) {
+        if (annots == null)
             return;
         Iterator<AnnotationNode> itr = annots.iterator();
-        while(itr.hasNext())
-        {
+        while (itr.hasNext()) {
             AnnotationNode type = itr.next();
             try {
-                if(visitor instanceof CheckClassAdapter)
-                    ((CheckClassAdapter)visitor).visitAnnotation(type.desc, visible);
-                else if(visitor instanceof CheckMethodAdapter)
-                    ((CheckMethodAdapter)visitor).visitAnnotation(type.desc, visible);
+                if (visitor instanceof CheckClassAdapter)
+                    ((CheckClassAdapter) visitor).visitAnnotation(type.desc, visible);
+                else if (visitor instanceof CheckMethodAdapter)
+                    ((CheckMethodAdapter) visitor).visitAnnotation(type.desc, visible);
                 else
-                    ((CheckFieldAdapter)visitor).visitAnnotation(type.desc, visible);
+                    ((CheckFieldAdapter) visitor).visitAnnotation(type.desc, visible);
             } catch (IllegalArgumentException | IllegalStateException ignored) {
                 itr.remove();
             }

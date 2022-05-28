@@ -43,7 +43,7 @@ import java.util.zip.ZipInputStream;
 
 import com.javadeobfuscator.deobfuscator.executor.defined.types.*;
 import com.javadeobfuscator.deobfuscator.executor.exceptions.ExecutionException;
-import com.javadeobfuscator.deobfuscator.executor.values.*; 
+import com.javadeobfuscator.deobfuscator.executor.values.*;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
 import com.javadeobfuscator.deobfuscator.executor.values.JavaCharacter;
@@ -898,42 +898,41 @@ public class JVMMethodProvider extends MethodProvider {
         return false;
     }
 
-    private static void initObject(Context context, String className, JavaValue object) { 
+    private static void initObject(Context context, String className, JavaValue object) {
         ClassNode classNode = context.dictionary.get(className);
         if (classNode != null) {
             for (FieldNode field : classNode.fields) {
-                switch (field.desc) { 
-                    case "B": 
+                switch (field.desc) {
+                    case "B":
                         context.provider.setField(classNode.name, field.name, field.desc, object, (byte) 0, context);
-                        break; 
-                    case "S": 
+                        break;
+                    case "S":
                         context.provider.setField(classNode.name, field.name, field.desc, object, (short) 0, context);
-                        break; 
-                    case "I": 
+                        break;
+                    case "I":
                         context.provider.setField(classNode.name, field.name, field.desc, object, 0, context);
-                        break; 
-                    case "J": 
+                        break;
+                    case "J":
                         context.provider.setField(classNode.name, field.name, field.desc, object, 0L, context);
-                        break; 
-                    case "F": 
+                        break;
+                    case "F":
                         context.provider.setField(classNode.name, field.name, field.desc, object, 0.0, context);
-                        break; 
-                    case "D": 
+                        break;
+                    case "D":
                         context.provider.setField(classNode.name, field.name, field.desc, object, 0.0D, context);
-                        break; 
-                    case "C": 
+                        break;
+                    case "C":
                         context.provider.setField(classNode.name, field.name, field.desc, object, (char) 0, context);
-                        break; 
-                    case "Z": 
+                        break;
+                    case "Z":
                         context.provider.setField(classNode.name, field.name, field.desc, object, false, context);
-                        break; 
-                } 
-            } 
-        } else { 
-            throw new RuntimeException("Could not initialize class " + className); 
-        } 
-    } 
- 
+                        break;
+                }
+            }
+        } else {
+            throw new RuntimeException("Could not initialize class " + className);
+        }
+    }
 
     private static void expect(JavaValue object, String type) {
         if (!object.type().equals(type)) {
@@ -955,7 +954,7 @@ public class JVMMethodProvider extends MethodProvider {
     }
 
     private static JavaClass[] toJavaClass(Object[] arr) {
-        if(arr == null)
+        if (arr == null)
             return new JavaClass[0];
         JavaClass[] clazz = new JavaClass[arr.length];
         for (int i = 0; i < arr.length; i++) {

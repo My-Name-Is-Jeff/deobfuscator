@@ -325,7 +325,7 @@ public class Deobfuscator {
             } catch (IllegalArgumentException | IndexOutOfBoundsException | InvalidClassException x) {
                 if (configuration.isParamorphismV2()) {
                     invalidClasses.put(name, data);
-                } else  if (!configuration.isPatchAsm()) {
+                } else if (!configuration.isPatchAsm()) {
                     logger.error("Could not parse {} (Try adding \"patchAsm: true\" to the config?)", name, x);
                 } else {
                     logger.error("Could not parse {} (Is it a class file?)", name, x);
@@ -381,8 +381,7 @@ public class Deobfuscator {
             logger.info("Detecting known obfuscators");
 
             for (Rule rule : Rules.RULES) {
-                try
-                {
+                try {
                     String message = rule.test(this);
                     if (message == null) {
                         continue;
@@ -402,8 +401,7 @@ public class Deobfuscator {
                             logger.info("\t{}", transformer.getName());
                         }
                     }
-                }catch(Exception e)
-                {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }

@@ -170,8 +170,9 @@ public class HideAccessTransformer extends Transformer<TransformerConfig> implem
             boolean isInterested = false;
             for (String decryptionClass : decryptionClasses) {
                 if (info.getClassNode().name.equals(decryptionClass) &&
-                        (info.getMethodNode().desc.equals(HIDE_ACCESS_DECRYPT_FIELD_SIG) ||
-                                info.getMethodNode().desc.equals(HIDE_ACCESS_DECRYPT_METHOD_SIG))) {
+                    (info.getMethodNode().desc.equals(HIDE_ACCESS_DECRYPT_FIELD_SIG) ||
+                     info.getMethodNode().desc.equals(HIDE_ACCESS_DECRYPT_METHOD_SIG)))
+                {
                     isInterested = true;
                 }
             }

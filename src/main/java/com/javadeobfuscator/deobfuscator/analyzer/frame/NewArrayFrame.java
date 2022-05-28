@@ -27,7 +27,7 @@ public class NewArrayFrame extends Frame {
 
         this.length.children.add(this);
     }
-    
+
     public Frame getLength() {
         return length;
     }

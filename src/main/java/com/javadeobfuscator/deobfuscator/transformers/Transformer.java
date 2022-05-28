@@ -19,6 +19,7 @@ package com.javadeobfuscator.deobfuscator.transformers;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+
 import com.javadeobfuscator.deobfuscator.Deobfuscator;
 import com.javadeobfuscator.deobfuscator.config.TransformerConfig;
 import com.javadeobfuscator.deobfuscator.exceptions.*;
@@ -70,6 +71,7 @@ public abstract class Transformer<T extends TransformerConfig> implements Opcode
     protected void oops(String why, Object... args) {
         logger.debug("oops: " + why, args);
     }
+
     protected void fail(String why, Object... args) {
         logger.error("fail: " + why, args);
     }

@@ -22,6 +22,7 @@ import com.javadeobfuscator.deobfuscator.transformers.*;
 
 import javax.crypto.*;
 import javax.crypto.spec.*;
+
 import java.math.*;
 import java.security.*;
 import java.security.spec.*;

@@ -41,7 +41,7 @@ public interface Provider {
     boolean canCheckInstanceOf(JavaValue target, Type type, Context context);
 
     boolean canCheckcast(JavaValue target, Type type, Context context);
-    
+
     boolean canCheckEquality(JavaValue first, JavaValue second, Context context);
 
     boolean canGetField(String className, String fieldName, String fieldDesc, JavaValue targetObject, Context context);

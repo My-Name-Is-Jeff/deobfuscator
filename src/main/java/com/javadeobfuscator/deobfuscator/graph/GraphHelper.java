@@ -17,6 +17,7 @@
 package com.javadeobfuscator.deobfuscator.graph;
 
 import org.objectweb.asm.tree.ClassNode;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;

@@ -21,5 +21,4 @@ public class ArrayLoadFrame extends Frame {
     public Frame getArray() {
         return this.array;
     }
-
 }

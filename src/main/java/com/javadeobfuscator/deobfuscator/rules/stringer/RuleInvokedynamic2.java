@@ -31,7 +31,7 @@ public class RuleInvokedynamic2 implements Rule, Opcodes {
     @Override
     public String getDescription() {
         return "Stringer has several modes of invokedynamic obfuscation. " +
-                "This one creates a bootstrap method for each invokedynamic instruction";
+               "This one creates a bootstrap method for each invokedynamic instruction";
     }
 
     @Override
@@ -48,7 +48,7 @@ public class RuleInvokedynamic2 implements Rule, Opcodes {
 
                 isBSM = isBSM && (
                         TransformerHelper.containsInvokeVirtual(bsm, "java/lang/invoke/MethodHandles$Lookup", "findVirtual", "(Ljava/lang/Class;Ljava/lang/String;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/MethodHandle;")
-                                || TransformerHelper.containsInvokeVirtual(bsm, "java/lang/invoke/MethodHandles$Lookup", "findStatic", "(Ljava/lang/Class;Ljava/lang/String;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/MethodHandle;"));
+                        || TransformerHelper.containsInvokeVirtual(bsm, "java/lang/invoke/MethodHandles$Lookup", "findStatic", "(Ljava/lang/Class;Ljava/lang/String;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/MethodHandle;"));
                 isBSM = isBSM && TransformerHelper.containsInvokeStatic(bsm, "java/lang/invoke/MethodHandles", "lookup", "()Ljava/lang/invoke/MethodHandles$Lookup;");
                 isBSM = isBSM && TransformerHelper.countOccurencesOf(bsm, ANEWARRAY) > 0;
                 isBSM = isBSM && TransformerHelper.countOccurencesOf(bsm, AASTORE) > 0;

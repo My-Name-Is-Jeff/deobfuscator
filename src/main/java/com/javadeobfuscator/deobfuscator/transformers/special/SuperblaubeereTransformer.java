@@ -171,7 +171,8 @@ public class SuperblaubeereTransformer extends Transformer<SuperblaubeereTransfo
                         modified = false;
                         for (AbstractInsnNode ain : method.instructions.toArray()) {
                             if (Utils.isInteger(ain) && ain.getNext() != null && Utils.isInteger(ain.getNext()) && ain.getNext().getNext() != null
-                                && isArth(ain.getNext().getNext())) {
+                                && isArth(ain.getNext().getNext()))
+                            {
                                 int res = doArth(Utils.getIntValue(ain), Utils.getIntValue(ain.getNext()), ain.getNext().getNext());
                                 method.instructions.remove(ain.getNext().getNext());
                                 method.instructions.remove(ain.getNext());
@@ -186,7 +187,8 @@ public class SuperblaubeereTransformer extends Transformer<SuperblaubeereTransfo
                             } else {
                                 String str = TransformerHelper.getConstantString(ain);
                                 if (StringUtils.containsOnly(str, ' ')
-                                    && TransformerHelper.isInvokeVirtual(ain.getNext(), "java/lang/String", "length", null)) {
+                                    && TransformerHelper.isInvokeVirtual(ain.getNext(), "java/lang/String", "length", null))
+                                {
                                     if (TransformerHelper.nullsafeOpcodeEqual(ain.getNext().getNext(), POP)) {
                                         method.instructions.remove(ain.getNext().getNext());
                                         method.instructions.remove(ain.getNext());
@@ -220,7 +222,8 @@ public class SuperblaubeereTransformer extends Transformer<SuperblaubeereTransfo
                 for (MethodNode method : classNode.methods) {
                     for (AbstractInsnNode ain : method.instructions.toArray()) {
                         if ((Utils.isInteger(ain) || ain.getOpcode() == ACONST_NULL)
-                            && ain.getNext() != null && isSingleIf(ain.getNext())) {
+                            && ain.getNext() != null && isSingleIf(ain.getNext()))
+                        {
                             AbstractInsnNode next = ain.getNext();
                             if (runSingleIf(ain, next)) {
                                 while (ain.getNext() != null && !(ain.getNext() instanceof LabelNode)) {
@@ -233,7 +236,8 @@ public class SuperblaubeereTransformer extends Transformer<SuperblaubeereTransfo
                             }
                         } else if (Utils.isInteger(ain) && ain.getNext() != null
                                    && Utils.isInteger(ain.getNext()) && ain.getNext().getNext() != null
-                                   && isDoubleIf(ain.getNext().getNext())) {
+                                   && isDoubleIf(ain.getNext().getNext()))
+                        {
                             AbstractInsnNode next = ain.getNext().getNext();
                             if (runDoubleIf(Utils.getIntValue(ain), Utils.getIntValue(ain.getNext()), next)) {
                                 while (ain.getNext() != null && !(ain.getNext() instanceof LabelNode)) {
@@ -266,7 +270,8 @@ public class SuperblaubeereTransformer extends Transformer<SuperblaubeereTransfo
                             MethodNode refer = classNode.methods.stream().filter(m -> m.name.equals(((MethodInsnNode) ain).name)
                                                                                       && m.desc.equals(((MethodInsnNode) ain).desc)).findFirst().orElse(null);
                             if (refer != null && !Modifier.isNative(refer.access) && !Modifier.isAbstract(refer.access)
-                                && Modifier.isPrivate(refer.access) && Modifier.isStatic(refer.access)) {
+                                && Modifier.isPrivate(refer.access) && Modifier.isStatic(refer.access))
+                            {
                                 int mode = -1;
                                 AbstractInsnNode first = refer.instructions.getFirst();
                                 if (REDUNDANT_IF_1_MATCHER.matchImmediately(refer.instructions.iterator())) {
@@ -275,13 +280,15 @@ public class SuperblaubeereTransformer extends Transformer<SuperblaubeereTransfo
                                            && Utils.isInteger(REDUNDANT_IF_2_GOTO.getCaptured().label.getPrevious())
                                            && Utils.getIntValue(REDUNDANT_IF_2_GOTO.getCaptured().label.getPrevious()) == 0
                                            && refer.instructions.getLast().getOpcode() == IRETURN
-                                           && refer.instructions.getLast().getPrevious() == REDUNDANT_IF_2_GOTO.getCaptured().label) {
+                                           && refer.instructions.getLast().getPrevious() == REDUNDANT_IF_2_GOTO.getCaptured().label)
+                                {
                                     mode = 1;
                                 } else if (REDUNDANT_IF_3_MATCHER.matchImmediately(refer.instructions.iterator())
                                            && Utils.isInteger(REDUNDANT_IF_3_GOTO.getCaptured().label.getPrevious())
                                            && Utils.getIntValue(REDUNDANT_IF_3_GOTO.getCaptured().label.getPrevious()) == 0
                                            && refer.instructions.getLast().getOpcode() == IRETURN
-                                           && refer.instructions.getLast().getPrevious() == REDUNDANT_IF_3_GOTO.getCaptured().label) {
+                                           && refer.instructions.getLast().getPrevious() == REDUNDANT_IF_3_GOTO.getCaptured().label)
+                                {
                                     mode = 2;
                                 }
                                 if (mode == 0) {
@@ -447,7 +454,7 @@ public class SuperblaubeereTransformer extends Transformer<SuperblaubeereTransfo
                         firstReal = Utils.getNext(firstReal);
                     }
                     AbstractInsnNode insn7 = Utils.getNext(firstReal, 6);
-                    if (!TransformerHelper.isInvokeVirtual(insn7, "java/lang/StackTraceElement", "getFileName","()Ljava/lang/String;")) {
+                    if (!TransformerHelper.isInvokeVirtual(insn7, "java/lang/StackTraceElement", "getFileName", "()Ljava/lang/String;")) {
                         continue;
                     }
                 }

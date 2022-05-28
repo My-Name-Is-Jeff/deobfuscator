@@ -34,8 +34,9 @@ public class RuleStringDecryptor implements Rule {
                     continue;
                 }
                 AnalyzerResult analyzerResult = null;
-                insns: for (AbstractInsnNode ain : methodNode.instructions) {
-                    if (!TransformerHelper.isInvokeStatic(ain,null, null, "([CLjava/lang/String;I)Ljava/lang/String;")) {
+                insns:
+                for (AbstractInsnNode ain : methodNode.instructions) {
+                    if (!TransformerHelper.isInvokeStatic(ain, null, null, "([CLjava/lang/String;I)Ljava/lang/String;")) {
                         continue;
                     }
                     MethodInsnNode min = (MethodInsnNode) ain;

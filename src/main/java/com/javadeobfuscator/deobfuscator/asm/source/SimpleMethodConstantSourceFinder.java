@@ -33,7 +33,6 @@ public class SimpleMethodConstantSourceFinder extends SourceFinderConsumer {
     @Override
     public SourceResult findSource(MethodNode methodNode, Frame<SourceValue>[] frames, List<AbstractInsnNode> instructions, AbstractInsnNode source, SourceValue want, AbstractInsnNode now) {
 
-
         return parent == null ? SourceResult.unknown() : parent.findSource(methodNode, frames, instructions, source, want, now);
     }
 }

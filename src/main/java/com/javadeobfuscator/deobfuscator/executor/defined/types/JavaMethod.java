@@ -18,6 +18,7 @@ package com.javadeobfuscator.deobfuscator.executor.defined.types;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import com.google.common.primitives.Primitives;
 import com.javadeobfuscator.deobfuscator.executor.Context;
 import com.javadeobfuscator.deobfuscator.executor.exceptions.ExecutionException;
@@ -84,62 +85,57 @@ public class JavaMethod {
     }
 
     public Object invoke(JavaValue instance, JavaValue argsObject, Context context) {
-        Object[] args; 
+        Object[] args;
         String[] argTypes;
-        if(argsObject.value() == null) 
-        {
+        if (argsObject.value() == null) {
             args = null;
             argTypes = null;
-        }else
-        {
-            args = (Object[])((JavaArray)argsObject).value();
-            argTypes = ((JavaArray)argsObject).getTypeArray();
+        } else {
+            args = (Object[]) ((JavaArray) argsObject).value();
+            argTypes = ((JavaArray) argsObject).getTypeArray();
         }
         try {
             //Fix for unboxing/boxing
             List<Integer> fixed = new ArrayList<>();
-            if(args != null && args.length == getParameterTypes().length)
-                for(int i = 0; i < args.length; i++)
-                {
+            if (args != null && args.length == getParameterTypes().length)
+                for (int i = 0; i < args.length; i++) {
                     Object o = args[i];
                     JavaClass[] params = getParameterTypes();
                     JavaClass argClass = params[i];
-                    if(argClass.isPrimitive())
-                    {
+                    if (argClass.isPrimitive()) {
                         Object value = o;
-                        if(Primitives.unwrap(value.getClass()).getName().equals(argClass.getName()))
-                            switch(argClass.getName())
-                            {
+                        if (Primitives.unwrap(value.getClass()).getName().equals(argClass.getName()))
+                            switch (argClass.getName()) {
                                 case "boolean":
-                                    args[i] = new JavaBoolean((Boolean)o);
+                                    args[i] = new JavaBoolean((Boolean) o);
                                     fixed.add(i);
                                     break;
                                 case "byte":
-                                    args[i] = new JavaByte((Byte)o);
+                                    args[i] = new JavaByte((Byte) o);
                                     fixed.add(i);
                                     break;
                                 case "char":
-                                    args[i] = new JavaCharacter((Character)o);
+                                    args[i] = new JavaCharacter((Character) o);
                                     fixed.add(i);
                                     break;
                                 case "double":
-                                    args[i] = new JavaDouble((Double)o);
+                                    args[i] = new JavaDouble((Double) o);
                                     fixed.add(i);
                                     break;
                                 case "float":
-                                    args[i] = new JavaFloat((Float)o);
+                                    args[i] = new JavaFloat((Float) o);
                                     fixed.add(i);
                                     break;
                                 case "int":
-                                    args[i] = new JavaInteger((Integer)o);
+                                    args[i] = new JavaInteger((Integer) o);
                                     fixed.add(i);
                                     break;
                                 case "long":
-                                    args[i] = new JavaLong((Long)o);
+                                    args[i] = new JavaLong((Long) o);
                                     fixed.add(i);
                                     break;
                                 case "short":
-                                    args[i] = new JavaShort((Short)o);
+                                    args[i] = new JavaShort((Short) o);
                                     fixed.add(i);
                                     break;
                             }
@@ -149,14 +145,13 @@ public class JavaMethod {
             if (args != null) {
                 for (int i = 0; i < args.length; i++) {
                     Object o = args[i];
-                    if(!fixed.contains(i))
-                    {
-                        if(o != null && o.getClass().isArray())
+                    if (!fixed.contains(i)) {
+                        if (o != null && o.getClass().isArray())
                             argsobjects.add(new JavaArray(o));
                         else
                             argsobjects.add(new JavaObject(o, argTypes[i]));
-                    }else
-                        argsobjects.add((JavaValue)o);
+                    } else
+                        argsobjects.add((JavaValue) o);
                 }
             }
 

@@ -59,10 +59,12 @@ public class StringEncryptionTransformer extends Transformer<TransformerConfig> 
 
                 insns:
                 for (AbstractInsnNode abstractInsnNode : TransformerHelper.instructionIterator(methodNode)) {
-                    if (abstractInsnNode.getOpcode() != INVOKESTATIC) continue;
+                    if (abstractInsnNode.getOpcode() != INVOKESTATIC)
+                        continue;
 
                     MethodInsnNode methodInsnNode = (MethodInsnNode) abstractInsnNode;
-                    if (!Type.getReturnType(methodInsnNode.desc).equals(STRING_TYPE)) continue;
+                    if (!Type.getReturnType(methodInsnNode.desc).equals(STRING_TYPE))
+                        continue;
 
                     Type[] argTypes = Type.getArgumentTypes(methodInsnNode.desc);
                     if (!TransformerHelper.hasArgumentTypes(argTypes, Type.INT_TYPE, STRING_TYPE))
@@ -73,7 +75,8 @@ public class StringEncryptionTransformer extends Transformer<TransformerConfig> 
                     MethodNode decryptorMethod = new MethodNode(ACC_STATIC | ACC_PUBLIC, "decrypt" + decrypted, "()Ljava/lang/String;", null, null);
                     for (int i = 0, stackOffset = currentFrame.getStackSize() - argTypes.length; i < argTypes.length; i++) {
                         Optional<Object> consensus = SourceFinder.findSource(methodNode, frames, new ArrayList<>(), new ConstantPropagatingSourceFinder(), methodInsnNode, currentFrame.getStack(stackOffset)).consensus();
-                        if (!consensus.isPresent()) continue insns;
+                        if (!consensus.isPresent())
+                            continue insns;
 
                         decryptorMethod.instructions.add(new LdcInsnNode(consensus.get()));
                         stackOffset++;
@@ -99,7 +102,8 @@ public class StringEncryptionTransformer extends Transformer<TransformerConfig> 
                     }
 
                     String value = vm.convertJavaObjectToString(execution.getReturnValue());
-                    if (value == null) continue;
+                    if (value == null)
+                        continue;
 
                     logger.info("Decrypted string in {} {}{}: {}", classNode.name, methodNode.name, methodNode.desc, value);
 

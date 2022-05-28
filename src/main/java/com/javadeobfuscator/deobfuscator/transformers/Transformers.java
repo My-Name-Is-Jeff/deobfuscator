@@ -31,7 +31,7 @@ public class Transformers {
         public static final Class<? extends Transformer> HIDEACCESS_OBFUSCATION = com.javadeobfuscator.deobfuscator.transformers.stringer.HideAccessObfuscationTransformer.class;
         public static final Class<? extends Transformer> RESOURCE_ENCRYPTION = com.javadeobfuscator.deobfuscator.transformers.stringer.ResourceEncryptionTransformer.class;
     }
-    
+
     public static class General {
         public static final Class<? extends Transformer> PEEPHOLE_OPTIMIZER = com.javadeobfuscator.deobfuscator.transformers.general.peephole.PeepholeOptimizer.class;
 
@@ -42,13 +42,13 @@ public class Transformers {
             public static final Class<? extends Transformer> SYNTHETIC_BRIDGE = SyntheticBridgeRemover.class;
         }
     }
-    
+
     public static class Smoke {
         public static final Class<? extends Transformer> STRING_ENCRYPTION = com.javadeobfuscator.deobfuscator.transformers.smoke.StringEncryptionTransformer.class;
         public static final Class<? extends Transformer> NUMBER_OBFUSCATION = com.javadeobfuscator.deobfuscator.transformers.smoke.NumberObfuscationTransformer.class;
         public static final Class<? extends Transformer> ILLEGAL_VARIABLE = com.javadeobfuscator.deobfuscator.transformers.smoke.IllegalVariableTransformer.class;
     }
-    
+
     public static class Zelix {
         public static final Class<? extends Transformer> STRING_ENCRYPTION_SIMPLE = com.javadeobfuscator.deobfuscator.transformers.zelix.string.SimpleStringEncryptionTransformer.class;
         public static final Class<? extends Transformer> STRING_ENCRYPTION_ENHANCED = com.javadeobfuscator.deobfuscator.transformers.zelix.string.EnhancedStringEncryptionTransformer.class;

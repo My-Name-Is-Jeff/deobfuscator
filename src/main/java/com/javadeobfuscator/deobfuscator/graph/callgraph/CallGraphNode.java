@@ -38,7 +38,6 @@ public final class CallGraphNode {
         this.desc = key.desc;
     }
 
-
     void addXrefTo(CallGraphNode other) {
         xrefsTo.add(other);
     }
@@ -82,12 +81,14 @@ public final class CallGraphNode {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
         CallGraphNode that = (CallGraphNode) o;
         return Objects.equals(owner, that.owner) &&
-                Objects.equals(name, that.name) &&
-                Objects.equals(desc, that.desc);
+               Objects.equals(name, that.name) &&
+               Objects.equals(desc, that.desc);
     }
 
     @Override

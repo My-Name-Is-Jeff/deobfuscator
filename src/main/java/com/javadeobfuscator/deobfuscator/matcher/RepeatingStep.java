@@ -50,7 +50,8 @@ public class RepeatingStep implements Step {
             for (int i = 0; i < max; i++) {
                 next = step.tryMatch(matcher, now);
                 if (next == null) {
-                    if (min != -1 && i >= min) return now;
+                    if (min != -1 && i >= min)
+                        return now;
                     return null;
                 } else {
                     now = next;

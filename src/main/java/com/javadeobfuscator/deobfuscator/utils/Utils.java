@@ -76,7 +76,7 @@ public class Utils {
         }
         return node;
     }
-    
+
     public static AbstractInsnNode getNext(AbstractInsnNode node) {
         AbstractInsnNode next = node.getNext();
         while (!Utils.isInstruction(next)) {
@@ -194,7 +194,8 @@ public class Utils {
     private static final TraceMethodVisitor methodPrinter = new TraceMethodVisitor(printer);
 
     public static String prettyprint(AbstractInsnNode insnNode) {
-        if (insnNode == null) return "null";
+        if (insnNode == null)
+            return "null";
         insnNode.accept(methodPrinter);
         StringWriter sw = new StringWriter();
         printer.print(new PrintWriter(sw));
@@ -329,7 +330,7 @@ public class Utils {
 
         for (AbstractInsnNode insn = original.getFirst(); insn != null; insn = insn.getNext()) {
             if (insn instanceof LabelNode) {
-                labels.put((LabelNode)insn, new LabelNode());
+                labels.put((LabelNode) insn, new LabelNode());
             }
         }
 
@@ -350,7 +351,7 @@ public class Utils {
         else
             return new LdcInsnNode(number);
     }
-    
+
     public static AbstractInsnNode getLongInsn(long number) {
         if (number >= 0 && number <= 1)
             return new InsnNode((int) (number + 9));
@@ -372,80 +373,74 @@ public class Utils {
         else
             return new LdcInsnNode(number);
     }
-    
-    public static void printClass(ClassNode classNode) { 
-        System.out.println(classNode.name + '\n'); 
-        classNode.methods.forEach(methodNode -> { 
-            System.out.println(methodNode.name + " " + methodNode.desc); 
-            for (int i = 0; i < methodNode.instructions.size(); i++) { 
-                System.out.printf("%s:   %s \n", i, prettyprint(methodNode.instructions.get(i))); 
-            } 
-        }); 
-    } 
 
-    public static boolean isInteger(AbstractInsnNode ain)
-    {
-        if (ain == null) return false;
-        if((ain.getOpcode() >= Opcodes.ICONST_M1
-            && ain.getOpcode() <= Opcodes.ICONST_5)
-            || ain.getOpcode() == Opcodes.SIPUSH 
+    public static void printClass(ClassNode classNode) {
+        System.out.println(classNode.name + '\n');
+        classNode.methods.forEach(methodNode -> {
+            System.out.println(methodNode.name + " " + methodNode.desc);
+            for (int i = 0; i < methodNode.instructions.size(); i++) {
+                System.out.printf("%s:   %s \n", i, prettyprint(methodNode.instructions.get(i)));
+            }
+        });
+    }
+
+    public static boolean isInteger(AbstractInsnNode ain) {
+        if (ain == null)
+            return false;
+        if ((ain.getOpcode() >= Opcodes.ICONST_M1
+             && ain.getOpcode() <= Opcodes.ICONST_5)
+            || ain.getOpcode() == Opcodes.SIPUSH
             || ain.getOpcode() == Opcodes.BIPUSH)
             return true;
-        if(ain instanceof LdcInsnNode)
-        {
-            LdcInsnNode ldc = (LdcInsnNode)ain;
-            if(ldc.cst instanceof Integer)
+        if (ain instanceof LdcInsnNode) {
+            LdcInsnNode ldc = (LdcInsnNode) ain;
+            if (ldc.cst instanceof Integer)
                 return true;
         }
         return false;
     }
 
-    public static int getIntValue(AbstractInsnNode node)
-    {
-        if(node.getOpcode() >= Opcodes.ICONST_M1
+    public static int getIntValue(AbstractInsnNode node) {
+        if (node.getOpcode() >= Opcodes.ICONST_M1
             && node.getOpcode() <= Opcodes.ICONST_5)
             return node.getOpcode() - 3;
-        if(node.getOpcode() == Opcodes.SIPUSH
+        if (node.getOpcode() == Opcodes.SIPUSH
             || node.getOpcode() == Opcodes.BIPUSH)
-            return ((IntInsnNode)node).operand;
-        if(node instanceof LdcInsnNode)
-        {
-            LdcInsnNode ldc = (LdcInsnNode)node;
-            if(ldc.cst instanceof Integer)
-                return (int)ldc.cst;
+            return ((IntInsnNode) node).operand;
+        if (node instanceof LdcInsnNode) {
+            LdcInsnNode ldc = (LdcInsnNode) node;
+            if (ldc.cst instanceof Integer)
+                return (int) ldc.cst;
         }
         return 0;
     }
 
-    public static boolean isLong(AbstractInsnNode ain)
-    {
-        if (ain == null) return false;
-        if(ain.getOpcode() == Opcodes.LCONST_0
+    public static boolean isLong(AbstractInsnNode ain) {
+        if (ain == null)
+            return false;
+        if (ain.getOpcode() == Opcodes.LCONST_0
             || ain.getOpcode() == Opcodes.LCONST_1)
             return true;
-        if(ain instanceof LdcInsnNode)
-        {
-            LdcInsnNode ldc = (LdcInsnNode)ain;
-            if(ldc.cst instanceof Long)
+        if (ain instanceof LdcInsnNode) {
+            LdcInsnNode ldc = (LdcInsnNode) ain;
+            if (ldc.cst instanceof Long)
                 return true;
         }
         return false;
     }
-    
-    public static long getLongValue(AbstractInsnNode node)
-    {
-        if(node.getOpcode() >= Opcodes.LCONST_0
+
+    public static long getLongValue(AbstractInsnNode node) {
+        if (node.getOpcode() >= Opcodes.LCONST_0
             && node.getOpcode() <= Opcodes.LCONST_1)
             return node.getOpcode() - 9;
-        if(node instanceof LdcInsnNode)
-        {
-            LdcInsnNode ldc = (LdcInsnNode)node;
-            if(ldc.cst instanceof Long)
-                return (long)ldc.cst;
+        if (node instanceof LdcInsnNode) {
+            LdcInsnNode ldc = (LdcInsnNode) node;
+            if (ldc.cst instanceof Long)
+                return (long) ldc.cst;
         }
         return 0;
     }
-    
+
     public static List<byte[]> loadBytes(File input) {
         List<byte[]> result = new ArrayList<>();
 
@@ -485,11 +480,9 @@ public class Utils {
         });
         return result;
     }
-    
-    public static int getPullValue(AbstractInsnNode ain, boolean includeShifts)
-    {
-        switch(ain.getOpcode())
-        {
+
+    public static int getPullValue(AbstractInsnNode ain, boolean includeShifts) {
+        switch (ain.getOpcode()) {
             case IALOAD:
             case LALOAD:
             case FALOAD:
@@ -521,31 +514,31 @@ public class Utils {
             case POP2:
                 return 2;
             case DUP:
-                if(includeShifts)
+                if (includeShifts)
                     return 1;
                 break;
             case DUP_X1:
-                if(includeShifts)
+                if (includeShifts)
                     return 1;
                 break;
             case DUP_X2:
-                if(includeShifts)
+                if (includeShifts)
                     return 1;
                 break;
             case DUP2:
-                if(includeShifts)
+                if (includeShifts)
                     return 2;
                 break;
             case DUP2_X1:
-                if(includeShifts)
+                if (includeShifts)
                     return 2;
                 break;
             case DUP2_X2:
-                if(includeShifts)
+                if (includeShifts)
                     return 2;
                 break;
             case SWAP:
-                if(includeShifts)
+                if (includeShifts)
                     return 2;
                 break;
             case IADD:
@@ -639,15 +632,15 @@ public class Utils {
             case DRETURN:
                 return 2;
             case PUTSTATIC:
-                if(Type.getType(((FieldInsnNode)ain).desc).getSort() == Type.LONG
-                || Type.getType(((FieldInsnNode)ain).desc).getSort() == Type.DOUBLE)
+                if (Type.getType(((FieldInsnNode) ain).desc).getSort() == Type.LONG
+                    || Type.getType(((FieldInsnNode) ain).desc).getSort() == Type.DOUBLE)
                     return 2;
                 return 1;
             case GETFIELD:
                 return 1;
             case PUTFIELD:
-                if(Type.getType(((FieldInsnNode)ain).desc).getSort() == Type.LONG
-                || Type.getType(((FieldInsnNode)ain).desc).getSort() == Type.DOUBLE)
+                if (Type.getType(((FieldInsnNode) ain).desc).getSort() == Type.LONG
+                    || Type.getType(((FieldInsnNode) ain).desc).getSort() == Type.DOUBLE)
                     return 3;
                 return 2;
             case INVOKESTATIC:
@@ -655,21 +648,23 @@ public class Utils {
             case INVOKEINTERFACE:
             case INVOKESPECIAL:
                 int args = 0;
-                if(ain.getOpcode() != Opcodes.INVOKESTATIC)
+                if (ain.getOpcode() != Opcodes.INVOKESTATIC)
                     args++;
-                for(Type t : Type.getArgumentTypes((((MethodInsnNode)ain).desc)))
-                    if(t.getSort() == Type.LONG || t.getSort() == Type.DOUBLE)
+                for (Type t : Type.getArgumentTypes((((MethodInsnNode) ain).desc))) {
+                    if (t.getSort() == Type.LONG || t.getSort() == Type.DOUBLE)
                         args += 2;
                     else
                         args++;
+                }
                 return args;
             case INVOKEDYNAMIC:
                 int args1 = 0;
-                for(Type t : Type.getArgumentTypes((((InvokeDynamicInsnNode)ain).desc)))
-                    if(t.getSort() == Type.LONG || t.getSort() == Type.DOUBLE)
+                for (Type t : Type.getArgumentTypes((((InvokeDynamicInsnNode) ain).desc))) {
+                    if (t.getSort() == Type.LONG || t.getSort() == Type.DOUBLE)
                         args1 += 2;
                     else
                         args1++;
+                }
                 return args1;
             case NEWARRAY:
             case ANEWARRAY:
@@ -683,7 +678,7 @@ public class Utils {
             case IFNONNULL:
                 return 1;
             case MULTIANEWARRAY:
-                return ((MultiANewArrayInsnNode)ain).dims;
+                return ((MultiANewArrayInsnNode) ain).dims;
         }
         return 0;
     }

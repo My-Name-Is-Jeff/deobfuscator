@@ -24,39 +24,37 @@ import java.util.regex.PatternSyntaxException;
 import com.javadeobfuscator.deobfuscator.config.*;
 import com.javadeobfuscator.deobfuscator.transformers.*;
 
-public class InvalidClassRemover extends Transformer<TransformerConfig> 
-{
+public class InvalidClassRemover extends Transformer<TransformerConfig> {
     @Override
-    public boolean transform()
-    {
+    public boolean transform() {
         System.out.println("[Special] [InvalidClassRemover] Starting");
         List<Pattern> patterns = new ArrayList<>();
-        if(getDeobfuscator().getConfig().getIgnoredClasses() != null)
-        for (String ignored : getDeobfuscator().getConfig().getIgnoredClasses()) {
-            Pattern pattern;
-            try {
-                pattern = Pattern.compile(ignored);
-            } catch (PatternSyntaxException e) {
-                logger.error("Error while compiling pattern for ignore statement {}", ignored, e);
-                continue;
+        if (getDeobfuscator().getConfig().getIgnoredClasses() != null)
+            for (String ignored : getDeobfuscator().getConfig().getIgnoredClasses()) {
+                Pattern pattern;
+                try {
+                    pattern = Pattern.compile(ignored);
+                } catch (PatternSyntaxException e) {
+                    logger.error("Error while compiling pattern for ignore statement {}", ignored, e);
+                    continue;
+                }
+                patterns.add(pattern);
             }
-            patterns.add(pattern);
-        }
         int before = getDeobfuscator().getInputPassthrough().size();
         getDeobfuscator().getInputPassthrough().entrySet().removeIf(e -> e.getKey().endsWith(".class")
-            && !hasClass(e.getKey(), patterns));
+                                                                         && !hasClass(e.getKey(), patterns));
         int after = getDeobfuscator().getInputPassthrough().size();
         System.out.println("[Special] [InvalidClassRemover] Removed " + (before - after) + " classes");
         return before - after > 0;
     }
-    
-    private boolean hasClass(String name, List<Pattern> patterns)
-    {
+
+    private boolean hasClass(String name, List<Pattern> patterns) {
         int start = name.lastIndexOf(".class");
         String newName = name.substring(0, start);
-        for(Pattern pattern : patterns)
-            if(pattern.matcher(newName).find())
+        for (Pattern pattern : patterns) {
+            if (pattern.matcher(newName).find())
                 return true;
+        }
         return false;
     }
 }

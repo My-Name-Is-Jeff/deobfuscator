@@ -107,7 +107,7 @@ public class StringEncryptionTransformer extends Transformer<TransformerConfig> 
                                     } else {
                                         continue insns;
                                     }
-                                }else if(child0 instanceof DupFrame)
+                                } else if (child0 instanceof DupFrame)
                                     localRemove.add(result.getMapping().get(child0));
                             }
                             args.add(obj);

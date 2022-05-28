@@ -50,19 +50,20 @@ public class ConstantPropagatingSourceFinder extends SourceFinderConsumer {
                 instructions.add(now);
                 SourceResult bres = SourceFinder.findSource(methodNode, frames, instructions, this, now, curFrame.getStack(curFrame.getStackSize() - 2));
                 SourceResult ares = SourceFinder.findSource(methodNode, frames, instructions, this, now, curFrame.getStack(curFrame.getStackSize() - 1));
-                if (bres.isUnknown() || ares.isUnknown()) return SourceResult.unknown();
+                if (bres.isUnknown() || ares.isUnknown())
+                    return SourceResult.unknown();
                 if (!bres.getExceptions().isEmpty() || !ares.getExceptions().isEmpty())
                     return SourceResult.unknown(); // todo maybe we should merge this?
                 if (bres.getValues().size() != ares.getValues().size())
                     throw new RuntimeException("unexpected different size of values " + bres + " " + ares);
 
-//                System.out.println("got " + TransformerHelper.insnToString(now) + " " + bres + " " + ares);
+                //                System.out.println("got " + TransformerHelper.insnToString(now) + " " + bres + " " + ares);
                 List<Object> values = new ArrayList<>();
                 List<ExceptionHolder> exceptions = new ArrayList<>();
                 for (int i = 0; i < ares.getValues().size(); i++) {
                     int b = (int) bres.getValues().get(i);
                     int a = (int) ares.getValues().get(i);
-//                    System.out.println("got " + TransformerHelper.insnToString(now) + " " + b + " " + a);
+                    //                    System.out.println("got " + TransformerHelper.insnToString(now) + " " + b + " " + a);
                     switch (now.getOpcode()) {
                         case IADD: {
                             values.add(b + a);
@@ -77,13 +78,17 @@ public class ConstantPropagatingSourceFinder extends SourceFinderConsumer {
                             break;
                         }
                         case IDIV: {
-                            if (a == 0) exceptions.add(new ExceptionHolder("java/lang/ArithmeticException"));
-                            else values.add(b / a);
+                            if (a == 0)
+                                exceptions.add(new ExceptionHolder("java/lang/ArithmeticException"));
+                            else
+                                values.add(b / a);
                             break;
                         }
                         case IREM: {
-                            if (a == 0) exceptions.add(new ExceptionHolder("java/lang/ArithmeticException"));
-                            else values.add(b % a);
+                            if (a == 0)
+                                exceptions.add(new ExceptionHolder("java/lang/ArithmeticException"));
+                            else
+                                values.add(b % a);
                             break;
                         }
                         case IAND: {
@@ -117,7 +122,7 @@ public class ConstantPropagatingSourceFinder extends SourceFinderConsumer {
                 }
                 return new SourceResult(values, exceptions);
             }
-            case DUP2: 
+            case DUP2:
             case SWAP: {
                 instructions.add(now);
                 if (getStackOffset(sourceFrame, want) == sourceFrame.getStackSize() - 1) {

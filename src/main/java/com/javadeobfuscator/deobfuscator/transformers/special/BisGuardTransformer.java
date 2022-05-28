@@ -39,23 +39,20 @@ import com.javadeobfuscator.javavm.mirrors.JavaClass;
 import com.javadeobfuscator.javavm.utils.ArrayConversionHelper;
 import com.javadeobfuscator.javavm.values.JavaWrapper;
 
-public class BisGuardTransformer extends Transformer<TransformerConfig> 
-{
+public class BisGuardTransformer extends Transformer<TransformerConfig> {
     @Override
-    public boolean transform() throws WrongTransformerException
-    {
+    public boolean transform() throws WrongTransformerException {
         VirtualMachine vm = TransformerHelper.newVirtualMachine(this);
         AtomicInteger count = new AtomicInteger();
         System.out.println("[Special] [BisGuardTransformer] Starting");
         ClassNode loader = classNodes().stream().filter(c -> c.name.equals("JavaPreloader")).findFirst().orElse(null);
         MethodNode getCipher = loader == null ? null : loader.methods.stream().filter(m -> m.name.equals("getCipher")
-            && m.desc.equals("([B)LJavaPreloader$Cipher;")).findFirst().orElse(null);
+                                                                                           && m.desc.equals("([B)LJavaPreloader$Cipher;")).findFirst().orElse(null);
         ClassNode cipher = classNodes().stream().filter(c -> c.name.equals("JavaPreloader$Cipher")).findFirst().orElse(null);
         MethodNode decrypt = cipher == null ? null : cipher.methods.stream().filter(m -> m.name.equals("decrypt")
-            && m.desc.equals("([B)V")).findFirst().orElse(null);
-        if(getCipher != null && decrypt != null)
-        {
-            MethodNode init = new MethodNode(Opcodes.ACC_PUBLIC, "<init>", "(I)V", null, null); 
+                                                                                         && m.desc.equals("([B)V")).findFirst().orElse(null);
+        if (getCipher != null && decrypt != null) {
+            MethodNode init = new MethodNode(Opcodes.ACC_PUBLIC, "<init>", "(I)V", null, null);
             init.instructions.add(new VarInsnNode(Opcodes.ALOAD, 0));
             init.instructions.add(new MethodInsnNode(Opcodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false));
             init.instructions.add(new InsnNode(Opcodes.RETURN));
@@ -63,11 +60,10 @@ public class BisGuardTransformer extends Transformer<TransformerConfig>
             JavaWrapper instance = vm.newInstance(JavaClass.forName(vm, "JavaPreloader"), "(I)V", vm.newInt(0));
             loader.methods.remove(init);
             MethodExecution cipherInstance = vm.execute(loader, getCipher, instance, Collections.<JavaWrapper>singletonList(
-                vm.getNull()));
+                    vm.getNull()));
             boolean contains = getDeobfuscator().getInputPassthrough().containsKey("JavaSerialNo.class");
             byte[] decryptionKey = null;
-            if(contains)
-            {
+            if (contains) {
                 byte[] data = getDeobfuscator().getInputPassthrough().get("JavaSerialNo.class");
                 JavaWrapper byteArr = ArrayConversionHelper.convertByteArray(vm, data);
                 vm.execute(cipher, decrypt, cipherInstance.getReturnValue(), Collections.<JavaWrapper>singletonList(byteArr));
@@ -81,25 +77,23 @@ public class BisGuardTransformer extends Transformer<TransformerConfig>
                 //Convert to decryption key
                 MethodNode hex2Bytes = loader.methods.stream().filter(m -> m.name.equals("hexToBytes")).findFirst().orElse(null);
                 MethodExecution execution2 = vm.execute(loader, hex2Bytes, instance, Collections.<JavaWrapper>singletonList(
-                    vm.getString(res)));
+                        vm.getString(res)));
                 cipherInstance = vm.execute(loader, getCipher, instance, Collections.<JavaWrapper>singletonList(
-                    vm.getNull()));
+                        vm.getNull()));
                 decryptionKey = ArrayConversionHelper.convertByteArray(execution2.getReturnValue().asArray());
                 JavaWrapper byteArr1 = ArrayConversionHelper.convertByteArray(vm, decryptionKey);
                 vm.execute(cipher, decrypt, cipherInstance.getReturnValue(), Collections.<JavaWrapper>singletonList(byteArr1));
                 decryptionKey = ArrayConversionHelper.convertByteArray(byteArr1.asArray());
                 cipherInstance = vm.execute(loader, getCipher, instance, Collections.<JavaWrapper>singletonList(
-                    ArrayConversionHelper.convertByteArray(vm, decryptionKey)));
+                        ArrayConversionHelper.convertByteArray(vm, decryptionKey)));
             }
             Map<String, byte[]> decrypted = new HashMap<>();
-            for(Entry<String, byte[]> passthrough : getDeobfuscator().getInputPassthrough().entrySet())
-                if(passthrough.getKey().endsWith(".class"))
-                {
+            for (Entry<String, byte[]> passthrough : getDeobfuscator().getInputPassthrough().entrySet()) {
+                if (passthrough.getKey().endsWith(".class")) {
                     byte[] data = passthrough.getValue();
-                    if(data[0] != -54 || data[1] != -2 || data[2] != -70 || data[3] != -66)
-                    {
+                    if (data[0] != -54 || data[1] != -2 || data[2] != -70 || data[3] != -66) {
                         cipherInstance = vm.execute(loader, getCipher, instance, Collections.<JavaWrapper>singletonList(
-                            decryptionKey == null ? vm.getNull() : ArrayConversionHelper.convertByteArray(vm, decryptionKey)));
+                                decryptionKey == null ? vm.getNull() : ArrayConversionHelper.convertByteArray(vm, decryptionKey)));
                         JavaWrapper byteArr = ArrayConversionHelper.convertByteArray(vm, data);
                         vm.execute(cipher, decrypt, cipherInstance.getReturnValue(), Collections.<JavaWrapper>singletonList(byteArr));
                         byte[] b = ArrayConversionHelper.convertByteArray(byteArr.asArray());
@@ -107,34 +101,34 @@ public class BisGuardTransformer extends Transformer<TransformerConfig>
                         count.getAndIncrement();
                     }
                 }
-            for(Entry<String, byte[]> entry : decrypted.entrySet())
-            {
+            }
+            for (Entry<String, byte[]> entry : decrypted.entrySet()) {
                 getDeobfuscator().getInputPassthrough().remove(entry.getKey());
                 getDeobfuscator().loadInput(entry.getKey(), entry.getValue());
             }
             //Delete all class files related to encryption
             classNodes().removeIf(c -> c.name.equals("JavaPreloader$1") || c.name.equals("JavaPreloader$2")
-                || c.name.equals("JavaPreloader$3") || c.name.equals("JavaPreloader$Cipher")
-                || c.name.equals("JavaPreloader$KlassLoader") || c.name.equals("JavaPreloader$Loader")
-                || c.name.equals("JavaPreloader$Protected") || c.name.equals("JavaPreloader")
-                || c.name.equals("JavaSerialNo")  || c.name.equals("SerialNoClass")
-                || c.name.equals("com/bisguard/utils/Authenticator"));
+                                       || c.name.equals("JavaPreloader$3") || c.name.equals("JavaPreloader$Cipher")
+                                       || c.name.equals("JavaPreloader$KlassLoader") || c.name.equals("JavaPreloader$Loader")
+                                       || c.name.equals("JavaPreloader$Protected") || c.name.equals("JavaPreloader")
+                                       || c.name.equals("JavaSerialNo") || c.name.equals("SerialNoClass")
+                                       || c.name.equals("com/bisguard/utils/Authenticator"));
             //Set Main-Class to Subordinate-Class
             String realMain = null;
             int index = -1;
             String[] lines = new String(getDeobfuscator().getInputPassthrough().get("META-INF/MANIFEST.MF")).split("\n");
-            for(int i = 0; i < lines.length; i++)
-            {
+            for (int i = 0; i < lines.length; i++) {
                 String line = lines[i];
-                if(line.startsWith("Subordinate-Class: "))
+                if (line.startsWith("Subordinate-Class: "))
                     realMain = line.replace("Subordinate-Class: ", "");
-                else if(line.startsWith("Main-Class: "))
+                else if (line.startsWith("Main-Class: "))
                     index = i;
             }
             lines[index] = "Main-Class: " + realMain;
             String res = "";
-            for(String line : lines)
+            for (String line : lines) {
                 res += line + "\n";
+            }
             res = res.substring(0, res.length() - 2);
             getDeobfuscator().getInputPassthrough().put("META-INF/MANIFEST.MF", res.getBytes());
         }

@@ -31,6 +31,7 @@ public class JavaLong extends JavaValue {
     public JavaLong copy() {
         return new JavaLong(value);
     }
+
     public String toString() {
         return "JavaLong(value=" + value + ")";
     }

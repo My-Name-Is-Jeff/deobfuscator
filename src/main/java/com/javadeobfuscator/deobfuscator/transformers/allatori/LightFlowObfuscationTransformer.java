@@ -17,9 +17,8 @@ import com.javadeobfuscator.deobfuscator.executor.providers.DelegatingProvider;
 import com.javadeobfuscator.deobfuscator.transformers.Transformer;
 import com.javadeobfuscator.deobfuscator.utils.Utils;
 
-public class LightFlowObfuscationTransformer extends Transformer<TransformerConfig> 
-{
-    @Override 
+public class LightFlowObfuscationTransformer extends Transformer<TransformerConfig> {
+    @Override
     public boolean transform() throws Throwable {
         DelegatingProvider provider = new DelegatingProvider();
         provider.register(new JVMMethodProvider());
@@ -30,16 +29,14 @@ public class LightFlowObfuscationTransformer extends Transformer<TransformerConf
         AtomicInteger fixed = new AtomicInteger();
 
         System.out.println("[Allatori] [LightFlowObfuscationTransformer] Starting");
-        for(ClassNode classNode : classNodes())
-            for(MethodNode method : classNode.methods)
-            {
+        for (ClassNode classNode : classNodes()) {
+            for (MethodNode method : classNode.methods) {
                 boolean modified;
-                do
-                {
+                do {
                     modified = false;
-                    for(AbstractInsnNode ain : method.instructions.toArray())
-                        if((willPush(ain) || ain.getOpcode() == Opcodes.DUP) && ain.getNext() != null 
-                        && (willPush(ain.getNext()) || ain.getNext().getOpcode() == Opcodes.DUP)
+                    for (AbstractInsnNode ain : method.instructions.toArray()) {
+                        if ((willPush(ain) || ain.getOpcode() == Opcodes.DUP) && ain.getNext() != null
+                            && (willPush(ain.getNext()) || ain.getNext().getOpcode() == Opcodes.DUP)
                             && ain.getNext().getNext() != null && ain.getNext().getNext().getOpcode() == Opcodes.POP2)
                         {
                             method.instructions.remove(ain.getNext().getNext());
@@ -48,18 +45,19 @@ public class LightFlowObfuscationTransformer extends Transformer<TransformerConf
                             modified = true;
                             fixed.incrementAndGet();
                         }
-                }while(modified);
+                    }
+                } while (modified);
             }
+        }
         System.out.println("[Allatori] [LightFlowObfuscationTransformer] Removed " + fixed + " dead instructions");
         System.out.println("[Allatori] [LightFlowObfuscationTransformer] Done");
         return fixed.get() > 0;
     }
-    
-    private boolean willPush(AbstractInsnNode ain)
-    {
-        if(ain.getOpcode() == Opcodes.LDC && (((LdcInsnNode)ain).cst instanceof Long || ((LdcInsnNode)ain).cst instanceof Double))
+
+    private boolean willPush(AbstractInsnNode ain) {
+        if (ain.getOpcode() == Opcodes.LDC && (((LdcInsnNode) ain).cst instanceof Long || ((LdcInsnNode) ain).cst instanceof Double))
             return false;
         return Utils.willPushToStack(ain.getOpcode()) && ain.getOpcode() != Opcodes.GETSTATIC
-            && ain.getOpcode() != Opcodes.LLOAD && ain.getOpcode() != Opcodes.DLOAD;
+               && ain.getOpcode() != Opcodes.LLOAD && ain.getOpcode() != Opcodes.DLOAD;
     }
 }

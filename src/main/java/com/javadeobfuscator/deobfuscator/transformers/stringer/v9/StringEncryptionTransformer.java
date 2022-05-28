@@ -33,19 +33,19 @@ public class StringEncryptionTransformer extends Transformer<TransformerConfig> 
     public boolean transform() throws Throwable {
         VirtualMachine vm = TransformerHelper.newVirtualMachine(this);
 
-//        vm.beforeCallHooks.add(info -> {
-//            if (!info.is("java/lang/Class", "forName0", "(Ljava/lang/String;ZLjava/lang/ClassLoader;Ljava/lang/Class;)Ljava/lang/Class;")) {
-//                return;
-//            }
-//            List<StackTraceHolder> stacktrace = vm.getStacktrace();
-//            if (stacktrace.size() < 3) {
-//                return;
-//            }
-//            if (!classes.containsKey(stacktrace.get(2).getClassNode().name)) {
-//                return;
-//            }
-//            info.getParams().set(1, vm.newBoolean(false));
-//        });
+        //        vm.beforeCallHooks.add(info -> {
+        //            if (!info.is("java/lang/Class", "forName0", "(Ljava/lang/String;ZLjava/lang/ClassLoader;Ljava/lang/Class;)Ljava/lang/Class;")) {
+        //                return;
+        //            }
+        //            List<StackTraceHolder> stacktrace = vm.getStacktrace();
+        //            if (stacktrace.size() < 3) {
+        //                return;
+        //            }
+        //            if (!classes.containsKey(stacktrace.get(2).getClassNode().name)) {
+        //                return;
+        //            }
+        //            info.getParams().set(1, vm.newBoolean(false));
+        //        });
 
         int decrypted = 0;
 

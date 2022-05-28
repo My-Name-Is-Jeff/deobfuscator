@@ -43,9 +43,10 @@ public class StringEncryptionClassFinder implements ClassFinder {
                 boolean foundInit = false;
                 for (MethodNode methodNode : classNode.methods) {
                     if (methodNode.desc.equals("(ILjava/lang/Object;)V") &&
-                            Modifier.isFinal(methodNode.access) &&
-                            Modifier.isPrivate(methodNode.access) &&
-                            Modifier.isStatic(methodNode.access)) {
+                        Modifier.isFinal(methodNode.access) &&
+                        Modifier.isPrivate(methodNode.access) &&
+                        Modifier.isStatic(methodNode.access))
+                    {
                         foundInit = true;
                     }
                 }

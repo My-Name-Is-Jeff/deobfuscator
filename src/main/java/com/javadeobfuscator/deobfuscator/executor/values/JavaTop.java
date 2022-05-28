@@ -20,6 +20,7 @@ public class JavaTop extends JavaValue {
     public JavaTop copy() {
         return new JavaTop();
     }
+
     public String toString() {
         return "JavaTop()";
     }

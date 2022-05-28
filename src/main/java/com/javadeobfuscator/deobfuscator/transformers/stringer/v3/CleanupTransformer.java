@@ -41,13 +41,13 @@ public class CleanupTransformer extends Transformer<CleanupTransformer.Config> {
     }
 
     private void cleanupResourceEncryption() {
-        if (!getConfig().cleanupResourceEncryption) return;
-
-
+        if (!getConfig().cleanupResourceEncryption)
+            return;
     }
 
     private void cleanupHideAccessClasses() {
-        if (!getConfig().cleanupHideAccess) return;
+        if (!getConfig().cleanupHideAccess)
+            return;
 
         Set<String> remove = new HideAccessClassFinder().findNames(classes.values());
         remove.forEach(classes::remove);
@@ -55,7 +55,8 @@ public class CleanupTransformer extends Transformer<CleanupTransformer.Config> {
     }
 
     private void cleanupStringEncryptionClasses() {
-        if (!getConfig().cleanupStringEncryption) return;
+        if (!getConfig().cleanupStringEncryption)
+            return;
 
         Set<String> remove = new StringEncryptionClassFinder().findNames(classes.values());
         remove.forEach(classes::remove);
@@ -63,7 +64,8 @@ public class CleanupTransformer extends Transformer<CleanupTransformer.Config> {
     }
 
     private void cleanupInvokedynamic() {
-        if (!getConfig().cleanupInvokedynamic) return;
+        if (!getConfig().cleanupInvokedynamic)
+            return;
 
         Map<ClassNode, Set<MethodNode>> remove = new InvokedynamicMethodFinder().find(classes.values());
         remove.forEach((c, m) -> c.methods.removeAll(m));

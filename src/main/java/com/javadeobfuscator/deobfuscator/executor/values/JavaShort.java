@@ -31,6 +31,7 @@ public class JavaShort extends JavaInteger {
     public JavaShort copy() {
         return new JavaShort(value);
     }
+
     public String toString() {
         return "JavaShort(value=" + value + ")";
     }

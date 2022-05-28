@@ -55,7 +55,7 @@ public class Context { //FIXME clinit classes
         clazz = clazz.replace('/', '.');
         stackTrace.add(0, new StackTraceElement(clazz, method, "", constantPoolSize));
     }
-    
+
     public void push(String clazz, String method, String sourceFile, int constantPoolSize) {
         clazz = clazz.replace('/', '.');
         stackTrace.add(0, new StackTraceElement(clazz, method, sourceFile, constantPoolSize));

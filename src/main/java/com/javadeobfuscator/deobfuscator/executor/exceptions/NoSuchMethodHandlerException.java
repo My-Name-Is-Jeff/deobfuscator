@@ -18,16 +18,16 @@ package com.javadeobfuscator.deobfuscator.executor.exceptions;
 
 public class NoSuchMethodHandlerException extends NoSuchHandlerException {
     private boolean isThrownFromInvoke;
-    
+
     public NoSuchMethodHandlerException(String msg) {
         super(msg);
     }
-    
+
     public NoSuchMethodHandlerException setThrownFromInvoke(boolean isThrownFromExe) {
         this.isThrownFromInvoke = isThrownFromExe;
         return this;
     }
-    
+
     public boolean isThrownFromInvoke() {
         return isThrownFromInvoke;
     }

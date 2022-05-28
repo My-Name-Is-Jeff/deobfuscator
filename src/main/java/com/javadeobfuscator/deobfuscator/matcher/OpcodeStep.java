@@ -33,7 +33,7 @@ public class OpcodeStep implements Step {
             this.wantOpcodes.add(opcode);
         }
     }
-    
+
     public OpcodeStep(int... opcodes) {
         this.wantOpcodes = new ArrayList<>();
         for (int opcode : opcodes) {
@@ -52,7 +52,7 @@ public class OpcodeStep implements Step {
     @Override
     public String toString() {
         return "OpcodeStep{" +
-                "wantOpcodes=" + wantOpcodes +
-                '}';
+               "wantOpcodes=" + wantOpcodes +
+               '}';
     }
 }

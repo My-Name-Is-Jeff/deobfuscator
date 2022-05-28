@@ -126,10 +126,8 @@ public class MethodNormalizer extends AbstractNormalizer<MethodNormalizer.Config
                     Type elementType = methodType.getElementType();
                     int layers = 1;
                     AtomicBoolean passed = new AtomicBoolean();
-                    while(true)
-                    {
-                        if(passed.get())
-                        {
+                    while (true) {
+                        if (passed.get()) {
                             layers++;
                             passed.set(false);
                         }
@@ -145,17 +143,18 @@ public class MethodNormalizer extends AbstractNormalizer<MethodNormalizer.Config
                                     Type otherType = Type.getMethodType(method.desc);
                                     if (methodNode.name.equals(method.name) && Arrays.equals(thisType.getArgumentTypes(), otherType.getArgumentTypes())) {
                                         Type otherEleType = otherType.getReturnType();
-                                        if(toTryParent.contains(node.name) && otherEleType.getSort() == Type.OBJECT
+                                        if (toTryParent.contains(node.name) && otherEleType.getSort() == Type.OBJECT
                                             && otherEleType.getInternalName().equals("java/lang/Object"))
                                         {
                                             //Passed (superclass has Object return)
                                             allMethodNodes.put(new AbstractMap.SimpleEntry<>(node, equalsMethod), true);
                                             break;
                                         }
-                                        if(otherEleType.getSort() != Type.ARRAY || otherEleType.getDimensions() < layersF)
+                                        if (otherEleType.getSort() != Type.ARRAY || otherEleType.getDimensions() < layersF)
                                             break;
-                                        for(int i = 0; i < layersF; i++)
+                                        for (int i = 0; i < layersF; i++) {
                                             otherEleType = otherEleType.getElementType();
+                                        }
                                         if (otherEleType.getSort() == Type.OBJECT) {
                                             foundSimilar = true;
                                             String child = otherEleType.getInternalName();
@@ -163,7 +162,8 @@ public class MethodNormalizer extends AbstractNormalizer<MethodNormalizer.Config
                                             this.getDeobfuscator().assureLoaded(child);
                                             if ((toTryChild.contains(node.name) && this.getDeobfuscator().isSubclass(parent, child))
                                                 || (toTryParent.contains(node.name) && this.getDeobfuscator().isSubclass(child, parent))
-                                                || child.equals(parent)) {
+                                                || child.equals(parent))
+                                            {
                                                 equals = true;
                                                 equalsMethod = method;
                                             }
@@ -189,17 +189,18 @@ public class MethodNormalizer extends AbstractNormalizer<MethodNormalizer.Config
                                     if (methodNode.name.equals(method.name) && Arrays.equals(thisType.getArgumentTypes(), otherType.getArgumentTypes())) {
                                         foundSimilar = true;
                                         Type otherEleType = otherType.getReturnType();
-                                        if(toTryParent.contains(node.name) && otherEleType.getSort() == Type.OBJECT
+                                        if (toTryParent.contains(node.name) && otherEleType.getSort() == Type.OBJECT
                                             && otherEleType.getInternalName().equals("java/lang/Object"))
                                         {
                                             //Passed (superclass has Object return)
                                             allMethodNodes.put(new AbstractMap.SimpleEntry<>(node, equalsMethod), true);
                                             break;
                                         }
-                                        if(otherEleType.getSort() != Type.ARRAY || otherEleType.getDimensions() < layersF)
+                                        if (otherEleType.getSort() != Type.ARRAY || otherEleType.getDimensions() < layersF)
                                             break;
-                                        for(int i = 0; i < layersF; i++)
+                                        for (int i = 0; i < layersF; i++) {
                                             otherEleType = otherEleType.getElementType();
+                                        }
                                         if (elementType.getSort() == otherEleType.getSort()) {
                                             equals = true;
                                             equalsMethod = method;
@@ -222,20 +223,20 @@ public class MethodNormalizer extends AbstractNormalizer<MethodNormalizer.Config
                                     Type otherType = Type.getMethodType(method.desc);
                                     if (methodNode.name.equals(method.name) && Arrays.equals(thisType.getArgumentTypes(), otherType.getArgumentTypes())) {
                                         Type otherEleType = otherType.getReturnType();
-                                        for(int i = 0; i < layersF; i++)
+                                        for (int i = 0; i < layersF; i++) {
                                             otherEleType = otherEleType.getElementType();
-                                        if (otherEleType.getSort() == Type.ARRAY)
-                                        {
+                                        }
+                                        if (otherEleType.getSort() == Type.ARRAY) {
                                             //Continue checking element
                                             passed.set(true);
                                             continue;
-                                        }else if(toTryParent.contains(node.name) && otherEleType.getSort() == Type.OBJECT
-                                            && otherEleType.getInternalName().equals("java/lang/Object"))
+                                        } else if (toTryParent.contains(node.name) && otherEleType.getSort() == Type.OBJECT
+                                                   && otherEleType.getInternalName().equals("java/lang/Object"))
                                         {
                                             //Passed (superclass has Object return)
                                             allMethodNodes.put(new AbstractMap.SimpleEntry<>(node, equalsMethod), true);
                                             break;
-                                        }else
+                                        } else
                                             //Fail
                                             break;
                                     }
@@ -260,12 +261,13 @@ public class MethodNormalizer extends AbstractNormalizer<MethodNormalizer.Config
                                     this.getDeobfuscator().assureLoaded(child);
                                     if ((toTryChild.contains(node.name) && this.getDeobfuscator().isSubclass(parent, child))
                                         || (toTryParent.contains(node.name) && this.getDeobfuscator().isSubclass(child, parent))
-                                        || child.equals(parent)) {
+                                        || child.equals(parent))
+                                    {
                                         equals = true;
                                         equalsMethod = method;
                                     }
-                                }else if (parent.equals("java/lang/Object")
-                                    && toTryChild.contains(node.name) && otherType.getSort() == Type.ARRAY)
+                                } else if (parent.equals("java/lang/Object")
+                                           && toTryChild.contains(node.name) && otherType.getSort() == Type.ARRAY)
                                 {
                                     //Arrays extend object
                                     foundSimilar = true;

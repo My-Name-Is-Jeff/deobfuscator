@@ -32,8 +32,8 @@ public class RuleEnhancedStringEncryption implements Rule, Opcodes {
     @Override
     public String getDescription() {
         return "Zelix Klassmaster has several modes of string encryption. " +
-                "This mode is similar to the simple mode, but adds an additional layer of decryption by " +
-                "calling a method with signature (II)Ljava/lang/String;";
+               "This mode is similar to the simple mode, but adds an additional layer of decryption by " +
+               "calling a method with signature (II)Ljava/lang/String;";
     }
 
     @Override

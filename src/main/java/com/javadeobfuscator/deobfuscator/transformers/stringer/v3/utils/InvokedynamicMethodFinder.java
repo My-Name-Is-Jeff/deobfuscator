@@ -32,9 +32,10 @@ public class InvokedynamicMethodFinder implements MethodFinder {
             Set<MethodNode> remove = new HashSet<>();
             for (MethodNode methodNode : classNode.methods) {
                 if (Modifier.isPrivate(methodNode.access)
-                        && Modifier.isStatic(methodNode.access)
-                        && methodNode.desc.equals("(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;")
-                        && methodNode.name.length() == 2) {
+                    && Modifier.isStatic(methodNode.access)
+                    && methodNode.desc.equals("(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;")
+                    && methodNode.name.length() == 2)
+                {
                     remove.add(methodNode);
                 }
             }
